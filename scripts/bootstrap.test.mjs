@@ -23,3 +23,10 @@ test("refuses to create credentials outside local/ci", () => {
   assert.equal(r.status, 1);
   assert.match(r.stderr, /only creates local credentials/);
 });
+
+test("license gate rejects copyleft and unknown licenses", async () => {
+  const { violations } = await import("./check-licenses.mjs");
+  assert.deepEqual(violations({ MIT: [{ name: "a", versions: ["1.0.0"] }] }), []);
+  assert.deepEqual(violations({ "GPL-3.0": [{ name: "g", versions: ["2.0.0"] }], Unknown: [{ name: "u", versions: ["0.1.0"] }] }),
+    ["g@2.0.0: GPL-3.0", "u@0.1.0: Unknown"]);
+});
