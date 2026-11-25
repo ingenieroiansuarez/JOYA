@@ -4,7 +4,8 @@ export type Tab = "boutique" | "design" | "favorites" | "profile";
 export const TABS: Tab[] = ["boutique", "design", "favorites", "profile"];
 export type Route =
   | { name: "catalog" } | { name: "favorites" } | { name: "profile" } | { name: "product"; id: string }
-  | { name: "designs" } | { name: "newDesign" } | { name: "editor"; id: string };
+  | { name: "designs" } | { name: "newDesign" } | { name: "editor"; id: string }
+  | { name: "quote"; revisionId: string } | { name: "order"; id: string };
 export interface NavState { tab: Tab; stacks: Record<Tab, Route[]> }
 export type NavAction = { type: "tab"; tab: Tab } | { type: "push"; route: Route } | { type: "replace"; route: Route } | { type: "back" };
 
