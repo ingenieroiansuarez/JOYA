@@ -1,0 +1,66 @@
+{
+  "$comment": "Where each state machine is stored and exposed. machines.json is the source of truth; tools/contracts/check_contracts.py fails CI when SQL or OpenAPI drift from it. null = not modelled yet (record the milestone that adds it).",
+  "$unboundStateProperties": {
+    "Result": "generic command result reused by many operations; replace with per-operation schemas before clients are generated",
+    "Task": "work_task has no state machine yet (17_MANUFACTURING/WORKSHOP.md); define it with the workshop slice, hito 700"
+  },
+  "Design": {
+    "sql": "revision.state",
+    "openapi": "DesignState"
+  },
+  "Quote": {
+    "sql": "quote.state",
+    "openapi": "QuoteState"
+  },
+  "Payment": {
+    "sql": "payment.state",
+    "openapi": "PaymentState"
+  },
+  "Reservation": {
+    "sql": "reservation.state",
+    "openapi": "ReservationState"
+  },
+  "WorkOrder": {
+    "sql": "work_order.state",
+    "openapi": "WorkOrderState"
+  },
+  "Order": {
+    "sql": "sales_order.state",
+    "openapi": "OrderState"
+  },
+  "Job": {
+    "sql": null,
+    "openapi": "JobState",
+    "pending": "job table: hito 100 backend bootstrap"
+  },
+  "Certificate": {
+    "sql": null,
+    "openapi": "CertificateState",
+    "pending": "certificate table: milestone to be defined"
+  },
+  "Shipment": {
+    "sql": null,
+    "openapi": null,
+    "pending": "logistics tables: milestone to be defined (likely 500 or 700)"
+  },
+  "Custody": {
+    "sql": null,
+    "openapi": null,
+    "pending": "custody tables: hito 700 (inventory/custody)"
+  },
+  "Service": {
+    "sql": null,
+    "openapi": null,
+    "pending": "service tables: milestone to be defined"
+  },
+  "Warranty": {
+    "sql": null,
+    "openapi": null,
+    "pending": "warranty tables: hito 800 (warranty)"
+  },
+  "PurchaseOrder": {
+    "sql": null,
+    "openapi": null,
+    "pending": "purchasing tables: hito 700 (procurement)"
+  }
+}
