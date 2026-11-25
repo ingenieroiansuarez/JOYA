@@ -20,8 +20,12 @@ export function webConfig(env: NodeJS.ProcessEnv = process.env): WebConfig {
   if (env.WEB_SESSION_SECRET!.length < 32) throw new WebConfigError("WEB_SESSION_SECRET must be at least 32 characters");
   const origin = (env.WEB_ORIGIN ?? "http://127.0.0.1:3100").replace(/\/$/, "");
   const apiUrl = (env.AUREA_API_URL ?? `http://127.0.0.1:${env.API_PORT ?? 3000}/v1`).replace(/\/$/, "");
-  const prodLike = env.AUREA_ENV === "production" || env.AUREA_ENV === "demo";
-  if (prodLike && !origin.startsWith("https://")) throw new WebConfigError(`WEB_ORIGIN must use https in ${env.AUREA_ENV}`);
+  // Demo (hito 600) runs on the presenter's laptop: http only on loopback. Production: https only.
+  const loopback = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(origin);
+  if (env.AUREA_ENV === "production" && !origin.startsWith("https://")) throw new WebConfigError("WEB_ORIGIN must use https in production");
+  if (env.AUREA_ENV === "demo" && !origin.startsWith("https://") && !loopback) {
+    throw new WebConfigError("WEB_ORIGIN must use https in demo (plain http only on loopback)");
+  }
   return {
     issuer: env.OIDC_ISSUER!.replace(/\/$/, ""),
     clientId: env.WEB_OIDC_CLIENT_ID ?? "aurea-web",

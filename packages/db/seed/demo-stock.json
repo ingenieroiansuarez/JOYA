@@ -1,12 +1,67 @@
 {
   "synthetic": true,
-  "note": "Existencias sintéticas de demostración (hito 500): un taller y lotes de metal en gramos. Cantidades ficticias para probar reservas y falta de stock; no son inventario real. Nunca se carga en producción.",
-  "location": { "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e0001", "name": "Taller AUREA (demo)", "kind": "WORKSHOP" },
+  "note": "Existencias sintéticas de demostración (hitos 500 y 600): un taller, lotes de metal en gramos y gemas de laboratorio de catálogo en quilates, más una gema única DEMO-GEM-1. Cantidades ficticias para probar reservas y falta de stock; no son inventario real ni gemas certificadas. Nunca se carga en producción.",
+  "location": {
+    "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e0001",
+    "name": "Taller AUREA (demo)",
+    "kind": "WORKSHOP"
+  },
   "lots": [
-    { "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1001", "itemKey": "gold-18k-yellow", "label": "Oro amarillo 18k · lote demo A", "unit": "g", "onHand": "30.000" },
-    { "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1002", "itemKey": "gold-18k-white", "label": "Oro blanco 18k · lote demo A", "unit": "g", "onHand": "20.000" },
-    { "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1003", "itemKey": "gold-18k-rose", "label": "Oro rosa 18k · lote demo A", "unit": "g", "onHand": "15.000" },
-    { "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1004", "itemKey": "silver-925", "label": "Plata 925 · lote demo A", "unit": "g", "onHand": "100.000" },
-    { "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1005", "itemKey": "platinum-950", "label": "Platino 950 · lote demo A", "unit": "g", "onHand": "10.000" }
+    {
+      "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1001",
+      "itemKey": "gold-18k-yellow",
+      "label": "Oro amarillo 18k · lote demo A",
+      "unit": "g",
+      "onHand": "30.000"
+    },
+    {
+      "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1002",
+      "itemKey": "gold-18k-white",
+      "label": "Oro blanco 18k · lote demo A",
+      "unit": "g",
+      "onHand": "20.000"
+    },
+    {
+      "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1003",
+      "itemKey": "gold-18k-rose",
+      "label": "Oro rosa 18k · lote demo A",
+      "unit": "g",
+      "onHand": "15.000"
+    },
+    {
+      "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1004",
+      "itemKey": "silver-925",
+      "label": "Plata 925 · lote demo A",
+      "unit": "g",
+      "onHand": "100.000"
+    },
+    {
+      "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1005",
+      "itemKey": "platinum-950",
+      "label": "Platino 950 · lote demo A",
+      "unit": "g",
+      "onHand": "10.000"
+    },
+    {
+      "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1006",
+      "itemKey": "emerald-lab",
+      "label": "Esmeralda de laboratorio (sintética) · lote demo",
+      "unit": "ct",
+      "onHand": "12.000"
+    },
+    {
+      "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1007",
+      "itemKey": "ruby-lab",
+      "label": "Rubí de laboratorio (sintético) · lote demo",
+      "unit": "ct",
+      "onHand": "8.000"
+    },
+    {
+      "id": "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1008",
+      "itemKey": "demo-gem-1",
+      "label": "DEMO-GEM-1 · esmeralda de laboratorio 1,20 ct (gema única, ficticia)",
+      "unit": "ea",
+      "onHand": "1"
+    }
   ]
 }

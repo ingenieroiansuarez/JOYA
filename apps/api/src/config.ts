@@ -46,8 +46,10 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): Config {
     throw new ConfigError("OIDC_ISSUER is not a URL");
   }
   const loopback = ["127.0.0.1", "localhost", "[::1]"].includes(issuer.hostname);
-  if (issuer.protocol !== "https:" && !(issuer.protocol === "http:" && loopback && (env === "local" || env === "ci"))) {
-    throw new ConfigError("OIDC_ISSUER must use https (plain http only on loopback in local or ci)");
+  // Demo (hito 600) runs the whole stack on the presenter's laptop; the phone reaches it over USB
+  // (adb reverse), so loopback http never crosses a network. Production always needs https.
+  if (issuer.protocol !== "https:" && !(issuer.protocol === "http:" && loopback && env !== "production")) {
+    throw new ConfigError("OIDC_ISSUER must use https (plain http only on loopback outside production)");
   }
   if (issuer.search || issuer.hash || issuer.username) throw new ConfigError("OIDC_ISSUER must be a bare issuer URL");
   return {
