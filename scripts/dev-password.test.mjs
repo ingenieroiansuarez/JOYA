@@ -28,3 +28,10 @@ test("refuses outside local, without the key, or with shell-unsafe values, never
     assert.throws(() => plan(text), (e) => re.test(e.message) && !e.message.includes("rm -rf") && !e.message.includes(pw));
   }
 });
+
+test("--staff types dev.equipo's password, never the customer's", () => {
+  const staffPw = "b".repeat(48);
+  const both = `${env}KC_DEV_STAFF_PASSWORD=${staffPw}\n`;
+  assert.deepEqual(plan(both, { staff: true }), [["shell", "input", "text", staffPw]]);
+  assert.throws(() => plan(env, { staff: true }), (e) => /KC_DEV_STAFF_PASSWORD no está/.test(e.message) && !e.message.includes(pw));
+});
