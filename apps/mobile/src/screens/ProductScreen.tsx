@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { ApiError, type Product } from "../api";
 import { formatDecimal, formatMoney } from "../format";
 import { useSession } from "../session";
-import { Button, c, errorKey, Header, JewelIllustration, Loading, Notice, s, styles, type } from "../ui";
+import { Button, c, errorKey, fonts, hasCatalogArt, Header, JewelArt, Loading, Notice, s, styles, type } from "../ui";
 
 type State = { phase: "loading" } | { phase: "error"; error: ApiError } | { phase: "ready"; product: Product };
 
@@ -61,9 +61,11 @@ export function ProductScreen({ id, onBack }: { id: string; onBack: () => void }
   return (
     <View style={styles.screen}>
       {header}
-      <ScrollView contentContainerStyle={detail.content}>
-        <JewelIllustration metal={p.metal} stone={p.stones[0]?.type} size={280} label={t("illustration", { name: p.name })} />
-        <Text accessibilityRole="header" style={styles.title}>{p.name}</Text>
+      <ScrollView contentContainerStyle={detail.scroll}>
+        <JewelArt sku={p.sku} metal={p.metal} stone={p.stones[0]?.type} label={t(hasCatalogArt(p.sku) ? "illustration3d" : "illustration", { name: p.name })} />
+        <View style={detail.content}>
+        <Text style={styles.overline}>{[p.collection, t(`metal_${p.metal}`)].filter(Boolean).join(" · ")}</Text>
+        <Text accessibilityRole="header" style={detail.name}>{p.name}</Text>
         <Text style={detail.price}>{formatMoney(p.price.amount, p.price.currency, locale)}</Text>
         <View style={detail.badges}>
           <Text style={[detail.badge, { color: p.available ? c.success : c.warning }]}>{p.available ? t("available") : t("soldOut")}</Text>
@@ -93,19 +95,23 @@ export function ProductScreen({ id, onBack }: { id: string; onBack: () => void }
           ))}
         </View>
         <Text style={styles.muted}>{p.description}</Text>
+        {hasCatalogArt(p.sku) && <Text style={styles.muted}>{t("illustration3dNote")}</Text>}
+        </View>
       </ScrollView>
     </View>
   );
 }
 
 const detail = StyleSheet.create({
-  content: { padding: s[4], gap: s[3], paddingBottom: s[6] },
-  price: { color: c.accent, fontSize: type[3], fontWeight: "600" },
+  scroll: { paddingBottom: s[6] },
+  content: { padding: s[4], gap: s[3] },
+  name: { color: c.text, fontSize: type[6], fontFamily: fonts.display, lineHeight: type[6] * 1.1 },
+  price: { color: c.accent, fontSize: type[3], fontWeight: "600", letterSpacing: 0.3 },
   badges: { flexDirection: "row", gap: s[3] },
   badge: { fontSize: type[1], fontWeight: "600" },
   prompt: { gap: s[2], padding: s[3], borderRadius: tokens.radius[0], backgroundColor: c.surface },
   specs: { borderTopWidth: StyleSheet.hairlineWidth, borderColor: c.inputBorder },
   specRow: { paddingVertical: s[2], borderBottomWidth: StyleSheet.hairlineWidth, borderColor: c.inputBorder, gap: 2 },
-  specKey: { color: c.textMuted, fontSize: type[1] },
+  specKey: { color: c.textMuted, fontSize: type[0], letterSpacing: 1.2, textTransform: "uppercase" },
   specValue: { color: c.text, fontSize: type[2] },
 });

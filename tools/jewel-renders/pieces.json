@@ -1,0 +1,12 @@
+[
+  { "sku": "AUR-RNG-001", "piece": "classicBand", "metal": "GOLD_18K_YELLOW", "view": "ring" },
+  { "sku": "AUR-RNG-002", "piece": "solitaire", "metal": "GOLD_18K_WHITE", "stone": "DIAMOND", "view": "ring" },
+  { "sku": "AUR-RNG-003", "piece": "emeraldBezel", "metal": "GOLD_18K_ROSE", "stone": "EMERALD", "view": "ring" },
+  { "sku": "AUR-RNG-004", "piece": "halfEternity", "metal": "PLATINUM_950", "stone": "DIAMOND", "view": "ring" },
+  { "sku": "AUR-PND-001", "piece": "medal", "metal": "GOLD_18K_YELLOW", "view": "front" },
+  { "sku": "AUR-PND-002", "piece": "pearPendant", "metal": "SILVER_925", "stone": "RUBY", "view": "front" },
+  { "sku": "AUR-EAR-001", "piece": "hoops", "metal": "GOLD_18K_YELLOW", "view": "front" },
+  { "sku": "AUR-EAR-002", "piece": "studs", "metal": "GOLD_18K_WHITE", "stone": "SAPPHIRE", "view": "front" },
+  { "sku": "AUR-BRC-001", "piece": "cuff", "metal": "SILVER_925", "view": "front" },
+  { "sku": "AUR-NCK-001", "piece": "venetianChain", "metal": "GOLD_18K_ROSE", "view": "front" }
+]

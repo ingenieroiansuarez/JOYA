@@ -4,9 +4,9 @@ import { useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { ApiError } from "../api";
 import { useDesign } from "../design/DesignContext";
-import { alloyColor } from "../design/describe";
+import { AlloySwatch, FamilyArt } from "../design/art";
 import { useSession } from "../session";
-import { Button, c, Header, s, styles, type } from "../ui";
+import { Button, c, fonts, Header, s, styles, type } from "../ui";
 
 type Notice = null | "offline" | "failed" | "name";
 
@@ -53,18 +53,24 @@ export function NewDesignScreen({ onBack, onCreated }: { onBack: () => void; onC
         <TextInput value={title} onChangeText={setTitle} maxLength={80} accessibilityLabel={t("designName")} accessibilityLabelledBy="design-name"
           style={form.input} placeholderTextColor={c.textMuted} />
         <Text accessibilityRole="header" style={form.label}>{t("family")}</Text>
-        <View accessibilityRole="radiogroup" style={form.group}>
+        <View accessibilityRole="radiogroup" style={form.grid}>
           {FAMILIES.map((f) => {
             const selected = f.id === familyId;
+            const kind = f.category === "ring" ? t("category_RING") : t("category_PENDANT");
             return (
-              <Pressable key={f.id} accessibilityRole="radio" accessibilityState={{ selected }} accessibilityLabel={f.name[locale]}
+              <Pressable key={f.id} accessibilityRole="radio" accessibilityState={{ selected }} accessibilityLabel={`${f.name[locale]}, ${kind}`}
                 onPress={() => setFamily(f.id)} style={[form.option, selected && form.selected]}>
-                <Text style={[styles.body, selected && { color: c.accent }]}>{f.name[locale]}</Text>
-                <Text style={styles.muted}>{f.category === "ring" ? t("category_RING") : t("category_PENDANT")}</Text>
+                <FamilyArt familyId={f.id} materialId={materialId} label="" />
+                <View style={form.optionText}>
+                  <Text style={form.optionKind}>{kind}</Text>
+                  <Text style={[form.optionName, selected && { color: c.accent }]}>{f.name[locale]}</Text>
+                </View>
+                {selected && <View style={form.check}><Text style={form.checkText}>✓</Text></View>}
               </Pressable>
             );
           })}
         </View>
+        <Text style={styles.muted}>{t("familyArtNote")}</Text>
         <Text accessibilityRole="header" style={form.label}>{t("alloy")}</Text>
         <View accessibilityRole="radiogroup" style={form.chips}>
           {MATERIALS.map((m) => {
@@ -72,7 +78,7 @@ export function NewDesignScreen({ onBack, onCreated }: { onBack: () => void; onC
             return (
               <Pressable key={m.id} accessibilityRole="radio" accessibilityState={{ selected }} accessibilityLabel={m.name[locale]}
                 onPress={() => setMaterial(m.id)} style={[form.chip, selected && form.selected]}>
-                <View style={[form.swatch, { backgroundColor: alloyColor(m.id) }]} />
+                <AlloySwatch id={m.id} />
                 <Text style={[styles.muted, selected && { color: c.accent }]}>{m.name[locale]}</Text>
               </Pressable>
             );
@@ -91,18 +97,28 @@ export function NewDesignScreen({ onBack, onCreated }: { onBack: () => void; onC
 
 const form = StyleSheet.create({
   content: { padding: s[4], gap: s[3], paddingBottom: s[6] },
-  label: { color: c.textMuted, fontSize: type[1], fontWeight: "600" },
+  label: { color: c.accent, fontSize: type[0], fontWeight: "600", letterSpacing: 2, textTransform: "uppercase", marginTop: s[2] },
   input: {
     minHeight: tokens.touchTargetDp, borderWidth: 1, borderColor: c.inputBorder, borderRadius: tokens.radius[0], color: c.text,
     paddingHorizontal: s[3], fontSize: type[2],
   },
-  group: { gap: s[2] },
-  option: { minHeight: tokens.touchTargetDp, borderRadius: tokens.radius[0], borderWidth: 1, borderColor: c.inputBorder, padding: s[3], gap: 2 },
+  grid: { flexDirection: "row", flexWrap: "wrap", gap: s[2] },
+  option: {
+    width: "48%", flexGrow: 1, minHeight: tokens.touchTargetDp, borderRadius: tokens.radius[1], borderWidth: 1, borderColor: c.inputBorder,
+    overflow: "hidden", backgroundColor: c.surface,
+  },
+  optionText: { padding: s[2], gap: 2 },
+  optionKind: { color: c.textMuted, fontSize: type[0], letterSpacing: 1.2, textTransform: "uppercase" },
+  optionName: { color: c.text, fontSize: type[3], fontFamily: fonts.display },
+  check: {
+    position: "absolute", top: s[2], right: s[2], width: 26, height: 26, borderRadius: 13, backgroundColor: c.accent,
+    alignItems: "center", justifyContent: "center",
+  },
+  checkText: { color: c.onAccent, fontWeight: "700" },
   selected: { borderColor: c.accent },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: s[2] },
   chip: {
-    minHeight: tokens.touchTargetDp, flexDirection: "row", alignItems: "center", gap: s[1], paddingHorizontal: s[3],
-    borderRadius: tokens.radius[0], borderWidth: 1, borderColor: c.inputBorder,
+    minHeight: tokens.touchTargetDp, flexDirection: "row", alignItems: "center", gap: s[1], paddingLeft: s[1], paddingRight: s[3],
+    borderRadius: tokens.touchTargetDp / 2, borderWidth: 1, borderColor: c.inputBorder, backgroundColor: c.surface,
   },
-  swatch: { width: 14, height: 14, borderRadius: 7 },
 });

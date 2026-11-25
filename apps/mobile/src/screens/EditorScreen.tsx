@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { ApiError } from "../api";
 import { useDesign } from "../design/DesignContext";
-import { alloyColor, alloyName, describeIssue, describeOp, familyName, mm, paramLabel, parseMm } from "../design/describe";
+import { AlloySwatch, studioColor } from "../design/art";
+import { alloyName, describeIssue, describeOp, familyName, mm, paramLabel, parseMm } from "../design/describe";
 import { GlbIntegrityError, loadGlb, waitForJob } from "../design/glb";
 import type { Draft } from "../design/sync";
 import type { AiProposal, AiProposalOption, DesignOperation, Job } from "../design/types";
@@ -213,7 +214,7 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
       <Header title={title} subtitle={`${familyName(fam.id, locale)} · ${revLine}`} onBack={onBack} backLabel={t("back")} />
       {offline && <Text accessibilityRole="alert" style={styles.banner}>{t("offlineBanner")}</Text>}
       <ScrollView contentContainerStyle={ed.content} keyboardShouldPersistTaps="handled">
-        <Viewer glb={glb} color={alloyColor(comp.materialId)} label={t("viewerLabel", { name: title })}
+        <Viewer glb={glb} color={studioColor(comp.materialId)} label={t("viewerLabel", { name: title })}
           emptyText={t(mesh === "building" ? "viewerBuilding" : mesh === "offline" ? "viewerEmpty" : "viewerBuildFailed")} errorText={t("viewerError")} loadingText={t("viewerLoading")} />
         <Text style={styles.muted}>{t("previewNote")}</Text>
 
@@ -305,7 +306,7 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
               <Pressable key={m.id} accessibilityRole="radio" accessibilityState={{ selected: chosen, disabled: busy }} accessibilityLabel={m.name[locale]}
                 disabled={busy} onPress={() => propose({ type: "change_material", componentId: comp.id, materialId: m.id }, "materialId")}
                 style={[ed.chip, chosen && { borderColor: c.accent }]}>
-                <View style={[ed.swatch, { backgroundColor: alloyColor(m.id) }]} />
+                <AlloySwatch id={m.id} />
                 <Text style={[styles.muted, chosen && { color: c.accent }]}>{m.name[locale]}</Text>
               </Pressable>
             );
@@ -384,7 +385,7 @@ function Metric({ k, v }: { k: string; v: string }) {
 
 const ed = StyleSheet.create({
   content: { padding: s[4], gap: s[3], paddingBottom: s[6] },
-  h: { color: c.text, fontSize: type[3], fontWeight: "600" },
+  h: { color: c.accent, fontSize: type[0], fontWeight: "600", letterSpacing: 2, textTransform: "uppercase", marginTop: s[2] },
   card: { backgroundColor: c.surface, borderRadius: 12, padding: s[3], gap: s[2] },
   param: { gap: s[1] },
   paramHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
@@ -400,9 +401,8 @@ const ed = StyleSheet.create({
   },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: s[2] },
   chip: {
-    minHeight: tokens.touchTargetDp, flexDirection: "row", alignItems: "center", gap: s[1], paddingHorizontal: s[3],
-    borderRadius: tokens.radius[0], borderWidth: 1, borderColor: c.inputBorder,
+    minHeight: tokens.touchTargetDp, flexDirection: "row", alignItems: "center", gap: s[1], paddingLeft: s[1], paddingRight: s[3],
+    borderRadius: tokens.touchTargetDp / 2, borderWidth: 1, borderColor: c.inputBorder, backgroundColor: c.surface,
   },
-  swatch: { width: 14, height: 14, borderRadius: 7 },
   metric: { flexDirection: "row", justifyContent: "space-between" },
 });

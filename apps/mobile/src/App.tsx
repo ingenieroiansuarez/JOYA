@@ -59,6 +59,8 @@ function ConfigErrorScreen() {
 }
 
 const TAB_LABEL = { boutique: "tabBoutique", design: "tabDesign", favorites: "tabFavorites", profile: "tabProfile" } as const;
+// Tab marks drawn with text glyphs (no icon font to license or bundle): outline when idle, filled when selected.
+const TAB_GLYPH = { boutique: ["◇", "◆"], design: ["✧", "✦"], favorites: ["♡", "♥"], profile: ["○", "●"] } as const;
 
 function Shell() {
   const { t, config } = useSession();
@@ -82,7 +84,7 @@ function Shell() {
   return (
     <View style={[styles.screen, { paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }]}>
       <StatusBar style="light" />
-      {config.env !== "production" && <Text style={styles.banner}>{t("envBanner", { env: config.env })}</Text>}
+      {config.env !== "production" && <Text style={[styles.banner, shell.banner]}>{t("envBanner", { env: config.env })}</Text>}
       <View style={{ flex: 1 }}>
         {route.name === "catalog" && <CatalogScreen onOpen={open} />}
         {route.name === "favorites" && <FavoritesScreen onOpen={open} onExplore={() => dispatch({ type: "tab", tab: "boutique" })} />}
@@ -112,6 +114,7 @@ function Shell() {
             <Pressable key={tab} accessibilityRole="tab" accessibilityState={{ selected }} accessibilityLabel={t(TAB_LABEL[tab])}
               onPress={() => dispatch({ type: "tab", tab })} style={bar.tab}>
               <View style={[bar.mark, selected && { backgroundColor: c.accent }]} />
+              <Text style={[bar.glyph, selected && { color: c.accent }]} importantForAccessibility="no">{TAB_GLYPH[tab][selected ? 1 : 0]}</Text>
               <Text style={[bar.label, selected && { color: c.accent, fontWeight: "600" }]}>{t(TAB_LABEL[tab])}</Text>
             </Pressable>
           );
@@ -121,9 +124,14 @@ function Shell() {
   );
 }
 
+const shell = StyleSheet.create({
+  banner: { textAlign: "center", fontSize: type[0], letterSpacing: 1, textTransform: "uppercase" },
+});
+
 const bar = StyleSheet.create({
   root: { flexDirection: "row", borderTopWidth: StyleSheet.hairlineWidth, borderColor: c.inputBorder, backgroundColor: c.surface, paddingBottom: s[1] },
   tab: { flex: 1, minHeight: tokens.touchTargetDp + s[2], alignItems: "center", justifyContent: "center", gap: s[0] },
-  mark: { width: 24, height: 3, borderRadius: 2, backgroundColor: "transparent" },
-  label: { color: c.textMuted, fontSize: type[1] },
+  mark: { position: "absolute", top: 0, width: 28, height: 2, borderRadius: 1, backgroundColor: "transparent" },
+  glyph: { color: c.textMuted, fontSize: type[3], lineHeight: type[3] * 1.15 },
+  label: { color: c.textMuted, fontSize: type[0], letterSpacing: 1, textTransform: "uppercase" },
 });
