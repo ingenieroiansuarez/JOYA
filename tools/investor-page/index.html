@@ -233,6 +233,23 @@ tfoot td { color: var(--gold-2); font-weight: 600; border-bottom: 0; }
 .notes ul, .notes ol { padding-left: 18px; margin: 0; display: grid; gap: 8px; }
 .notes a { white-space: nowrap; color: var(--gold-2); }
 
+.ops { padding-block: 16vh 6vh; position: relative; }
+.ops-hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: end; margin-bottom: 7vh; }
+.ops-hero h2 { font-size: clamp(2.4rem, 4.8vw, 5.2rem); }
+.ops-hero h2 .hl { color: var(--gold); }
+.ops-hero > p { color: var(--ink-2); max-width: 44ch; justify-self: end; }
+.ops-knobs { display: flex; flex-wrap: wrap; gap: 32px; align-items: end; margin-bottom: 28px; }
+.ops-sum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin: 0 0 36px; }
+.ops-sum div { background: var(--bg); padding: 22px 24px; }
+.ops-sum dt { font-size: 13px; color: var(--muted); }
+.ops-sum dd { margin: 6px 0 0; font-family: var(--font-display); font-size: clamp(1.6rem, 2.6vw, 2.6rem); color: var(--ink); line-height: 1.05; }
+.ops-sum dd small { display: block; font-family: var(--font-body); font-size: 14px; color: var(--ink-2); margin-top: 6px; }
+.ops-sum .is-total dd { color: var(--gold-2); }
+.ops table { min-width: 820px; }
+.ops td .why { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.ops td a { color: var(--gold-2); }
+.ops .today { margin-top: 26px; padding: 18px 20px; border-left: 2px solid var(--gold); background: oklch(80% 0.13 80 / 0.06); color: var(--ink-2); max-width: 80ch; }
+
 /* ---------- truth ---------- */
 .truth { padding-block: 16vh; }
 .truth h2 { font-size: clamp(2.3rem, 4.4vw, 4.6rem); max-width: 16ch; margin-bottom: 7vh; }
@@ -286,6 +303,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
   .knobs { grid-template-columns: 1fr; gap: 24px; }
   .notes { grid-template-columns: 1fr; }
   .truth-list { grid-template-columns: 1fr; }
+  .ops-hero { grid-template-columns: 1fr; }
+  .ops-hero > p { justify-self: start; }
+  .ops-sum { grid-template-columns: 1fr; }
   .funds { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 560px) {
@@ -313,6 +333,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
       <li><a href="#aura">AURA</a></li>
       <li><a href="#ruta">Hoja de ruta</a></li>
       <li><a href="#costeo">Costeo</a></li>
+      <li><a href="#operacion">Operación</a></li>
       <li><a href="#transparencia">Qué es real</a></li>
     </ul>
     <a class="btn btn--sm" href="#costeo" data-magnetic>Ver el costeo</a>
@@ -321,7 +342,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
 
 <main>
 <section class="hero" id="inicio" aria-labelledby="h1">
-  <p class="hint" aria-hidden="true">Mueve el cursor: <b>el anillo te sigue</b></p>
+  <p class="hint" aria-hidden="true">Mueve el cursor y baja: <b>vas a atravesar el anillo</b></p>
   <div class="wrap">
     <h1 id="h1" data-split>Joyas a medida, <em>listas para fabricar.</em></h1>
     <div class="hero-side" data-hero-side>
@@ -332,7 +353,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
       </div>
     </div>
   </div>
-  <div class="scrollcue" aria-hidden="true"><span>Atraviesa el anillo</span><i></i></div>
+  <div class="scrollcue" aria-hidden="true"><i></i></div>
 </section>
 
 <section class="chapter chapter--left" id="disena" aria-labelledby="s1" data-ring="design">
@@ -489,6 +510,44 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
   </div>
 </section>
 
+<section class="ops" id="operacion" aria-labelledby="s8" data-ring="off">
+  <div class="wrap">
+    <div class="ops-hero">
+      <h2 id="s8">Mantenerla en línea: <span class="hl" id="opsHead">US$112 a US$154</span> al mes.</h2>
+      <p data-reveal>Lo que pagaría cada mes la empresa que opere AUREA en producción: servidores, base de datos, login, archivos 3D, la IA de AURA, monitoreo, dominio y tiendas de apps.</p>
+    </div>
+    <div class="ops-knobs" role="group" aria-label="Escenario de operación">
+      <div class="knob"><span>Escenario</span>
+        <div class="seg" id="opsScen">
+          <button class="tab" type="button" data-v="pilot" aria-pressed="true">Piloto</button>
+          <button class="tab" type="button" data-v="growth" aria-pressed="false">Crecimiento</button>
+        </div>
+      </div>
+      <div class="knob"><span>Modelo de IA para AURA</span>
+        <div class="seg" id="opsAI">
+          <button class="tab" type="button" data-v="haiku" aria-pressed="false">Claude Haiku 5.5</button>
+          <button class="tab" type="button" data-v="sonnet" aria-pressed="true">Claude Sonnet 5.5</button>
+        </div>
+      </div>
+    </div>
+    <dl class="ops-sum" data-reveal>
+      <div class="is-total"><dt>Total al mes</dt><dd class="num" id="opsUSD">US$154</dd></div>
+      <div><dt>En pesos, con la TRM de la calculadora</dt><dd class="num" id="opsCOP">$553.000</dd></div>
+      <div><dt>Al año</dt><dd class="num" id="opsYear">US$1.848<small id="opsYearCop"></small></dd></div>
+    </dl>
+    <div class="scroll">
+      <table aria-label="Costo mensual de operación por servicio">
+        <thead><tr><th>Servicio</th><th>Proveedor y plan</th><th>USD al mes</th><th>COP al mes</th><th>Fuente</th></tr></thead>
+        <tbody id="opsBody"></tbody>
+        <tfoot id="opsFoot"></tfoot>
+      </table>
+    </div>
+    <p class="fine" id="opsAInote"></p>
+    <p class="fine" style="margin-top:10px">Pago único aparte: cuenta de Google Play, US$25. No incluye comisiones de la pasarela de pagos (se cobran por transacción), IA para generar mallas desde fotos, soporte ni el equipo que mantiene el código (de 15 a 20 % del costo de construcción al año, ver el desglose de arriba). Precios de lista consultados el 25 de noviembre de 2026; pueden cambiar.</p>
+    <p class="today">Hoy AUREA cuesta $0 al mes: corre en el computador del equipo, AURA es un motor de reglas sin modelo de IA y los pagos son simulados. Estos costos empiezan cuando se lance en producción.</p>
+  </div>
+</section>
+
 <section class="truth" id="transparencia" aria-labelledby="s6" data-ring="off">
   <div class="wrap">
     <h2 id="s6" data-split>Lo que es real hoy, y lo que todavía no.</h2>
@@ -547,6 +606,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
 
   /* ================= ring state (one object drives the WebGL ring) ================= */
   var S = { x: 0, y: mobile() ? 0.17 : 0.06, z: 0, sc: mobile() ? 0.82 : 1, tilt: 1.05, face: 0, metal: 0, wire: 0, intro: motion ? 0 : 1, glow: 1 };
+  /* the hero scene drives its own copy, so a fast jump past the hero never fights a chapter tween */
+  var Hs = Object.assign({}, S), heroDone = !motion;
   var CHAPTERS = {
     design: function () { return mobile() ? { x: 0, y: 0.3, z: 0, sc: 0.5, tilt: 1.0, face: 0, metal: 0, wire: 0 } : { x: 0.25, y: 0, z: 0, sc: 1.05, tilt: 1.0, face: 0, metal: 0, wire: 0 }; },
     aura:   function () { return mobile() ? { x: 0, y: 0.3, z: 0, sc: 0.5, tilt: 1.2, face: 0, metal: 1, wire: 0 } : { x: -0.25, y: 0, z: 0, sc: 1.05, tilt: 1.2, face: 0, metal: 1, wire: 0 }; },
@@ -642,23 +703,24 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
     function frame(now) {
       requestAnimationFrame(frame);
       if (!visible) return;
+      var R = heroDone ? S : Hs;
       var dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
-      if (!reduce) spin += dt * 0.35 * (1 - S.face);
+      if (!reduce) spin += dt * 0.35 * (1 - R.face);
       px += (tx - px) * Math.min(1, dt * 4); py += (ty - py) * Math.min(1, dt * 4);
       var fit = aspect < 1 ? Math.max(0.55, aspect * 1.25) : 1;
-      var sc = S.sc * fit * (0.72 + 0.28 * S.intro);
+      var sc = R.sc * fit * (0.72 + 0.28 * S.intro);
       if (sc < 0.02) { if (pos.visible) { pos.visible = false; renderer.render(scene, cam); } return; }
       pos.visible = true;
-      pos.position.set(S.x * vw, S.y * vh, S.z);
+      pos.position.set(R.x * vw, R.y * vh, R.z);
       pos.scale.setScalar(sc);
       var yaw = spin, faced = Math.round(spin / Math.PI) * Math.PI;
-      yawNode.rotation.y = yaw + (faced - yaw) * S.face + px * 0.45 * (1 - S.face);
-      tiltNode.rotation.x = S.tilt + (Math.PI / 2 - S.tilt) * S.face + py * 0.22 * (1 - S.face);
+      yawNode.rotation.y = yaw + (faced - yaw) * R.face + px * 0.45 * (1 - R.face);
+      tiltNode.rotation.x = R.tilt + (Math.PI / 2 - R.tilt) * R.face + py * 0.22 * (1 - R.face);
       key.position.set(px * 70, -py * 50 + 20, 60);
-      mat.color.copy(GOLD).lerp(PLAT, S.metal);
-      mat.roughness = 0.14 + 0.08 * S.metal;
-      mat.opacity = 1 - 0.88 * S.wire; mat.depthWrite = S.wire < 0.5;
-      wireMat.opacity = 0.55 * S.wire;
+      mat.color.copy(GOLD).lerp(PLAT, R.metal);
+      mat.roughness = 0.14 + 0.08 * R.metal;
+      mat.opacity = 1 - 0.88 * R.wire; mat.depthWrite = R.wire < 0.5;
+      wireMat.opacity = 0.55 * R.wire;
       renderer.toneMappingExposure = 0.5 + 0.85 * S.intro;
       renderer.render(scene, cam);
     }
@@ -778,6 +840,53 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
   $('#trm').addEventListener('input', render);
   render();
 
+  /* ================= monthly operating cost ================= */
+  var OPS = [
+    { n: 'Web: centro de mando y esta página', p: 'Vercel Pro', pilot: 20, growth: 20, why: 'El plan gratis no permite uso comercial', src: ['vercel.com', 'https://vercel.com/docs/plans/pro-plan'] },
+    { n: 'API de la app', p: 'Render, servicio web', pilot: 7, growth: 50, why: 'Piloto: Starter. Crecimiento: dos Standard', src: ['render.com', 'https://render.com/pricing'] },
+    { n: 'Motor CAD (OpenCascade)', p: 'Render, servicio web', pilot: 25, growth: 85, why: 'Piloto: Standard 2 GB. Crecimiento: Pro 4 GB', src: ['render.com', 'https://render.com/pricing'] },
+    { n: 'Login seguro (Keycloak)', p: 'Render, servicio web Standard', pilot: 25, growth: 25, why: 'Necesita unos 2 GB de memoria', src: ['render.com', 'https://render.com/pricing'] },
+    { n: 'Base de datos PostgreSQL', p: 'Render Postgres', pilot: 19, growth: 90, why: 'Piloto: Basic 1 GB. Crecimiento: Standard', src: ['makerkit.dev', 'https://makerkit.dev/pricing-calculator/render'] },
+    { n: 'Archivos 3D y STEP', p: 'Cloudflare R2', pilot: 0, growth: 5, why: '10 GB gratis; luego US$0,015 por GB, sin costo de descarga', src: ['cloudflare.com', 'https://developers.cloudflare.com/r2/pricing/'] },
+    { n: 'Monitoreo de errores', p: 'Sentry', pilot: 0, growth: 26, why: 'Piloto: plan gratis. Crecimiento: Team', src: ['sentry.io', 'https://sentry.io/pricing/'] },
+    { n: 'Dominio .co', p: 'Renovación anual de $229.990 COP', pilot: 'dom', growth: 'dom', why: 'Prorrateado al mes', src: ['mi.com.co', 'https://mi.com.co/precios'] },
+    { n: 'App en iPhone', p: 'Apple Developer Program', pilot: 99 / 12, growth: 99 / 12, why: 'US$99 al año, prorrateado', src: ['apple.com', 'https://developer.apple.com/programs/'] },
+    { n: 'IA de AURA', p: 'ai', pilot: 'ai', growth: 'ai', why: '', src: ['anthropic.com', 'https://www.anthropic.com/claude-haiku-5-5'] }
+  ];
+  var AI = { haiku: { name: 'Claude Haiku 5.5', inp: 0.10, out: 0.50 }, sonnet: { name: 'Claude Sonnet 5.5', inp: 2, out: 10 } };
+  var TURNS = { pilot: 2000, growth: 30000 }, TOK_IN = 6000, TOK_OUT = 1000, DOMAIN_COP = 229990;
+  var opsScen = 'pilot', opsAI = 'sonnet';
+  function money(n) { return 'US$' + (n < 100 ? n.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : Math.round(n).toLocaleString('es-CO')); }
+  function pesos(n) { return '$' + (Math.round(n / 1000) * 1000).toLocaleString('es-CO'); }
+  function aiCost(sc, m) { var a = AI[m]; return TURNS[sc] * (TOK_IN * a.inp + TOK_OUT * a.out) / 1e6; }
+  function lineUSD(r, sc, m, trm) { var v = r[sc]; return v === 'ai' ? aiCost(sc, m) : v === 'dom' ? DOMAIN_COP / 12 / trm : v; }
+  function opsTotal(sc, m, trm) { return OPS.reduce(function (t, r) { return t + lineUSD(r, sc, m, trm); }, 0); }
+  function renderOps() {
+    var trm = Math.max(1000, +$('#trm').value || 3592.03), body = $('#opsBody'); body.innerHTML = '';
+    OPS.forEach(function (r) {
+      var u = lineUSD(r, opsScen, opsAI, trm);
+      var prov = r.p === 'ai' ? 'Anthropic, ' + AI[opsAI].name : r.p;
+      var why = r.p === 'ai' ? TURNS[opsScen].toLocaleString('es-CO') + ' conversaciones al mes' : r.why;
+      body.insertAdjacentHTML('beforeend', '<tr><td>' + r.n + '<span class="why">' + why + '</span></td><td>' + prov + '</td><td>' + money(u) + '</td><td>' + pesos(u * trm) + '</td><td><a href="' + r.src[1] + '" target="_blank" rel="noopener">' + r.src[0] + '</a></td></tr>');
+    });
+    var t = opsTotal(opsScen, opsAI, trm);
+    $('#opsFoot').innerHTML = '<tr><td>Total ' + (opsScen === 'pilot' ? 'piloto' : 'crecimiento') + '</td><td></td><td>' + money(t) + '</td><td>' + pesos(t * trm) + '</td><td></td></tr>';
+    $('#opsUSD').textContent = money(t);
+    $('#opsCOP').textContent = pesos(t * trm);
+    $('#opsYear').firstChild.nodeValue = money(t * 12);
+    $('#opsYearCop').textContent = pesos(t * 12 * trm) + ' COP';
+    var lo = opsTotal(opsScen, 'haiku', trm), hi = opsTotal(opsScen, 'sonnet', trm);
+    $('#opsHead').textContent = 'US$' + Math.round(lo).toLocaleString('es-CO') + ' a US$' + Math.round(hi).toLocaleString('es-CO');
+    $('#opsAInote').textContent = 'IA estimada con ' + TURNS[opsScen].toLocaleString('es-CO') + ' conversaciones al mes (' + (opsScen === 'pilot' ? 'unos 200 clientes con 10 cada uno' : 'unos 3.000 clientes con 10 cada uno') + '), cada una de ' + TOK_IN.toLocaleString('es-CO') + ' tokens de entrada y ' + TOK_OUT.toLocaleString('es-CO') + ' de salida, a precios de lista de Anthropic: Haiku 5.5 a US$0,10 y US$0,50 por millón de tokens; Sonnet 5.5 a US$2 y US$10. Hoy AURA no usa ningún modelo.';
+  }
+  [['#opsScen', function (v) { opsScen = v; }], ['#opsAI', function (v) { opsAI = v; }]].forEach(function (g) {
+    $$(g[0] + ' .tab').forEach(function (b) {
+      b.addEventListener('click', function () { g[1](b.dataset.v); $$(g[0] + ' .tab').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); renderOps(); });
+    });
+  });
+  $('#trm').addEventListener('input', renderOps);
+  renderOps();
+
   /* ================= nav ================= */
   var nav = $('#nav'), lastY = 0, prog = $('#progress');
   function onScroll() {
@@ -794,7 +903,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) { if (e.isIntersecting) navLinks.forEach(function (a) { a.setAttribute('aria-current', String(a.getAttribute('href') === '#' + e.target.id)); }); });
     }, { rootMargin: '-45% 0px -50% 0px' });
-    ['disena', 'aura', 'ruta', 'costeo', 'transparencia'].forEach(function (id) { io.observe(document.getElementById(id)); });
+    ['disena', 'aura', 'ruta', 'costeo', 'operacion', 'transparencia'].forEach(function (id) { io.observe(document.getElementById(id)); });
   }
 
   /* ================= no motion: static ring per chapter, done ================= */
@@ -855,9 +964,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
        .to('[data-hero-side]', { opacity: 1, y: 0, duration: 1, ease: 'expo.out' }, 0.9);
 
   /* signature: scroll flies the camera through the ring */
-  var heroTL = G.timeline({ scrollTrigger: { trigger: '#inicio', start: 'top top', end: '+=140%', scrub: 0.9, pin: true, anticipatePin: 1 } });
-  heroTL.to(S, { face: 1, tilt: Math.PI / 2, x: 0, y: 0, sc: 1.1, metal: 0, wire: 0, duration: 0.45, ease: 'power2.inOut' }, 0)
-        .to(S, { z: 78, duration: 0.55, ease: 'power2.in' }, 0.42)
+  var heroTL = G.timeline({ scrollTrigger: { trigger: '#inicio', start: 'top top', end: '+=140%', scrub: 0.9, pin: true, anticipatePin: 1, refreshPriority: 2,
+    onLeave: function () { ['x', 'y', 'z', 'sc', 'tilt', 'face', 'metal', 'wire'].forEach(function (k) { S[k] = Hs[k]; }); heroDone = true; },
+    onEnterBack: function () { heroDone = false; current = null; if (chapterTween) chapterTween.kill(); setRing(+dia.value, +wid.value, WALL); } } });
+  heroTL.to(Hs, { face: 1, tilt: Math.PI / 2, x: 0, y: 0, sc: 1.1, metal: 0, wire: 0, duration: 0.45, ease: 'power2.inOut' }, 0)
+        .to(Hs, { z: 78, duration: 0.55, ease: 'power2.in' }, 0.42)
         .fromTo(heroWords, { yPercent: 0, opacity: 1 }, { yPercent: -120, opacity: 0, stagger: 0.025, duration: 0.35, ease: 'power2.in', immediateRender: false }, 0.001)
         .fromTo('[data-hero-side], .scrollcue, .hint', { opacity: 1, y: 0 }, { opacity: 0, y: -30, duration: 0.25, immediateRender: false }, 0.001)
         .to('.fx--glow', { opacity: 1.6, duration: 0.3 }, 0.6);
@@ -877,7 +988,6 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
       onEnter: function () { goChapter(sec.dataset.ring); },
       onEnterBack: function () { goChapter(sec.dataset.ring); } });
   });
-  ST.create({ trigger: '#inicio', start: 'top top', end: 'bottom top', onEnterBack: function () { current = null; if (chapterTween) chapterTween.kill(); setRing(+dia.value, +wid.value, WALL); } });
 
   /* masked headline reveals + soft reveals */
   $$('[data-split]').forEach(function (h) {
@@ -906,7 +1016,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
   mm.add('(min-width: 981px)', function () {
     var track = $('#track');
     var dist = function () { return Math.max(0, track.scrollWidth - innerWidth + 80); };
-    G.to(track, { x: function () { return -dist(); }, ease: 'none', scrollTrigger: { trigger: '#ruta', start: 'top top', end: function () { return '+=' + dist(); }, pin: true, scrub: 0.6, invalidateOnRefresh: true } });
+    G.to(track, { x: function () { return -dist(); }, ease: 'none', scrollTrigger: { trigger: '#ruta', start: 'top top', end: function () { return '+=' + dist(); }, pin: true, scrub: 0.6, invalidateOnRefresh: true, refreshPriority: 1, onEnter: function () { goChapter("road"); }, onEnterBack: function () { goChapter("road"); } } });
   });
 
   /* cost: bars fill, big multiple counts up */
@@ -923,7 +1033,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wr
     });
   }
 
-  addEventListener('load', function () { ST.refresh(); });
+  ST.sort();
+  addEventListener('load', function () { ST.sort(); ST.refresh(); });
   var rz; addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { var c = current; current = null; if (c) goChapter(c); }, 200); });
 })();
 </script>
