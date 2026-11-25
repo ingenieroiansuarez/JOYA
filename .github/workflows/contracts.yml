@@ -8,6 +8,8 @@ on:
       - "06_API_CONTRACTS/**"
       - "08_STATE_MACHINES/**"
       - "tools/contracts/**"
+      - "13_AI_PROMPTS_AND_TOOLS/tools.json"
+      - "11_3D_ASSET_LIBRARY/families.json"
       - ".github/workflows/contracts.yml"
 permissions:
   contents: read
@@ -29,7 +31,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-      - run: python -m pip install pyyaml==6.0.3
+      - run: python -m pip install --no-deps -r tools/contracts/requirements.lock
       - name: Drift check
         run: python tools/contracts/check_contracts.py
       - name: Checker tests

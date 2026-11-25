@@ -21,6 +21,8 @@ MACHINES = ROOT / "08_STATE_MACHINES/machines.json"
 BINDINGS = ROOT / "08_STATE_MACHINES/bindings.json"
 SQL = ROOT / "05_DATABASE/core_reference.sql"
 OPENAPI = ROOT / "06_API_CONTRACTS/openapi.yaml"
+TOOLS = ROOT / "13_AI_PROMPTS_AND_TOOLS/tools.json"
+FAMILIES = ROOT / "11_3D_ASSET_LIBRARY/families.json"
 
 
 def machine_states(machine: dict) -> list[str]:
@@ -110,6 +112,81 @@ def check(machines: dict, bindings: dict, sql: str, openapi: dict) -> list[str]:
     return errs
 
 
+def design_operations(tools: list) -> dict:
+    """OpenAPI DesignOperation variants: one per PREVIEW tool, discriminated by `type`.
+
+    tools.json is the allowlist: an operation the AI or the app can propose must be a
+    PREVIEW tool, and its arguments are exactly that tool's inputSchema.
+    """
+    variants = {}
+    for t in tools:
+        if t["executionMode"] != "PREVIEW":
+            continue
+        schema = t["inputSchema"]
+        variants[t["name"]] = {
+            "type": "object",
+            "properties": {"type": {"const": t["name"]}, **schema["properties"]},
+            "required": ["type", *schema["required"]],
+            "additionalProperties": False,
+        }
+    return variants
+
+
+def check_operations(tools: list, openapi: dict) -> list[str]:
+    errs = []
+    schemas = openapi["components"]["schemas"]
+    expected = design_operations(tools)
+    op = schemas.get("DesignOperation")
+    if op is None:
+        return ["OpenAPI has no DesignOperation schema"]
+    refs = [r["$ref"].rsplit("/", 1)[-1] for r in op.get("oneOf", [])]
+    mapping = op.get("discriminator", {}).get("mapping", {})
+    if op.get("discriminator", {}).get("propertyName") != "type":
+        errs.append("DesignOperation must use discriminator propertyName `type`")
+    want = {name: _op_schema_name(name) for name in expected}
+    if sorted(refs) != sorted(want.values()):
+        errs.append(f"DesignOperation variants {sorted(refs)} != PREVIEW tools {sorted(want.values())}")
+    for name, sname in want.items():
+        if mapping.get(name, "").rsplit("/", 1)[-1] != sname:
+            errs.append(f"DesignOperation discriminator mapping for {name} must point to {sname}")
+        if schemas.get(sname) != expected[name]:
+            errs.append(f"OpenAPI {sname} differs from tools.json {name} inputSchema")
+    return errs
+
+
+def check_create_ring_ranges(tools: list, families: list) -> list[str]:
+    """create_ring must accept exactly the ring.classic parameter ranges (families.json is canonical)."""
+    tool = next(t for t in tools if t["name"] == "create_ring")
+    fam = next(f for f in families if f["id"] == "ring.classic")
+    errs = []
+    props = tool["inputSchema"]["properties"]
+    for name, rng in fam["parameters"].items():
+        p = props.get(name)
+        if p is None:
+            errs.append(f"create_ring lacks ring.classic parameter {name}")
+        elif (p.get("minimum"), p.get("maximum")) != (rng["min"], rng["max"]):
+            errs.append(f"create_ring.{name} range {p.get('minimum')}-{p.get('maximum')} != ring.classic {rng['min']}-{rng['max']}")
+    return errs
+
+
+def _op_schema_name(tool: str) -> str:
+    return "Op" + "".join(p.capitalize() for p in tool.split("_"))
+
+
+def emit_operations(tools: list) -> str:
+    variants = design_operations(tools)
+    out = ["    DesignOperation:\n",
+           "      description: Generado de 13_AI_PROMPTS_AND_TOOLS/tools.json (herramientas PREVIEW). No editar a mano.\n",
+           "      oneOf:\n"]
+    out += [f"      - $ref: '#/components/schemas/{_op_schema_name(n)}'\n" for n in variants]
+    out += ["      discriminator:\n", "        propertyName: type\n", "        mapping:\n"]
+    out += [f"          {n}: '#/components/schemas/{_op_schema_name(n)}'\n" for n in variants]
+    for n, sch in variants.items():
+        body = yaml.safe_dump({_op_schema_name(n): sch}, sort_keys=False, allow_unicode=True)
+        out.append("".join("    " + line + "\n" for line in body.splitlines()))
+    return "".join(out)
+
+
 def emit(machines: dict, bindings: dict) -> str:
     out = []
     for name, b in bindings.items():
@@ -126,10 +203,15 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     machines = json.loads(MACHINES.read_text())
     bindings = json.loads(BINDINGS.read_text())
+    tools = json.loads(TOOLS.read_text())
     if args.emit:
-        print(emit(machines, bindings), end="")
+        print(emit(machines, bindings) + emit_operations(tools), end="")
         return 0
-    errs = check(machines, bindings, SQL.read_text(), yaml.safe_load(OPENAPI.read_text()))
+    api = yaml.safe_load(OPENAPI.read_text())
+    families = json.loads(FAMILIES.read_text())
+    families = families if isinstance(families, list) else families["families"]
+    errs = (check(machines, bindings, SQL.read_text(), api) + check_operations(tools, api)
+            + check_create_ring_ranges(tools, families))
     for e in errs:
         print(f"DRIFT: {e}")
     if errs:
