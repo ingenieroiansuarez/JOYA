@@ -8,12 +8,13 @@ export interface Config {
   port: number;
   databaseUrl: string;
   valkeyUrl: string;
+  oidc: { issuer: string; audience: string };
 }
 
 export class ConfigError extends Error {}
 
 export function loadConfig(source: NodeJS.ProcessEnv = process.env): Config {
-  const missing = ["AUREA_ENV", "DATABASE_URL", "VALKEY_URL"].filter((k) => !source[k]);
+  const missing = ["AUREA_ENV", "DATABASE_URL", "VALKEY_URL", "OIDC_ISSUER", "OIDC_AUDIENCE"].filter((k) => !source[k]);
   if (missing.length) throw new ConfigError(`missing configuration: ${missing.join(", ")}`);
   const env = source.AUREA_ENV as Environment;
   if (!ENVIRONMENTS.includes(env)) throw new ConfigError(`AUREA_ENV must be one of ${ENVIRONMENTS.join(", ")}`);
@@ -32,5 +33,22 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): Config {
   if (env === "production" && new URL(source.VALKEY_URL!).protocol !== "rediss:") {
     throw new ConfigError("VALKEY_URL must use TLS (rediss:) in production");
   }
-  return { env, port, databaseUrl: source.DATABASE_URL!, valkeyUrl: source.VALKEY_URL! };
+  let issuer: URL;
+  try {
+    issuer = new URL(source.OIDC_ISSUER!);
+  } catch {
+    throw new ConfigError("OIDC_ISSUER is not a URL");
+  }
+  const loopback = ["127.0.0.1", "localhost", "[::1]"].includes(issuer.hostname);
+  if (issuer.protocol !== "https:" && !(issuer.protocol === "http:" && loopback && (env === "local" || env === "ci"))) {
+    throw new ConfigError("OIDC_ISSUER must use https (plain http only on loopback in local or ci)");
+  }
+  if (issuer.search || issuer.hash || issuer.username) throw new ConfigError("OIDC_ISSUER must be a bare issuer URL");
+  return {
+    env,
+    port,
+    databaseUrl: source.DATABASE_URL!,
+    valkeyUrl: source.VALKEY_URL!,
+    oidc: { issuer: source.OIDC_ISSUER!.replace(/\/$/, ""), audience: source.OIDC_AUDIENCE! },
+  };
 }

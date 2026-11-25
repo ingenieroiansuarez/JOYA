@@ -88,6 +88,10 @@ def check(roles_doc: dict, api: dict, tools: list, screens: list, screens_csv: l
         elif (row["role"], row["permission"]) != (s["role"], s["permission"]):
             errs.append(f"screen {s['id']}: csv and json disagree on role/permission")
 
+    role_enum = api.get("components", {}).get("schemas", {}).get("Role", {}).get("enum")
+    if role_enum != list(roles):
+        errs.append(f"OpenAPI Role enum {role_enum} != roles.reference.json roles {list(roles)}")
+
     for rule in roles_doc.get("segregation", []):
         a, b = rule["author"], rule["publisher"]
         for role, perms in roles.items():

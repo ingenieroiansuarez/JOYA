@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: AUREA API V1 — contract baseline
-  version: 1.5.1
+  version: 1.6.0
   description: Contratos iniciales; extender por vertical slice. No API implementada.
 servers:
 - url: http://localhost:3000/v1
@@ -4633,6 +4633,46 @@ paths:
               - size
               - sha256
               additionalProperties: false
+  /me:
+    get:
+      operationId: getMe
+      summary: Identidad y permisos efectivos del token
+      description: El sujeto y los roles salen del token OIDC validado (issuer, audience, expiración, firma); los permisos, de 21_SECURITY/roles.reference.json. No expone datos personales del IdP.
+      tags:
+      - identity
+      x-permission: identity.self
+      x-first-milestone: '100'
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /notifications:
     get:
       operationId: listNotifications
@@ -4946,6 +4986,47 @@ components:
       - componentId
       - curveId
       - count
+      additionalProperties: false
+    Role:
+      description: Generado de 21_SECURITY/roles.reference.json. No editar a mano.
+      type: string
+      enum:
+      - guest
+      - customer
+      - advisor
+      - designer
+      - manager
+      - worker
+      - stockkeeper
+      - inspector
+      - finance
+      - buyer
+      - cashier
+      - supplier
+      - marketing
+      - admin
+      - owner
+      - auditor
+    Me:
+      type: object
+      properties:
+        subject:
+          type: string
+          minLength: 1
+          maxLength: 255
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        permissions:
+          type: array
+          items:
+            type: string
+            pattern: ^[a-z]+\.[a-z]+$
+      required:
+      - subject
+      - roles
+      - permissions
       additionalProperties: false
     Money:
       type: object

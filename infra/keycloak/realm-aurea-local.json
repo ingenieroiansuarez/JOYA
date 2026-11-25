@@ -1,0 +1,176 @@
+{
+  "realm": "aurea-local",
+  "displayName": "AUREA local (no producción)",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": false,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "bruteForceProtected": true,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "revokeRefreshToken": true,
+  "refreshTokenMaxReuse": 0,
+  "roles": {
+    "realm": [
+      {
+        "name": "guest",
+        "description": "AUREA role guest (roles.reference.json)"
+      },
+      {
+        "name": "customer",
+        "description": "AUREA role customer (roles.reference.json)"
+      },
+      {
+        "name": "advisor",
+        "description": "AUREA role advisor (roles.reference.json)"
+      },
+      {
+        "name": "designer",
+        "description": "AUREA role designer (roles.reference.json)"
+      },
+      {
+        "name": "manager",
+        "description": "AUREA role manager (roles.reference.json)"
+      },
+      {
+        "name": "worker",
+        "description": "AUREA role worker (roles.reference.json)"
+      },
+      {
+        "name": "stockkeeper",
+        "description": "AUREA role stockkeeper (roles.reference.json)"
+      },
+      {
+        "name": "inspector",
+        "description": "AUREA role inspector (roles.reference.json)"
+      },
+      {
+        "name": "finance",
+        "description": "AUREA role finance (roles.reference.json)"
+      },
+      {
+        "name": "buyer",
+        "description": "AUREA role buyer (roles.reference.json)"
+      },
+      {
+        "name": "cashier",
+        "description": "AUREA role cashier (roles.reference.json)"
+      },
+      {
+        "name": "supplier",
+        "description": "AUREA role supplier (roles.reference.json)"
+      },
+      {
+        "name": "marketing",
+        "description": "AUREA role marketing (roles.reference.json)"
+      },
+      {
+        "name": "admin",
+        "description": "AUREA role admin (roles.reference.json)"
+      },
+      {
+        "name": "owner",
+        "description": "AUREA role owner (roles.reference.json)"
+      },
+      {
+        "name": "auditor",
+        "description": "AUREA role auditor (roles.reference.json)"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "aurea-api",
+      "name": "AUREA API (audience only)",
+      "enabled": true,
+      "bearerOnly": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    },
+    {
+      "clientId": "aurea-mobile",
+      "name": "AUREA mobile (public, Authorization Code + PKCE S256)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "com.aurea.customer.dev:/oauthredirect"
+      ],
+      "webOrigins": [],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "com.aurea.customer.dev:/oauthredirect"
+      },
+      "protocolMappers": [
+        {
+          "name": "audience aurea-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "aurea-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "aurea-ci",
+      "name": "CI only: client credentials to exercise the API (never in demo or production)",
+      "enabled": true,
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${KC_CI_CLIENT_SECRET}",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "audience aurea-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "aurea-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "service-account-aurea-ci",
+      "enabled": true,
+      "serviceAccountClientId": "aurea-ci",
+      "realmRoles": [
+        "auditor"
+      ]
+    },
+    {
+      "username": "dev.cliente",
+      "enabled": true,
+      "email": "dev.cliente@aurea.invalid",
+      "emailVerified": true,
+      "firstName": "Cliente",
+      "lastName": "Demo",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${KC_DEV_USER_PASSWORD}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "customer"
+      ]
+    }
+  ]
+}

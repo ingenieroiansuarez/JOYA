@@ -20,10 +20,14 @@ addFormats(ajv);
 ajv.addSchema({ $id: "openapi", components: api.components });
 const validError = ajv.compile({ $ref: "openapi#/components/schemas/Error" });
 
-const CONFIG = { env: "ci", port: 0, databaseUrl: "postgresql://x@127.0.0.1:1/x", valkeyUrl: "redis://127.0.0.1:1" };
+const CONFIG = {
+  env: "ci", port: 0, databaseUrl: "postgresql://x@127.0.0.1:1/x", valkeyUrl: "redis://127.0.0.1:1",
+  oidc: { issuer: "http://127.0.0.1:1/realms/test", audience: "aurea-api" },
+};
+const rejectAll = { verify: async () => { throw new Error("no tokens in this suite"); } };
 const fakeProbes = (state) => ({ check: async () => state, close: async () => {} });
 
-// A protected route, built without decorator syntax: identity is not wired, so it must answer 401.
+// A protected route, built without decorator syntax: without a token it must answer 401.
 class Protected { secret() { return { leaked: true }; } }
 Get("protected")(Protected.prototype, "secret", Object.getOwnPropertyDescriptor(Protected.prototype, "secret"));
 Controller()(Protected);
@@ -34,7 +38,7 @@ Public()(Failing.prototype, "boom", Object.getOwnPropertyDescriptor(Failing.prot
 Controller()(Failing);
 
 async function start(state = { database: "ok", valkey: "ok" }) {
-  const app = await createApp(CONFIG, fakeProbes(state), [Protected, Failing]);
+  const app = await createApp(CONFIG, fakeProbes(state), rejectAll, [Protected, Failing]);
   await app.listen(0, "127.0.0.1");
   const { port } = app.getHttpServer().address();
   return { app, url: (p) => `http://127.0.0.1:${port}${p}` };
@@ -125,7 +129,12 @@ test("readiness fails with 503 when a dependency is down", async () => {
 });
 
 describe("configuration fails closed", () => {
-  const ok = { AUREA_ENV: "local", DATABASE_URL: "postgresql://u:p@127.0.0.1/db", VALKEY_URL: "redis://:p@127.0.0.1:6379" };
+  const ok = {
+    AUREA_ENV: "local", DATABASE_URL: "postgresql://u:p@127.0.0.1/db", VALKEY_URL: "redis://:p@127.0.0.1:6379",
+    OIDC_ISSUER: "http://127.0.0.1:8080/realms/aurea-local/", OIDC_AUDIENCE: "aurea-api",
+  };
+  test("issuer is normalised without a trailing slash", () =>
+    assert.equal(loadConfig(ok).oidc.issuer, "http://127.0.0.1:8080/realms/aurea-local"));
   test("valid local config", () => assert.equal(loadConfig(ok).env, "local"));
   for (const [name, env, re] of [
     ["missing database", { ...ok, DATABASE_URL: "" }, /missing configuration: DATABASE_URL/],
@@ -134,6 +143,11 @@ describe("configuration fails closed", () => {
     ["no password in demo", { ...ok, AUREA_ENV: "demo", DATABASE_URL: "postgresql://u@h/db" }, /needs credentials in demo/],
     ["plain valkey in production", { ...ok, AUREA_ENV: "production" }, /must use TLS/],
     ["bad port", { ...ok, API_PORT: "http" }, /API_PORT/],
+    ["missing issuer", { ...ok, OIDC_ISSUER: "" }, /missing configuration: OIDC_ISSUER/],
+    ["missing audience", { ...ok, OIDC_AUDIENCE: undefined }, /missing configuration: OIDC_AUDIENCE/],
+    ["plain http issuer off loopback", { ...ok, OIDC_ISSUER: "http://idp.example/realms/x" }, /OIDC_ISSUER must use https/],
+    ["plain http issuer in demo", { ...ok, AUREA_ENV: "demo", OIDC_ISSUER: "http://127.0.0.1:8080/realms/x" }, /OIDC_ISSUER must use https/],
+    ["issuer with query", { ...ok, OIDC_ISSUER: "https://idp.example/r?x=1" }, /bare issuer/],
   ]) {
     test(name, () => assert.throws(() => loadConfig(env), (e) => e instanceof ConfigError && re.test(e.message)));
   }

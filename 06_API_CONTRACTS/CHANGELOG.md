@@ -1,5 +1,10 @@
 # Contratos — changelog
 
+## 1.6.0 — 2026-11-25 (hito 100, identidad)
+- `GET /me` (`getMe`, `x-permission: identity.self`): sujeto, roles y permisos efectivos del llamante tal como los ve la API.
+- `Role`: enum con los 16 roles, en el orden de `roles.reference.json`. `check_permissions.py` falla si divergen.
+- `identity.self` (alcance `self`) se concede a todos los roles: cada usuario autenticado puede ver su propia identidad.
+
 ## 1.5.1 — 2026-11-25 (corrección)
 - `SyncOperation.branchId` (UUID) pasa a `branch` (`BranchName`): en SQL una rama se identifica por `(project_id, name)` y no tiene id propio. `createBranch.name` usa el mismo `BranchName` (`^[a-z0-9][a-z0-9._-]{0,63}$`), y SQL `branch.name` tiene el mismo CHECK.
 

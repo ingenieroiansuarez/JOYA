@@ -5,7 +5,8 @@
     "guest": [
       "catalog.read",
       "public.verify",
-      "cart.edit"
+      "cart.edit",
+      "identity.self"
     ],
     "customer": [
       "catalog.read",
@@ -42,7 +43,8 @@
       "order.read",
       "document.read",
       "project.edit",
-      "notification.read"
+      "notification.read",
+      "identity.self"
     ],
     "designer": [
       "project.read",
@@ -52,7 +54,8 @@
       "job.cancel",
       "library.write",
       "notification.read",
-      "design.approve"
+      "design.approve",
+      "identity.self"
     ],
     "manager": [
       "workshop.read",
@@ -60,13 +63,15 @@
       "workshop.release",
       "project.read",
       "library.publish",
-      "notification.read"
+      "notification.read",
+      "identity.self"
     ],
     "worker": [
       "workshop.read",
       "workshop.execute",
       "document.write",
-      "notification.read"
+      "notification.read",
+      "identity.self"
     ],
     "stockkeeper": [
       "inventory.read",
@@ -75,61 +80,72 @@
       "inventory.move",
       "custody.transfer",
       "logistics.ship",
-      "notification.read"
+      "notification.read",
+      "identity.self"
     ],
     "inspector": [
       "quality.inspect",
       "quality.certify",
       "quality.revoke",
-      "notification.read"
+      "notification.read",
+      "identity.self"
     ],
     "finance": [
       "finance.read",
       "payment.read",
       "payment.refund",
-      "notification.read"
+      "notification.read",
+      "identity.self"
     ],
     "buyer": [
       "procurement.write",
-      "notification.read"
+      "notification.read",
+      "identity.self"
     ],
     "cashier": [
       "order.create",
       "payment.create",
       "order.read",
       "notification.read",
-      "order.cancel"
+      "order.cancel",
+      "identity.self"
     ],
     "supplier": [
       "supplier.assigned",
-      "notification.read"
+      "notification.read",
+      "identity.self"
     ],
     "marketing": [
       "marketing.write",
       "ai.generate",
-      "notification.read"
+      "notification.read",
+      "identity.self"
     ],
     "admin": [
       "identity.admin",
       "organization.admin",
       "catalog.write",
-      "notification.read"
+      "notification.read",
+      "identity.self"
     ],
     "owner": [
       "finance.read",
       "organization.admin",
-      "notification.read"
+      "notification.read",
+      "identity.self"
     ],
     "auditor": [
       "audit.read",
-      "notification.read"
+      "notification.read",
+      "identity.self"
     ]
   },
   "scopes": {
     "guest": {
       "catalog.read": "public",
       "public.verify": "public",
-      "cart.edit": "session"
+      "cart.edit": "session",
+      "identity.self": "self"
     },
     "customer": {
       "catalog.read": "public",
@@ -166,7 +182,8 @@
       "order.read": "assigned",
       "document.read": "assigned",
       "project.edit": "shared",
-      "notification.read": "own"
+      "notification.read": "own",
+      "identity.self": "self"
     },
     "designer": {
       "project.read": "assigned",
@@ -176,7 +193,8 @@
       "job.cancel": "assigned",
       "library.write": "organization",
       "notification.read": "own",
-      "design.approve": "assigned"
+      "design.approve": "assigned",
+      "identity.self": "self"
     },
     "manager": {
       "workshop.read": "location",
@@ -184,13 +202,15 @@
       "workshop.release": "location",
       "project.read": "location",
       "library.publish": "organization",
-      "notification.read": "own"
+      "notification.read": "own",
+      "identity.self": "self"
     },
     "worker": {
       "workshop.read": "assigned",
       "workshop.execute": "assigned",
       "document.write": "assigned",
-      "notification.read": "own"
+      "notification.read": "own",
+      "identity.self": "self"
     },
     "stockkeeper": {
       "inventory.read": "location",
@@ -199,54 +219,64 @@
       "inventory.move": "location",
       "custody.transfer": "location",
       "logistics.ship": "location",
-      "notification.read": "own"
+      "notification.read": "own",
+      "identity.self": "self"
     },
     "inspector": {
       "quality.inspect": "organization",
       "quality.certify": "organization",
       "quality.revoke": "organization",
-      "notification.read": "own"
+      "notification.read": "own",
+      "identity.self": "self"
     },
     "finance": {
       "finance.read": "organization",
       "payment.read": "organization",
       "payment.refund": "organization",
-      "notification.read": "own"
+      "notification.read": "own",
+      "identity.self": "self"
     },
     "buyer": {
       "procurement.write": "organization",
-      "notification.read": "own"
+      "notification.read": "own",
+      "identity.self": "self"
     },
     "cashier": {
       "order.create": "location",
       "payment.create": "location",
       "order.read": "location",
       "notification.read": "own",
-      "order.cancel": "location"
+      "order.cancel": "location",
+      "identity.self": "self"
     },
     "supplier": {
       "supplier.assigned": "assigned",
-      "notification.read": "own"
+      "notification.read": "own",
+      "identity.self": "self"
     },
     "marketing": {
       "marketing.write": "organization",
       "ai.generate": "organization",
-      "notification.read": "own"
+      "notification.read": "own",
+      "identity.self": "self"
     },
     "admin": {
       "identity.admin": "organization",
       "organization.admin": "organization",
       "catalog.write": "organization",
-      "notification.read": "own"
+      "notification.read": "own",
+      "identity.self": "self"
     },
     "owner": {
       "finance.read": "organization",
       "organization.admin": "organization",
-      "notification.read": "own"
+      "notification.read": "own",
+      "identity.self": "self"
     },
     "auditor": {
       "audit.read": "organization",
-      "notification.read": "own"
+      "notification.read": "own",
+      "identity.self": "self"
     }
   },
   "scopeVocabulary": {

@@ -7,7 +7,7 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | Hito | Estado | Nota |
 |---|---|---|
 | 000 Feasibility | GO CONDICIONAL (ian, 2026-11-25) | CAD/DFM y render con evidencia; AR bloqueado y mesh IA solo simulada (`27_IMPLEMENTATION_ROADMAP/000_GO_NO_GO.md`) |
-| 100 Foundation | EN CURSO | Contratos 1.1–1.5 con verificación en CI; arranque local (pnpm, Compose, migraciones); esqueleto de API. Falta identidad, tokens, apps |
+| 100 Foundation | EN CURSO | Contratos 1.1–1.6 con verificación en CI; arranque local (pnpm, Compose, migraciones); API con OIDC y permisos por rol; Keycloak local con login PKCE probado. Faltan tokens de diseño, esqueletos de apps, SBOM |
 | 200–1000 | NOT_STARTED | |
 
 ## Backlog 000
@@ -72,9 +72,9 @@ Pendiente: evaluar Meshy/Tripo (permiso, términos comerciales verificados y cre
 corepack enable            # pnpm 10.28.0 desde packageManager; Node 22.23.5 (.node-version)
 pnpm install --frozen-lockfile
 pnpm bootstrap             # crea .env (ignorado por git) con contraseñas aleatorias; no las imprime
-docker compose up -d --wait   # PostgreSQL 16.15 y Valkey 8.1.4, fijados por digest, solo en 127.0.0.1
+docker compose up -d --wait   # PostgreSQL 16.15, Valkey 8.1.4 y Keycloak 26.8.1, fijados por digest, solo en 127.0.0.1
 pnpm db:migrate             # lee .env
-TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # db 3, api 16, scripts 3
+TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # db 3, api 45 (5 contra Keycloak), scripts 5
 ```
 - `pnpm db:migrate` carga `.env` si existe (`node --env-file-if-exists`); un `DATABASE_URL` exportado tiene prioridad.
 - Migraciones en `packages/db/migrations` (Drizzle migrator sobre SQL plano, esquema `aurea_migrations`). La prueba crea dos bases nuevas, aplica las migraciones a una y `05_DATABASE/core_reference.sql` a la otra, y exige el mismo catálogo: columnas, restricciones e índices. Una migración alterada hace fallar la prueba (verificado).
@@ -82,8 +82,15 @@ TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # db 3, api 16, scripts 3
 - Política: una migración que ya está en main no se edita, se añade otra (CI lo bloquea). Roll-forward: no hay down migrations; un cambio se corrige con una migración nueva compatible. Cada migración actualiza también `core_reference.sql`, del que leen los verificadores de contratos.
 - Valkey en lugar de Redis: Redis 7.4+ ya no es BSD (RSALv2/SSPL, AGPL en 8.x). Valkey es BSD-3-Clause, habla el mismo protocolo y BullMQ lo admite. Si se prefiere Redis, es una decisión de licencias.
 - `bootstrap` se niega a correr con `AUREA_ENV` distinto de local/ci; `compose.yaml` exige `.env` y falla sin él.
-- API (`apps/api`, NestJS 12.6.1 sobre Express, TypeScript 5.9.3): `GET /healthz` (vivo) y `GET /readyz` (PostgreSQL y Valkey con timeout de 2 s, 503 si alguno cae), fuera de `/v1` y sin datos. Todo lo demás se niega por defecto con 401 hasta conectar OIDC. Los errores siguen el `Error` de OpenAPI con códigos de `errors.json` y `x-correlation-id`, y un fallo no previsto responde `INTERNAL_ERROR` sin filtrar el mensaje. La configuración falla cerrada: faltan variables, entorno desconocido, credenciales ausentes en demo/producción o Valkey sin TLS en producción. `pnpm api:start` la levanta con el `.env` local.
+- API (`apps/api`, NestJS 12.6.1 sobre Express, TypeScript 5.9.3): `GET /healthz` (vivo) y `GET /readyz` (PostgreSQL y Valkey con timeout de 2 s, 503 si alguno cae), fuera de `/v1` y sin datos. Todo lo demás exige token (ver Identidad). Los errores siguen el `Error` de OpenAPI con códigos de `errors.json` y `x-correlation-id`, y un fallo no previsto responde `INTERNAL_ERROR` sin filtrar el mensaje. La configuración falla cerrada: faltan variables, entorno desconocido, credenciales ausentes en demo/producción o Valkey sin TLS en producción. `pnpm api:start` la levanta con el `.env` local.
 - Licencias: `pnpm license-check` falla si una dependencia npm no es MIT, Apache-2.0, BSD-2/3, ISC o 0BSD (122 paquetes, todos dentro). Falta generar el SBOM CycloneDX.
+- Identidad (contratos 1.6.0):
+  - Keycloak 26.8.1 (Apache-2.0) en Compose, modo dev, **solo local/CI**. El realm `aurea-local` y el mapa rol→permiso de la API (`apps/api/src/identity/roles.generated.ts`) se generan desde `roles.reference.json` con `node scripts/identity-gen.mjs`; CI falla si están desfasados.
+  - Clientes: `aurea-mobile` público, solo Authorization Code con PKCE S256 obligatorio, redirect `com.aurea.customer.dev:/oauthredirect`, sin password grant; `aurea-ci` confidencial, solo client credentials, rol `auditor`; `aurea-api` solo audiencia. Token de acceso de 5 min, refresh rotado.
+  - Secretos (`KC_BOOTSTRAP_ADMIN_PASSWORD`, `KC_CI_CLIENT_SECRET`, `KC_DEV_USER_PASSWORD`) aleatorios en `.env`; el realm versionado solo tiene marcadores `${...}`. `pnpm bootstrap` añade a un `.env` existente las claves nuevas sin tocar las que ya tiene.
+  - API: `Authorization: Bearer`, firma verificada con las claves del `jwks_uri` del documento de descubrimiento (no atado a Keycloak), `iss` y `aud` exactos, solo RS256/PS256/ES256/EdDSA, 30 s de tolerancia. Token inválido → 401 sin motivo; rol sin el permiso o ruta sin `@RequirePermission` → 403; IdP inalcanzable → 503. Roles desconocidos se ignoran. `OIDC_ISSUER` debe ser https salvo loopback en local/ci.
+  - Probado: 9 formas de token malo (sin cabecera, no JWT, vencido, emisor y audiencia ajenos, otra clave, `alg: none`, HS256 con la clave pública, payload alterado) → 401; contra Keycloak real, client credentials → `/v1/me` como auditor, login PKCE de `dev.cliente` → customer, el código no se canjea sin `code_verifier` ni con uno falso, la petición sin `code_challenge` se rechaza y el ID token no sirve contra la API.
+  - Pendiente: MFA para personal y step-up (exige pantallas de login de staff, hito 200+), alcance por recurso y ubicación (lo aplica cada módulo cuando exista), revocación/introspección, y el IdP de producción (decisión de ian).
 - Probado localmente: compose arriba, migración aplicada, `state_checks.sql` sobre la base migrada OK, Valkey rechaza clientes sin contraseña (`NOAUTH`).
 
 ## Hallazgos del hito 000
@@ -112,12 +119,14 @@ Avance (contratos 1.1.0 a 1.5.0, PR #7 a #11 y este): estados alineados, `Job` c
 | pg y transitivas (packages/db) | 8.23.1 | MIT / ISC | `pnpm licenses list` |
 | PostgreSQL (imagen) | 16.15 | PostgreSQL License | Docker oficial, por digest |
 | Valkey (imagen) | 8.1.4 | BSD-3-Clause | Docker oficial, por digest |
+| Keycloak (imagen) | 26.8.1 | Apache-2.0 | Docker Hub `keycloak/keycloak`, por digest; solo local/CI |
+| jose (apps/api) | 6.2.17 | MIT | Verificación JWT/JWKS |
 Lista completa en `services/geometry/requirements.lock`. No es asesoría legal.
 
 ## Bloqueos y decisiones pendientes (ian)
 1. Android físico: Z Flip 7 disponible (2026-11-25). Falta un Android de gama media para representatividad.
 2. Mercado/país piloto y moneda (condiciona proveedor de pago).
-3. Keycloak autogestionado o IdP gestionado.
+3. Keycloak autogestionado o IdP gestionado para producción (local/CI ya usa Keycloak; la API solo depende de OIDC estándar).
 4. Permiso y presupuesto para evaluar un proveedor de mesh IA (Meshy/Tripo).
 
 ## Siguiente
