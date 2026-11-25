@@ -101,6 +101,10 @@ export function validateDocument(doc) {
   const seen = new Set();
   doc.components.forEach((c, i) => {
     const base = `/components/${i}`;
+    if (!c || typeof c !== "object" || Array.isArray(c)) {
+      issues.push(issue("SCHEMA", base, "component must be an object"));
+      return;
+    }
     if (typeof c.id !== "string" || !COMPONENT_ID.test(c.id)) issues.push(issue("INVALID_ID", `${base}/id`, String(c.id)));
     if (seen.has(c.id)) issues.push(issue("DUPLICATE_ID", `${base}/id`, c.id));
     seen.add(c.id);
@@ -162,9 +166,11 @@ export function applyOperation(doc, op) {
     if (!spec) return { ok: false, issues: [issue("UNKNOWN_PARAMETER", "/operation/name", String(op.name))] };
     const bad = checkValue(spec, op.value, "/operation/value");
     if (bad.length) return { ok: false, issues: bad };
+    if (comp.parameters[op.name] === op.value) return { ok: false, issues: [issue("NO_CHANGE", "/operation/value", String(op.value))] };
     comp.parameters[op.name] = op.value;
   } else {
     if (!material(op.materialId)) return { ok: false, issues: [issue("UNKNOWN_MATERIAL", "/operation/materialId", String(op.materialId))] };
+    if (comp.materialId === op.materialId) return { ok: false, issues: [issue("NO_CHANGE", "/operation/materialId", op.materialId)] };
     comp.materialId = op.materialId;
   }
   next.revision = doc.revision + 1;

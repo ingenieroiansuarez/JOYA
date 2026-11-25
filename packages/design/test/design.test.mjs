@@ -106,3 +106,21 @@ test("rebase only across independent parameters (no last-write-wins)", () => {
   assert.equal(canRebase(metal, [metal]), false);
   assert.equal(canRebase({ type: "create_ring" }, []), false);
 });
+
+test("writing the current value is NO_CHANGE, never an empty revision", () => {
+  for (const op of [
+    { type: "modify_parameter", componentId: "ring-base", name: "bandWidth", value: 4 },
+    { type: "change_material", componentId: "ring-base", materialId: "gold-18k-yellow" },
+  ]) {
+    const r = applyOperation(ring(), op);
+    assert.equal(r.ok, false, op.type);
+    assert.equal(r.issues[0].code, "NO_CHANGE");
+  }
+});
+
+test("malformed components are validation issues, not exceptions", () => {
+  for (const bad of [null, 7, "ring", []]) {
+    const issues = validateDocument({ ...ring(), components: [bad] });
+    assert.deepEqual(issues.map((i) => [i.code, i.path]), [["SCHEMA", "/components/0"]]);
+  }
+});
