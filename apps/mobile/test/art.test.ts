@@ -21,3 +21,18 @@ describe("design renders", () => {
     }
   });
 });
+
+describe("tab icons", () => {
+  it("every tab has its icon at 1×, 2× and 3×, at the right pixel size", () => {
+    const { existsSync } = require("node:fs") as typeof import("node:fs");
+    const { TABS } = require("../src/nav") as typeof import("../src/nav");
+    for (const tab of TABS) {
+      for (const [suffix, px] of [["", 24], ["@2x", 48], ["@3x", 72]] as const) {
+        const file = join(__dirname, `../assets/icons/tab-${tab}${suffix}.png`);
+        expect(existsSync(file)).toBe(true);
+        const png = readFileSync(file);
+        expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([px, px]);
+      }
+    }
+  });
+});

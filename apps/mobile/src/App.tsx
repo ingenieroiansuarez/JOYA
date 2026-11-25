@@ -1,7 +1,7 @@
 import tokens from "@aurea/tokens";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useReducer } from "react";
-import { BackHandler, Pressable, StyleSheet, Text, View } from "react-native";
+import { BackHandler, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { maybeCompleteAuthSession } from "expo-web-browser";
 import { configFromBuild, ConfigError, type AppConfig } from "./config";
@@ -59,8 +59,13 @@ function ConfigErrorScreen() {
 }
 
 const TAB_LABEL = { boutique: "tabBoutique", design: "tabDesign", favorites: "tabFavorites", profile: "tabProfile" } as const;
-// Tab marks drawn with text glyphs (no icon font to license or bundle): outline when idle, filled when selected.
-const TAB_GLYPH = { boutique: ["◇", "◆"], design: ["✧", "✦"], favorites: ["♡", "♥"], profile: ["○", "●"] } as const;
+// Tab icons drawn in-house (tools/icons/render.mjs: line art, white, 1×–3×), tinted muted or gold.
+const TAB_ICON: Record<Tab, number> = {
+  boutique: require("../assets/icons/tab-boutique.png"),
+  design: require("../assets/icons/tab-design.png"),
+  favorites: require("../assets/icons/tab-favorites.png"),
+  profile: require("../assets/icons/tab-profile.png"),
+};
 
 function Shell() {
   const { t, config } = useSession();
@@ -114,7 +119,7 @@ function Shell() {
             <Pressable key={tab} accessibilityRole="tab" accessibilityState={{ selected }} accessibilityLabel={t(TAB_LABEL[tab])}
               onPress={() => dispatch({ type: "tab", tab })} style={bar.tab}>
               <View style={[bar.mark, selected && { backgroundColor: c.accent }]} />
-              <Text style={[bar.glyph, selected && { color: c.accent }]} importantForAccessibility="no">{TAB_GLYPH[tab][selected ? 1 : 0]}</Text>
+              <Image source={TAB_ICON[tab]} style={[bar.icon, { tintColor: selected ? c.accent : c.textMuted }]} importantForAccessibility="no" accessibilityIgnoresInvertColors />
               <Text style={[bar.label, selected && { color: c.accent, fontWeight: "600" }]}>{t(TAB_LABEL[tab])}</Text>
             </Pressable>
           );
@@ -132,6 +137,6 @@ const bar = StyleSheet.create({
   root: { flexDirection: "row", borderTopWidth: StyleSheet.hairlineWidth, borderColor: c.inputBorder, backgroundColor: c.surface, paddingBottom: s[1] },
   tab: { flex: 1, minHeight: tokens.touchTargetDp + s[2], alignItems: "center", justifyContent: "center", gap: s[0] },
   mark: { position: "absolute", top: 0, width: 28, height: 2, borderRadius: 1, backgroundColor: "transparent" },
-  glyph: { color: c.textMuted, fontSize: type[3], lineHeight: type[3] * 1.15 },
+  icon: { width: 24, height: 24 },
   label: { color: c.textMuted, fontSize: type[0], letterSpacing: 1, textTransform: "uppercase" },
 });
