@@ -6,6 +6,7 @@ import { DATABASE } from "../database";
 import { correlationId } from "../errors.filter";
 import { RequirePermission } from "../identity/permission.decorator";
 import type { Principal } from "../identity/principal";
+import { acceptProposalPreview, markProposalAccepted } from "../ai/ai.controller";
 import { ApiError, toDetails } from "./api-error";
 import { JOB_COLUMNS, jobArtifacts, toJob, type JobRow } from "./jobs";
 import {
@@ -140,7 +141,12 @@ export class ProjectsController {
       if (job.revision_id !== baseId) throw new ApiError(422, "INVARIANT_VIOLATED", [{ code: "INVARIANT_VIOLATED", pointer: "/previewJobId", message: "preview was made on another base" }]);
       if (job.state !== "SUCCEEDED") throw new ApiError(409, "RESULT_NOT_READY");
       if (p.head_id !== baseId) throw new ApiError(409, "VERSION_CONFLICT", [{ code: "VERSION_CONFLICT", pointer: "/baseRevisionId", message: "base is not the head of main" }]);
-      const r = await appendRevision(c, { project: p, document: job.document, actor: subject, source: "PREVIEW", sourceId: job.id, correlationId: correlationId(req) });
+      // A preview of an AURA proposal: the proposal must still be open on this very preview.
+      const proposalId = await acceptProposalPreview(c, job);
+      const r = await appendRevision(c, {
+        project: p, document: job.document, actor: subject, source: proposalId ? "AI" : "PREVIEW", sourceId: proposalId ?? job.id, correlationId: correlationId(req),
+      });
+      if (proposalId) await markProposalAccepted(c, proposalId, r.id);
       return toRevision(r);
     }));
   }

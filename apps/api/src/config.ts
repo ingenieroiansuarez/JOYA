@@ -11,6 +11,8 @@ export interface Config {
   oidc: { issuer: string; audience: string };
   /** Hito 300 design module (design/config.ts loadDesignConfig); absent → design routes answer 503. */
   design?: import("./design/config").DesignConfig;
+  /** Hito 400 AURA gateway (ai/config.ts loadAiConfig + adapter); absent → ai routes answer 503. */
+  ai?: import("./ai/ai.controller").AiRuntime;
 }
 
 export class ConfigError extends Error {}

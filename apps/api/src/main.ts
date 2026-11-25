@@ -4,6 +4,8 @@ import { createProbes } from "./probes";
 import { createVerifier } from "./identity/verifier";
 import { createPool } from "./database";
 import { loadDesignConfig } from "./design/config";
+import { loadAiConfig } from "./ai/config";
+import { SimulatedAdapter } from "./ai/simulator";
 import { JobRunner } from "./design/jobs";
 import { ArtifactStore } from "./design/store";
 import { GeometryWorker } from "./design/worker-client";
@@ -13,6 +15,7 @@ async function main() {
   try {
     config = loadConfig();
     config.design = loadDesignConfig(process.env, config.env);
+    config.ai = { config: loadAiConfig(process.env, config.env), adapter: new SimulatedAdapter() };
   } catch (err) {
     if (err instanceof ConfigError) {
       console.error(`refusing to start: ${err.message}`);

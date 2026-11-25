@@ -477,5 +477,52 @@
         "guard": "authorized"
       }
     ]
+  },
+  "AiProposal": {
+    "initial": "PROPOSED",
+    "transitions": [
+      {
+        "from": "PROPOSED",
+        "to": "PREVIEWING",
+        "action": "preview",
+        "guard": "base is still the head of main"
+      },
+      {
+        "from": "PREVIEWING",
+        "to": "PREVIEWING",
+        "action": "preview",
+        "guard": "another option; base is still the head"
+      },
+      {
+        "from": "PREVIEWING",
+        "to": "ACCEPTED",
+        "action": "accept",
+        "guard": "person accepts the finished preview (createRevision accepted=true)"
+      },
+      {
+        "from": "PROPOSED",
+        "to": "DISCARDED",
+        "action": "discard",
+        "guard": "owner"
+      },
+      {
+        "from": "PREVIEWING",
+        "to": "DISCARDED",
+        "action": "discard",
+        "guard": "owner"
+      },
+      {
+        "from": "PROPOSED",
+        "to": "EXPIRED",
+        "action": "expire",
+        "guard": "expiresAt passed"
+      },
+      {
+        "from": "PREVIEWING",
+        "to": "EXPIRED",
+        "action": "expire",
+        "guard": "expiresAt passed"
+      }
+    ]
   }
 }

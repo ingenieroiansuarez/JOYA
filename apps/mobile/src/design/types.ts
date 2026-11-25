@@ -35,3 +35,16 @@ export type SyncOperationResult =
   | { operationId: string; status: "CONFLICT"; serverRevisionId: string; error: { code: string; message: string } }
   | { operationId: string; status: "REJECTED"; error: { code: string; pointer?: string; message: string } };
 export interface SyncResult { results: SyncOperationResult[]; cursor: string }
+
+/** AURA (contracts 1.10.0). A proposal never changes the project; a person previews and accepts. */
+export type AiNoteCode = "ASSUMPTION" | "OUT_OF_RANGE" | "NEEDS_JEWELER" | "UNSUPPORTED" | "IGNORED_INSTRUCTION" | "NOT_UNDERSTOOD" | "ALREADY_SO";
+export interface AiProposalOption {
+  index: number; title: string; summary: string; operations: DesignOperation[]; changes: ParameterChange[]; assumptions: string[]; previewRequired: true;
+}
+export interface AiProposal {
+  id: string; projectId: string; baseRevisionId: string; state: "PROPOSED" | "PREVIEWING" | "ACCEPTED" | "DISCARDED" | "EXPIRED";
+  provider: { id: string; model: string; simulated: boolean }; locale: "es" | "en"; understood: string[];
+  notes: { code: AiNoteCode; message: string }[]; options: AiProposalOption[];
+  previewOptionIndex: number | null; previewJobId: string | null; revisionId: string | null; createdAt: string; expiresAt: string;
+}
+export interface AiQuota { day: string; limitUnits: number; usedUnits: number; remainingUnits: number; resetsAt: string }
