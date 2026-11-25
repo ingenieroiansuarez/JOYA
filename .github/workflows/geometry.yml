@@ -1,0 +1,32 @@
+name: Geometry service (hito 000)
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "services/geometry/**"
+      - "09_JEWELRY_ENGINE/**"
+      - "11_3D_ASSET_LIBRARY/families.json"
+      - ".github/workflows/geometry.yml"
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install locked dependencies
+        run: |
+          python -m pip install -r services/geometry/requirements.lock
+          python -m pip install --no-deps -e services/geometry
+      - name: Tests
+        run: python -m pytest -v services/geometry
+      - name: Regenerate handoff ring fixture
+        run: aurea-geometry 09_JEWELRY_ENGINE/fixtures/ring.json services/geometry/out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: geometry-evidence
+          path: services/geometry/out/
