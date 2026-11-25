@@ -1,6 +1,6 @@
 # STATUS — AUREA
 
-Hito activo: **200 — Boutique**. Actualizado: 2026-11-25.
+Hito activo: **300 — Jewelry Engine**. Actualizado: 2026-11-25.
 Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5YS
 
 ## Hitos
@@ -8,7 +8,7 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 |---|---|---|
 | 000 Feasibility | GO CONDICIONAL (ian, 2026-11-25) | CAD/DFM y render con evidencia; AR bloqueado y mesh IA solo simulada (`27_IMPLEMENTATION_ROADMAP/000_GO_NO_GO.md`) |
 | 100 Foundation | ACEPTADO (ian, 2026-11-25, PR #25) | Gate "arranque limpio, pruebas y login; entorno aislado; sin secretos": CI verde en main, login PKCE real en el Z Flip 7 (debug y release), `.env` fuera de git y `No secrets tracked` en CI. Contratos 1.1–1.7 con verificación en CI; arranque local (pnpm, Compose, migraciones); API con OIDC y permisos por rol; Keycloak local con login PKCE probado. Tokens de diseño con contraste AA verificado. Esqueletos web (Next) y móvil (Expo, login PKCE). Login PKCE real probado en el Z Flip 7 (2026-11-25) |
-| 200 Boutique | EN CURSO | Contratos 1.8.0, migración 0001, seed demo y API de catálogo/favoritos (PR #26). App: navegación de invitado, catálogo, detalle, favoritos, perfil. Falta: prueba del gate en el Z Flip 7 |
+| 200 Boutique | ACEPTADO (ian, 2026-11-25, PR #30) | Gate "APK dev navega el catálogo; estados vacío/error accesibles": APK debug en el Z Flip 7 navega catálogo, detalle y favoritos contra la API; error "Sin conexión" con Reintentar visto con la API apagada (2026-11-25). Contratos 1.8.0, migración 0001, seed demo, API (PR #26), app (PR #27–#29). Pendiente: recorrido con TalkBack |
 | 300–1000 | NOT_STARTED | |
 
 ## Backlog 000
@@ -106,7 +106,7 @@ Gate: "APK dev navega el catálogo; estados vacío/error accesibles".
 - App (`apps/mobile`): pestañas Boutique, Favoritos y Perfil con pila propia y botón atrás de Android; catálogo en cuadrícula con filtros por categoría, paginación y deslizar para recargar; detalle con metal, peso (g) y piedras (ct) exactos, precio formateado como texto (sin flotantes); favoritos optimistas con reversión; el invitado navega sin cuenta y al guardar se le pide iniciar sesión (REQ-02-01). Sesión restaurada al abrir con el refresh token del Keystore; el access token se renueva al vencer y tras un 401 una sola vez.
 - Estados: carga anunciada (región viva), error por tipo (sin conexión / servicio caído / inesperado) con Reintentar y rol `alert`, vacío de categoría con "Ver todas", vacío de favoritos con "Explorar la boutique", pieza retirada con "Volver a la boutique", fallo al cargar más sin perder lo mostrado. Controles ≥ 48 dp con rol y etiqueta. Probado con `@testing-library/react-native` buscando por rol y texto (`test/screens.test.tsx`).
 - Imágenes: no hay fotografías ni renders licenciados; las tarjetas usan una ilustración dibujada con vistas en el tono del metal, anunciada como "Ilustración…, no es una fotografía". Fotos o renders reales quedan pendientes (licencia y material de ian).
-- Prueba en dispositivo (2026-11-25, Z Flip 7 SM-F766B, Android 17, build debug desde main por USB con `adb reverse`, modo avión): la Boutique carga el catálogo sintético desde la API (capturas), ian recorrió filtros, detalle, guardar como invitado (pide login), login de `dev.cliente` y guardar en favoritos ("Quitar de favoritos" visible) y reportó que pasaron. Hallazgo: la barra de pestañas quedaba bajo los botones de navegación de Android (edge to edge), así que no podía abrir Favoritos; corregido con los insets de `react-native-safe-area-context` 5.11.1 (versión de Expo SDK 58, MIT). Pendiente: confirmar el arreglo en el teléfono, ver el estado de error con la API apagada y recorrer con TalkBack.
+- Prueba en dispositivo (2026-11-25, Z Flip 7 SM-F766B, Android 17, build debug desde main por USB con `adb reverse`, modo avión): la Boutique carga el catálogo sintético desde la API (capturas), ian recorrió filtros, detalle, guardar como invitado (pide login), login de `dev.cliente` y guardar en favoritos ("Quitar de favoritos" visible) y reportó que pasaron. Hallazgo: la barra de pestañas quedaba bajo los botones de navegación de Android (edge to edge), así que no podía abrir Favoritos; corregido con los insets de `react-native-safe-area-context` 5.11.1 (versión de Expo SDK 58, MIT). Arreglo confirmado en el teléfono (PR #29): la barra queda sobre los botones y Favoritos muestra el Anillo Clásico guardado (captura de ian, 09:03). Estado de error: con la API detenida, al recargar la Boutique aparece "Sin conexión. Revisa tu red e inténtalo de nuevo." con Reintentar y la barra intacta, sin lista vacía (captura de ian, 09:16); la API se reinició y el endpoint de catálogo responde de nuevo; al tocar Reintentar el catálogo vuelve con el favorito intacto (captura de ian, 09:18). Los estados vacíos y la accesibilidad (rol, etiqueta, región viva, alerta) se verificaron con pruebas automáticas; falta recorrerlos con TalkBack en el teléfono.
 - Nota de dispositivo: un cable USB defectuoso cortaba ADB cada pocos segundos (y con él los `adb reverse`); con otro cable quedó estable.
 
 ## Hallazgos del hito 000
