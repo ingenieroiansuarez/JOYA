@@ -7,11 +7,12 @@ import { pickLocale, translator } from "../lib/i18n";
 export const metadata = { title: "AUREA", robots: { index: false, follow: false } };
 
 const SECTIONS = [
-  { key: "home", milestone: null },
-  { key: "projects", milestone: "300" },
-  { key: "orders", milestone: "500" },
-  { key: "inventory", milestone: "600" },
-  { key: "workshop", milestone: "700" },
+  { key: "home", href: "/", milestone: null },
+  { key: "quotes", href: "/panel/cotizaciones", milestone: null },
+  { key: "orders", href: "/panel/pedidos", milestone: null },
+  { key: "inventory", href: "/panel/inventario", milestone: null },
+  { key: "projects", href: null, milestone: "300" },
+  { key: "workshop", href: null, milestone: "700" },
 ] as const;
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
@@ -33,7 +34,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                     <span aria-disabled="true" title={t("home.comingIn", { milestone: s.milestone })}>{t(`nav.${s.key}`)}</span>
                   </li>
                 ) : (
-                  <li key={s.key}><a href="/" aria-current="page">{t(`nav.${s.key}`)}</a></li>
+                  <li key={s.key}><a href={s.href}>{t(`nav.${s.key}`)}</a></li>
                 ),
               )}
             </ul>

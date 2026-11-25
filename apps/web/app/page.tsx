@@ -7,6 +7,7 @@ export default async function Home() {
     <>
       <h1>{t("home.title")}</h1>
       <p className="lead">{t("home.lead")}</p>
+      <p><a className="button" href="/panel">{t("home.openPanel")}</a></p>
     </>
   );
 }
