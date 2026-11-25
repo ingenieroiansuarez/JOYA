@@ -1,8 +1,5 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    id("com.android.application")  // AGP 9 built-in Kotlin support compiles src/main/java/**/*.kt
 }
 
 // Filament 1.79.0 (google/filament tag v1.79.0). Same version for all three artifacts.
@@ -10,7 +7,7 @@ val filamentVersion = "1.79.0"
 
 android {
     namespace = "dev.aurea.renderbench"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "dev.aurea.renderbench.poc"
@@ -27,8 +24,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     // The GLB is read with openFd(), which needs it stored uncompressed.
@@ -36,7 +33,7 @@ android {
 }
 
 kotlin {
-    compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
+    jvmToolchain(21)
 }
 
 dependencies {

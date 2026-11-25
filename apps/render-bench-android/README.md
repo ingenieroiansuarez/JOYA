@@ -4,7 +4,7 @@ APK de prueba para ADR-0003: misma escena, cámara, giro, escenas (`base`, `vitr
 (100 → 2500 anillos) y formato de informe que `tools/render-bench` (WebView/Three.js), para comparar las dos rutas
 en el mismo teléfono. No es la app de AUREA ni código de producción.
 
-- Filament / gltfio / filament-utils **1.79.0**, AGP 8.7.3, Gradle 8.11.1, Kotlin 2.1.0, minSdk 28, solo `arm64-v8a`.
+- Filament / gltfio / filament-utils **1.79.0**, AGP 9.4.1, Gradle 9.6.0, Kotlin 2.4.0, compileSdk 37 (lo exige Filament 1.79.0), minSdk 28, solo `arm64-v8a`.
 - Escena: `app/src/main/assets/showcase.glb`, copia exacta de `tools/render-bench/scene/showcase.glb`
   (CI lo comprueba). Se genera desde la salida del servicio de geometría:
   `python tools/render-bench/scene/build_scene.py ring-base.stl tools/render-bench/scene/showcase.glb`.
@@ -20,4 +20,4 @@ procedural no es idéntico a `RoomEnvironment`.
 
 ## Compilar
 CI: workflow `Android render bench APK` → artefacto `aurea-render-bench-android-debug` (APK + SHA-256).
-Local: `gradle -p apps/render-bench-android assembleDebug` con JDK 17 y Android SDK 35.
+Local: `gradle -p apps/render-bench-android assembleDebug` con JDK 21 y Android SDK 37.
