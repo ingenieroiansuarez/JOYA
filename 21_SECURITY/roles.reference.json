@@ -1,10 +1,11 @@
 {
   "default": "DENY",
-  "note": "Illustrative grants; additional policies and permissions from screen/action specifications must be defined. Ownership/location/project/assignment constraints apply; no wildcard.",
+  "note": "Illustrative grants; additional policies and permissions from screen/action specifications must be defined. Ownership/location/project/assignment constraints apply; no wildcard. Scopes are mandatory for every grant (tools/contracts/check_permissions.py).",
   "roles": {
     "guest": [
       "catalog.read",
-      "public.verify"
+      "public.verify",
+      "cart.edit"
     ],
     "customer": [
       "catalog.read",
@@ -23,7 +24,13 @@
       "payment.create",
       "payment.read",
       "sync.read",
-      "sync.write"
+      "sync.write",
+      "cart.edit",
+      "notification.read",
+      "document.read",
+      "loyalty.read",
+      "identity.self",
+      "crm.contact"
     ],
     "advisor": [
       "crm.read",
@@ -31,69 +38,227 @@
       "quote.read",
       "quote.issue",
       "project.read",
-      "order.read"
+      "order.read",
+      "document.read",
+      "project.edit",
+      "notification.read"
     ],
     "designer": [
       "project.read",
       "project.edit",
       "project.validate",
       "job.read",
-      "job.cancel"
+      "job.cancel",
+      "library.write",
+      "notification.read"
     ],
     "manager": [
       "workshop.read",
       "workshop.plan",
       "workshop.release",
-      "project.read"
+      "project.read",
+      "library.publish",
+      "notification.read"
     ],
     "worker": [
       "workshop.read",
       "workshop.execute",
-      "document.write"
+      "document.write",
+      "notification.read"
     ],
     "stockkeeper": [
       "inventory.read",
       "inventory.reserve",
       "inventory.release",
       "inventory.move",
-      "custody.transfer"
+      "custody.transfer",
+      "logistics.ship",
+      "notification.read"
     ],
     "inspector": [
       "quality.inspect",
       "quality.certify",
-      "quality.revoke"
+      "quality.revoke",
+      "notification.read"
     ],
     "finance": [
       "finance.read",
       "payment.read",
-      "payment.refund"
+      "payment.refund",
+      "notification.read"
     ],
     "buyer": [
-      "procurement.write"
+      "procurement.write",
+      "notification.read"
     ],
     "cashier": [
       "order.create",
       "payment.create",
-      "order.read"
+      "order.read",
+      "notification.read"
     ],
     "supplier": [
-      "supplier.assigned"
+      "supplier.assigned",
+      "notification.read"
     ],
     "marketing": [
       "marketing.write",
-      "ai.generate"
+      "ai.generate",
+      "notification.read"
     ],
     "admin": [
       "identity.admin",
       "organization.admin",
-      "catalog.write"
+      "catalog.write",
+      "notification.read"
     ],
     "owner": [
       "finance.read",
-      "organization.admin"
+      "organization.admin",
+      "notification.read"
     ],
     "auditor": [
-      "audit.read"
+      "audit.read",
+      "notification.read"
     ]
-  }
+  },
+  "scopes": {
+    "guest": {
+      "catalog.read": "public",
+      "public.verify": "public",
+      "cart.edit": "session"
+    },
+    "customer": {
+      "catalog.read": "public",
+      "project.create": "self",
+      "project.read": "own",
+      "project.edit": "own",
+      "project.share": "own",
+      "project.comment": "own",
+      "ai.generate": "own",
+      "pricing.estimate": "own",
+      "quote.request": "own",
+      "quote.read": "own",
+      "quote.accept": "own",
+      "order.read": "own",
+      "order.create": "own",
+      "payment.create": "own",
+      "payment.read": "own",
+      "sync.read": "own",
+      "sync.write": "own",
+      "cart.edit": "own",
+      "notification.read": "own",
+      "document.read": "own",
+      "loyalty.read": "own",
+      "identity.self": "self",
+      "crm.contact": "assigned"
+    },
+    "advisor": {
+      "crm.read": "assigned",
+      "crm.write": "assigned",
+      "quote.read": "assigned",
+      "quote.issue": "assigned",
+      "project.read": "shared",
+      "order.read": "assigned",
+      "document.read": "assigned",
+      "project.edit": "shared",
+      "notification.read": "own"
+    },
+    "designer": {
+      "project.read": "assigned",
+      "project.edit": "assigned",
+      "project.validate": "assigned",
+      "job.read": "assigned",
+      "job.cancel": "assigned",
+      "library.write": "organization",
+      "notification.read": "own"
+    },
+    "manager": {
+      "workshop.read": "location",
+      "workshop.plan": "location",
+      "workshop.release": "location",
+      "project.read": "location",
+      "library.publish": "organization",
+      "notification.read": "own"
+    },
+    "worker": {
+      "workshop.read": "assigned",
+      "workshop.execute": "assigned",
+      "document.write": "assigned",
+      "notification.read": "own"
+    },
+    "stockkeeper": {
+      "inventory.read": "location",
+      "inventory.reserve": "location",
+      "inventory.release": "location",
+      "inventory.move": "location",
+      "custody.transfer": "location",
+      "logistics.ship": "location",
+      "notification.read": "own"
+    },
+    "inspector": {
+      "quality.inspect": "organization",
+      "quality.certify": "organization",
+      "quality.revoke": "organization",
+      "notification.read": "own"
+    },
+    "finance": {
+      "finance.read": "organization",
+      "payment.read": "organization",
+      "payment.refund": "organization",
+      "notification.read": "own"
+    },
+    "buyer": {
+      "procurement.write": "organization",
+      "notification.read": "own"
+    },
+    "cashier": {
+      "order.create": "location",
+      "payment.create": "location",
+      "order.read": "location",
+      "notification.read": "own"
+    },
+    "supplier": {
+      "supplier.assigned": "assigned",
+      "notification.read": "own"
+    },
+    "marketing": {
+      "marketing.write": "organization",
+      "ai.generate": "organization",
+      "notification.read": "own"
+    },
+    "admin": {
+      "identity.admin": "organization",
+      "organization.admin": "organization",
+      "catalog.write": "organization",
+      "notification.read": "own"
+    },
+    "owner": {
+      "finance.read": "organization",
+      "organization.admin": "organization",
+      "notification.read": "own"
+    },
+    "auditor": {
+      "audit.read": "organization",
+      "notification.read": "own"
+    }
+  },
+  "scopeVocabulary": {
+    "public": "no identity needed; published data only",
+    "session": "bound to an anonymous session; claimable by the customer who later signs in",
+    "self": "the actor's own identity or a resource the actor is creating",
+    "own": "resources the actor owns",
+    "assigned": "resources explicitly assigned to the actor (customer, task, order, purchase)",
+    "shared": "resources whose owner shared them with the actor; revocable",
+    "location": "resources of the actor's assigned locations",
+    "organization": "any resource of the organization; audited"
+  },
+  "segregation": [
+    {
+      "author": "library.write",
+      "publisher": "library.publish",
+      "rule": "a family version is published by someone other than its author"
+    }
+  ],
+  "segregationRuntime": "Per-action rules (initiator != approver for production release, refunds, cert revoke, admin grants; SECURITY.md) are enforced at runtime on each approval, not by role layout."
 }
