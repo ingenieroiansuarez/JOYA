@@ -36,6 +36,8 @@ export function FamilyArt({ familyId, materialId, label, style }: { familyId: st
   return (
     <View accessible={!!label} accessibilityRole={label ? "image" : undefined} accessibilityLabel={label || undefined}
       importantForAccessibility={label ? "yes" : "no-hide-descendants"} style={[art.frame, style]}>
+      {/* Under the render, a soft dot of the alloy: what shows while the picture loads or if it fails. */}
+      <View style={[art.dot, { backgroundColor: studioColor(materialId) }]} />
       {src !== undefined && <Image source={src} style={art.image} resizeMode="cover" />}
     </View>
   );
@@ -43,5 +45,6 @@ export function FamilyArt({ familyId, materialId, label, style }: { familyId: st
 
 const art = StyleSheet.create({
   frame: { aspectRatio: 1, backgroundColor: "#141416", overflow: "hidden" },
+  dot: { position: "absolute", width: "28%", aspectRatio: 1, borderRadius: 999, top: "36%", left: "36%", opacity: 0.35 },
   image: { width: "100%", height: "100%" },
 });

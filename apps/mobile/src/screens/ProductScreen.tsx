@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { ApiError, type Product } from "../api";
 import { formatDecimal, formatMoney } from "../format";
 import { useSession } from "../session";
-import { Button, c, errorKey, fonts, hasCatalogArt, Header, JewelArt, Loading, Notice, s, styles, type } from "../ui";
+import { Button, c, errorKey, fonts, LINING, hasCatalogArt, Header, JewelArt, Loading, Notice, s, styles, type } from "../ui";
 
 type State = { phase: "loading" } | { phase: "error"; error: ApiError } | { phase: "ready"; product: Product };
 
@@ -105,7 +105,7 @@ export function ProductScreen({ id, onBack }: { id: string; onBack: () => void }
 const detail = StyleSheet.create({
   scroll: { paddingBottom: s[6] },
   content: { padding: s[4], gap: s[3] },
-  name: { color: c.text, fontSize: type[6], fontFamily: fonts.display, lineHeight: type[6] * 1.1 },
+  name: { color: c.text, fontSize: type[6], fontFamily: fonts.display, fontVariant: LINING, lineHeight: type[6] * 1.1 },
   price: { color: c.accent, fontSize: type[4], fontFamily: fonts.displayStrong, fontVariant: ["lining-nums"], letterSpacing: 0.3 },
   badges: { flexDirection: "row", gap: s[3] },
   badge: { fontSize: type[1], fontWeight: "600" },
