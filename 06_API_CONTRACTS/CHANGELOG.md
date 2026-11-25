@@ -1,5 +1,11 @@
 # Contratos — changelog
 
+## 1.8.0 — 2026-11-25 (hito 200, Boutique)
+- Catálogo tipado: `listProducts` devuelve `ProductPage` (`items` de `ProductSummary`, `nextCursor`) en lugar del `Page` libre, con `limit` (1–50, 20 por defecto) y filtro `category`. `getProduct` devuelve `Product` con `sku`, `summary`, `description`, `collection`, `category` (`ProductCategory`), `metal` (`Metal`), `metalWeightGrams` (decimal exacto en gramos), `stones` (`ProductStone`: tipo, cantidad, `totalCarats` decimal exacto, origen) y precio `Money`. Nunca costos.
+- Idioma: parámetro común `AcceptLanguage` (es o en, es por defecto); la respuesta lo indica en `Content-Language`.
+- Favoritos: `GET /me/favorites` (`favorite.read`), `PUT` y `DELETE /me/favorites/{productId}` (`favorite.edit`), ambos idempotentes con 204. Solo productos publicados. Permisos nuevos para `customer` con alcance `own`; el invitado no los tiene (la app pide iniciar sesión al guardar, REQ-02-01).
+- SQL (migración 0001): tablas `product` (publicado si `published_at` no es nulo; precio `numeric(20,6)`, peso `numeric(12,3)`, textos por idioma en `content`) y `favorite` (cliente, producto).
+
 ## 1.7.0 — 2026-11-25 (hito 100, documento de diseño)
 - `Revision.document` deja de ser un objeto libre: referencia `DesignDocument`, generado de `09_JEWELRY_ENGINE/design.schema.json` (`check_contracts.py --emit`). `check_contracts.py` falla si divergen o si `Revision.document` no lo referencia.
 - `design.schema.json` declara ahora reglas que antes solo aplicaba `services/geometry`: al menos un componente, ids de componente con `^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$` (también son nombres de archivo) y `dependsOn` con ids válidos y sin repetir. El servicio de geometría mantiene sus códigos `EMPTY_DESIGN` e `INVALID_ID` para esos casos.
