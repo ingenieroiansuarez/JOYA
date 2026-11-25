@@ -110,7 +110,7 @@ const j = StyleSheet.create({
   row: { flexDirection: "row", justifyContent: "space-between", gap: s[3] },
   total: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: GOLD_EDGE, paddingTop: s[2], gap: 2 },
   totalKey: { color: c.accent, fontSize: type[0], letterSpacing: 1.6, textTransform: "uppercase", fontWeight: "600" },
-  totalValue: { color: c.text, fontSize: type[5], fontFamily: fonts.display, fontVariant: ["tabular-nums"] },
+  totalValue: { color: c.text, fontSize: type[5], fontFamily: fonts.displayStrong, fontVariant: ["lining-nums", "tabular-nums"] },
   status: { flexDirection: "row", alignItems: "center", gap: s[2] },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
   statusText: { color: c.text, fontSize: type[3], fontFamily: fonts.display, flex: 1 },
@@ -148,5 +148,5 @@ const x = StyleSheet.create({
   to: { color: c.text, fontSize: type[2], fontWeight: "600" },
   tile: { flexBasis: "47%", flexGrow: 1, backgroundColor: c.background, borderRadius: 8, padding: s[2], gap: 2 },
   tileKey: { color: c.textMuted, fontSize: type[0], letterSpacing: 1.2, textTransform: "uppercase" },
-  tileValue: { color: c.text, fontSize: type[3], fontFamily: fonts.display, fontVariant: ["tabular-nums"] },
+  tileValue: { color: c.text, fontSize: type[3] + 2, fontFamily: fonts.displayStrong, fontVariant: ["lining-nums", "tabular-nums"] },
 });

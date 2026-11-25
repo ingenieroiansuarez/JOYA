@@ -106,7 +106,7 @@ const detail = StyleSheet.create({
   scroll: { paddingBottom: s[6] },
   content: { padding: s[4], gap: s[3] },
   name: { color: c.text, fontSize: type[6], fontFamily: fonts.display, lineHeight: type[6] * 1.1 },
-  price: { color: c.accent, fontSize: type[3], fontWeight: "600", letterSpacing: 0.3 },
+  price: { color: c.accent, fontSize: type[4], fontFamily: fonts.displayStrong, fontVariant: ["lining-nums"], letterSpacing: 0.3 },
   badges: { flexDirection: "row", gap: s[3] },
   badge: { fontSize: type[1], fontWeight: "600" },
   prompt: { gap: s[2], padding: s[3], borderRadius: tokens.radius[0], backgroundColor: c.surface },

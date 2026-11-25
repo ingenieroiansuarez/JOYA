@@ -38,7 +38,7 @@ const card = StyleSheet.create({
   text: { paddingHorizontal: s[2], paddingTop: s[2], paddingBottom: s[3], gap: 2 },
   meta: { color: c.textMuted, fontSize: type[0], letterSpacing: 1.2, textTransform: "uppercase" },
   name: { color: c.text, fontSize: type[3], fontFamily: fonts.display, lineHeight: type[3] * 1.2 },
-  price: { color: c.accent, fontSize: type[1], fontWeight: "600", marginTop: s[0], letterSpacing: 0.3 },
+  price: { color: c.accent, fontSize: type[2], fontFamily: fonts.displayStrong, fontVariant: ["lining-nums"], marginTop: s[0], letterSpacing: 0.3 },
   fav: {
     position: "absolute", right: s[2], top: s[2], width: 30, height: 30, borderRadius: 15, alignItems: "center", justifyContent: "center",
     backgroundColor: "rgba(12,12,13,0.7)",

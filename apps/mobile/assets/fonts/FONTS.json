@@ -1,0 +1,12 @@
+{
+  "note": "Display face of the app. Files copied unmodified from the pinned npm package below; checked by test/fonts.test.ts (hash, license file, plugin list).",
+  "family": "Cormorant Garamond",
+  "copyright": "Copyright 2015 the Cormorant Project Authors (github.com/CatharsisFonts/Cormorant)",
+  "license": "OFL-1.1",
+  "licenseFile": "OFL.txt",
+  "source": "npm:@expo-google-fonts/cormorant-garamond@0.4.1 (package license: MIT AND OFL-1.1; LICENSE_FONT identical to google/fonts ofl/cormorantgaramond/OFL.txt)",
+  "files": {
+    "CormorantGaramond_500Medium.ttf": "ba0bb9115906ba3e3f14c44a8508a69c2cc2c8dd20713e5586a6ccde97039507",
+    "CormorantGaramond_600SemiBold.ttf": "c26e0547fc712fa60d1b0842cbc20801bd54144a31e2ad28001c65479b662b7f"
+  }
+}
