@@ -11,10 +11,16 @@ export const c = tokens.themes.dark;
 export const s = tokens.space;
 export const type = tokens.typography.scale;
 /**
- * Families. The brand fonts (Cormorant Garamond, Inter) are not bundled until their licence files
- * are verified (18_DESIGN_SYSTEM); meanwhile titles use the system serif and text the system sans.
+ * Families. Display: Cormorant Garamond (SIL OFL 1.1, files and hashes in assets/fonts/FONTS.json),
+ * embedded at build time by the expo-font plugin (app.json), so it never loads over the network. The
+ * family name is the file name. Body text stays the system sans until Inter is bundled the same way.
  */
-export const fonts = { display: "serif", body: undefined as string | undefined };
+export const fonts = {
+  display: "CormorantGaramond_500Medium",
+  /** Prices and measures: the same face, heavier, so figures stay legible at small sizes. */
+  displayStrong: "CormorantGaramond_600SemiBold",
+  body: undefined as string | undefined,
+};
 
 export function Button({ label, onPress, disabled, variant = "primary", hint, selected }: {
   label: string; onPress: () => void; disabled?: boolean; variant?: "primary" | "secondary"; hint?: string; selected?: boolean;

@@ -13,7 +13,16 @@
     "plugins": [
       "expo-secure-store",
       "expo-web-browser",
-      "./plugins/with-dev-cleartext.js"
+      "./plugins/with-dev-cleartext.js",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/CormorantGaramond_500Medium.ttf",
+            "./assets/fonts/CormorantGaramond_600SemiBold.ttf"
+          ]
+        }
+      ]
     ]
   }
 }
