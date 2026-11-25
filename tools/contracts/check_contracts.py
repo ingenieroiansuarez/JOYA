@@ -1,6 +1,7 @@
 """Fail when SQL or OpenAPI state values drift from 08_STATE_MACHINES/machines.json,
 or when a machine action has no trigger in 08_STATE_MACHINES/transitions.json,
-or when OpenAPI Event / SQL outbox drift from 07_DOMAIN_MODELS/event.schema.json.
+or when OpenAPI Event / SQL outbox drift from 07_DOMAIN_MODELS/event.schema.json,
+or when an error code used by services/ or OpenAPI is not in 06_API_CONTRACTS/errors.json.
 
     python tools/contracts/check_contracts.py            # check, exit 1 on drift
     python tools/contracts/check_contracts.py --emit     # print the OpenAPI state schemas
@@ -11,6 +12,7 @@ reachable from it, and every transition has an action.
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import re
 import sys
@@ -27,6 +29,9 @@ TOOLS = ROOT / "13_AI_PROMPTS_AND_TOOLS/tools.json"
 FAMILIES = ROOT / "11_3D_ASSET_LIBRARY/families.json"
 TRANSITIONS = ROOT / "08_STATE_MACHINES/transitions.json"
 EVENT = ROOT / "07_DOMAIN_MODELS/event.schema.json"
+ERRORS = ROOT / "06_API_CONTRACTS/errors.json"
+SERVICES = ROOT / "services"
+CODE = re.compile(r"[A-Z][A-Z0-9]*(_[A-Z0-9]+)*")
 # Envelope field -> SQL outbox column.
 OUTBOX_COLUMNS = {
     "eventId": "id", "eventType": "event_type", "schemaVersion": "schema_version",
@@ -321,6 +326,68 @@ def check_events(envelope: dict, openapi: dict, sql: str) -> list[str]:
     return errs
 
 
+def service_error_codes(root: Path = SERVICES) -> dict[str, str]:
+    """Stable codes raised in services/*/aurea_*: class `code = "X"`, `code="X"` keywords,
+    and the first argument of `ValidationIssue("X", ...)`. Returns code -> first file."""
+    out: dict[str, str] = {}
+    for f in sorted(root.glob("*/aurea_*/*.py")):
+        rel = str(f.relative_to(ROOT)) if f.is_relative_to(ROOT) else str(f)
+        for n in ast.walk(ast.parse(f.read_text(encoding="utf-8"))):
+            found = []
+            if isinstance(n, ast.ClassDef):
+                found += [b.value.value for b in n.body if isinstance(b, ast.Assign)
+                          and any(isinstance(t, ast.Name) and t.id == "code" for t in b.targets)
+                          and isinstance(b.value, ast.Constant)]
+            if isinstance(n, ast.Call):
+                found += [k.value.value for k in n.keywords if k.arg == "code" and isinstance(k.value, ast.Constant)]
+                name = getattr(n.func, "id", getattr(n.func, "attr", None))
+                if name == "ValidationIssue" and n.args and isinstance(n.args[0], ast.Constant):
+                    found.append(n.args[0].value)
+            for c in found:
+                out.setdefault(c, rel)
+    return out
+
+
+def check_errors(catalog: dict, openapi: dict, used: dict[str, str]) -> list[str]:
+    errs = []
+    schemas = openapi["components"]["schemas"]
+    seen: dict[str, dict] = {}
+    for e in catalog["codes"]:
+        c = e["code"]
+        if c in seen:
+            errs.append(f"errors.json: {c} repeated")
+        seen[c] = e
+        if not CODE.fullmatch(c):
+            errs.append(f"errors.json: {c!r} is not UPPER_SNAKE")
+        if e["use"] == "error" and not (isinstance(e.get("http"), int) and 400 <= e["http"] <= 599):
+            errs.append(f"errors.json: {c} needs an HTTP status 4xx/5xx")
+        if e["use"] == "detail" and e.get("http") is not None:
+            errs.append(f"errors.json: detail code {c} must not carry an HTTP status")
+        if e["use"] not in ("error", "detail"):
+            errs.append(f"errors.json: {c} has unknown use {e['use']!r}")
+    for c, f in sorted(used.items()):
+        if c not in seen:
+            errs.append(f"{f}: error code {c} is not in 06_API_CONTRACTS/errors.json")
+    pattern = schemas.get("ErrorCode", {}).get("pattern")
+    if pattern is None or not all(re.fullmatch(pattern.strip("^$"), c) for c in seen):
+        errs.append("OpenAPI ErrorCode pattern missing or rejects a catalogued code")
+    err = schemas.get("Error", {}).get("properties", {})
+    if err.get("code", {}).get("$ref", "").rsplit("/", 1)[-1] != "ErrorCode":
+        errs.append("OpenAPI Error.code must use ErrorCode")
+    if err.get("details", {}).get("items", {}).get("$ref", "").rsplit("/", 1)[-1] != "ErrorDetail":
+        errs.append("OpenAPI Error.details must be an array of ErrorDetail")
+    statuses = {str(e["http"]) for e in catalog["codes"] if e["use"] == "error"}
+    for ops in openapi["paths"].values():
+        for op in ops.values():
+            if not isinstance(op, dict) or "operationId" not in op:
+                continue
+            for code, r in op.get("responses", {}).items():
+                ref = r.get("content", {}).get("application/json", {}).get("schema", {}).get("$ref", "")
+                if ref.endswith("/Error") and code not in statuses:
+                    errs.append(f"{op['operationId']}: response {code} has no catalogued error code")
+    return errs
+
+
 def _op_schema_name(tool: str) -> str:
     return "Op" + "".join(p.capitalize() for p in tool.split("_"))
 
@@ -367,7 +434,8 @@ def main(argv: list[str] | None = None) -> int:
     errs = (check(machines, bindings, sql, api) + check_operations(tools, api)
             + check_create_ring_ranges(tools, families)
             + check_transitions(machines, bindings, transitions, api) + check_digest_bound(api)
-            + check_events(json.loads(EVENT.read_text()), api, sql))
+            + check_events(json.loads(EVENT.read_text()), api, sql)
+            + check_errors(json.loads(ERRORS.read_text()), api, service_error_codes()))
     if not re.search(r"CREATE TABLE quote\([^;]*\bdigest char\(64\) NOT NULL", sql):
         errs.append("SQL quote has no `digest char(64) NOT NULL`")
     for e in errs:

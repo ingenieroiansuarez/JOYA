@@ -1,5 +1,25 @@
 # Contratos — changelog
 
+## 1.5.0 — 2026-11-25 (hito 100, sincronización y errores)
+Se cierran los dos últimos objetos libres de la revisión del handoff.
+
+Sincronización offline (`syncPush`, 22_OFFLINE_AND_SYNC/SYNC.md):
+- Cada operación es un `SyncOperation`: `id`, `projectId`, `branchId`, `baseRevisionId`, `sequence`, `createdAt` y `operation`, que es un `DesignOperation`. Es la misma lista permitida que en línea, así que offline no se puede enviar nada que en línea no sea válido. Desaparecen `type` y `payload` libres.
+- `operations` lleva entre 1 y 200 elementos.
+- `SyncResult` pasa de `applied` + `conflicts` a `results`, uno por operación y en el mismo orden. Cada resultado es `APPLIED` (con `revisionId`), `CONFLICT` (con `serverRevisionId` y error, sin last-write-wins) o `REJECTED` (con error; el cliente no la reintenta). Antes, una operación rechazada no tenía dónde ir.
+
+Errores:
+- Nuevo catálogo `06_API_CONTRACTS/errors.json`, con 43 códigos estables.
+  - `use: error`: código de `Error.code`, con su estado HTTP.
+  - `use: detail`: código de `ErrorDetail.code`.
+- `Error.code` y `Job.errorCode` usan `ErrorCode` (UPPER_SNAKE).
+- `Error.details` pasa de objeto libre a una lista de `ErrorDetail`: `code`, `pointer` (JSON Pointer al campo) y `message`. Sin trazas ni PII.
+- `check_contracts.py` lee por AST los códigos que lanzan `services/geometry` y `services/mesh`, y falla si alguno falta en el catálogo. También falla si un código se repite, no es UPPER_SNAKE, o si una respuesta de error usa un estado HTTP sin código catalogado.
+
+Compatibilidad: incompatible para quien enviara `type`/`payload` en sync o leyera `applied`/`conflicts`/`details`. No hay clientes todavía.
+
+Sigue libre: `Revision.document`, que debería referenciar el esquema de `DesignDocument`; `Page.items`, que es genérico; `Product.publicSummary` y `Customer.consent`.
+
 ## 1.4.0 — 2026-11-25 (hito 100, sobre de eventos)
 Había tres sobres distintos: `07_DOMAIN_MODELS/event.schema.json` (completo), `Event` de OpenAPI (`type`, `version`; sin `schemaVersion`, `occurredAt`, `correlationId` ni `causationId`) y la tabla `outbox` (las mismas carencias). Ahora hay uno solo: `event.schema.json`. `check_contracts.py` falla en CI si `Event` u `outbox` se desvían de él.
 
