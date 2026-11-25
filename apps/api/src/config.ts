@@ -9,6 +9,8 @@ export interface Config {
   databaseUrl: string;
   valkeyUrl: string;
   oidc: { issuer: string; audience: string };
+  /** Hito 300 design module (design/config.ts loadDesignConfig); absent → design routes answer 503. */
+  design?: import("./design/config").DesignConfig;
 }
 
 export class ConfigError extends Error {}

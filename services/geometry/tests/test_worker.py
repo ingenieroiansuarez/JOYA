@@ -157,3 +157,44 @@ def test_job_that_exceeds_memory_fails_without_details():
     finally:
         srv.shutdown()
         srv.server_close()
+
+
+def test_withheld_body_times_out_before_any_signature_check():
+    srv = WorkerServer(settings(read_timeout_s=0.3))
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        conn = http.client.HTTPConnection(*srv.server_address, timeout=10)
+        conn.putrequest("POST", "/v1/regenerate")
+        conn.putheader("Content-Length", "100")
+        conn.endheaders()
+        conn.send(b"{")  # announces 100 bytes, sends 1, then stalls
+        started = time.monotonic()
+        res = conn.getresponse()
+        assert res.status == 408
+        assert json.loads(res.read())["code"] == "INVALID_REQUEST"
+        assert time.monotonic() - started < 5
+    finally:
+        srv.shutdown()
+        srv.server_close()
+
+
+def test_connections_over_the_cap_are_closed_without_a_thread():
+    import socket
+
+    srv = WorkerServer(settings(read_timeout_s=5, max_connections=1))
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        idle = socket.create_connection(srv.server_address)  # holds the only slot
+        time.sleep(0.2)
+        extra = socket.create_connection(srv.server_address)
+        extra.settimeout(3)
+        assert extra.recv(1) == b"", "over-cap connection is closed at once"
+        extra.close()
+        idle.close()
+        time.sleep(0.2)
+        conn = http.client.HTTPConnection(*srv.server_address, timeout=10)
+        conn.request("GET", "/healthz")
+        assert conn.getresponse().status == 200, "the slot is released when a connection ends"
+    finally:
+        srv.shutdown()
+        srv.server_close()

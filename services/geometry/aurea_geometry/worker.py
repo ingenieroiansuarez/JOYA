@@ -50,6 +50,10 @@ class Settings:
     timeout_s: float
     memory_mb: int
     concurrency: int
+    # Socket deadline for reading a request (headers and body). Bounds clients that announce a
+    # body and never send it, which would otherwise hold a thread before any signature check.
+    read_timeout_s: float = 10.0
+    max_connections: int = 32
 
     @staticmethod
     def from_env(env: dict[str, str] | None = None) -> "Settings":
@@ -64,6 +68,8 @@ class Settings:
             timeout_s=float(env.get("GEOMETRY_JOB_TIMEOUT_S", "60")),
             memory_mb=int(env.get("GEOMETRY_JOB_MEMORY_MB", "2048")),
             concurrency=int(env.get("GEOMETRY_WORKER_CONCURRENCY", "2")),
+            read_timeout_s=float(env.get("GEOMETRY_READ_TIMEOUT_S", "10")),
+            max_connections=int(env.get("GEOMETRY_MAX_CONNECTIONS", "32")),
         )
 
 
@@ -201,13 +207,35 @@ class WorkerServer(ThreadingHTTPServer):
         self.settings = settings
         self.ctx = ctx or _context()
         self.slots = threading.BoundedSemaphore(settings.concurrency)
+        self.connections = threading.BoundedSemaphore(settings.max_connections)
         super().__init__((settings.host, settings.port), Handler)
+
+    def process_request(self, request, client_address):
+        # Connections beyond the cap are closed at once instead of each taking a thread.
+        if not self.connections.acquire(blocking=False):
+            self.shutdown_request(request)
+            return
+        try:
+            super().process_request(request, client_address)
+        except BaseException:
+            self.connections.release()
+            raise
+
+    def process_request_thread(self, request, client_address):
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            self.connections.release()
 
 
 class Handler(BaseHTTPRequestHandler):
     server: WorkerServer
     server_version = "aurea-geometry"
     sys_version = ""
+
+    def setup(self):
+        self.timeout = self.server.settings.read_timeout_s  # StreamRequestHandler applies it to the socket
+        super().setup()
 
     def log_message(self, fmt, *args):  # access log without bodies or PII
         sys.stderr.write(f"{self.command} {self.path.split('?')[0]} {args[1] if len(args) > 1 else ''}\n")
@@ -241,7 +269,14 @@ class Handler(BaseHTTPRequestHandler):
             return self._error(HTTPStatus.LENGTH_REQUIRED, "INVALID_REQUEST")
         if length < 0 or length > MAX_BODY_BYTES:
             return self._error(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, "INVALID_REQUEST")
-        body = self.rfile.read(length)
+        try:
+            body = self.rfile.read(length)
+        except TimeoutError:
+            self.close_connection = True
+            return self._error(HTTPStatus.REQUEST_TIMEOUT, "INVALID_REQUEST")
+        if len(body) != length:  # client closed before sending the announced body
+            self.close_connection = True
+            return self._error(HTTPStatus.BAD_REQUEST, "INVALID_REQUEST")
         if not verify(self.server.settings.secret, self.headers.get(SIGNATURE_HEADER), "POST", self.path, body):
             return self._error(HTTPStatus.UNAUTHORIZED, "UNAUTHENTICATED")
         try:

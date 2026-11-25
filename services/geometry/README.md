@@ -43,12 +43,22 @@ the API calls it:
   limits where the OS has them (`GEOMETRY_JOB_MEMORY_MB`, 2048) → 500
   `GEOMETRY_FAILED` without internal details. At most
   `GEOMETRY_WORKER_CONCURRENCY` (2) jobs at once, else 503 with `Retry-After`.
+- Reading a request has a socket deadline (`GEOMETRY_READ_TIMEOUT_S`, 10) →
+  408, checked before the signature, and at most `GEOMETRY_MAX_CONNECTIONS`
+  (32) open connections; extra ones are closed at once. A client that
+  announces a body and withholds it cannot pin threads.
 - Stateless: no database, no files kept. The API stores the returned files by
   hash and owns job state.
 
 ```bash
 GEOMETRY_WORKER_SECRET=... aurea-geometry-worker
 ```
+
+Locally, `pnpm bootstrap` writes `GEOMETRY_WORKER_SECRET` and
+`GEOMETRY_WORKER_PORT` into `.env` next to the API's `GEOMETRY_WORKER_URL`, so
+both sides share one secret: load `.env` and start the worker from the venv
+(`set -a; . ./.env; set +a; aurea-geometry-worker`, or in PowerShell read
+the same keys from `.env`).
 
 ## Canonical digest
 `inputDigest` is SHA-256 over canonical JSON (RFC 8785 subset: sorted keys,

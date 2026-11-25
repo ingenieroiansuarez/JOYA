@@ -1,5 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from "@nestjs/common";
 import { randomUUID } from "node:crypto";
+import { ApiError } from "./design/api-error";
 // Minimal shapes of the Express request/response used here (avoids depending on @types/express).
 interface Request { header(name: string): string | undefined }
 interface Response { setHeader(name: string, value: string): void; status(code: number): { json(body: unknown): void } }
@@ -26,6 +27,10 @@ const MESSAGES: Record<string, string> = {
   RATE_LIMITED: "Demasiadas solicitudes.",
   SERVICE_UNAVAILABLE: "Servicio no disponible; intente de nuevo.",
   INTERNAL_ERROR: "Error interno.",
+  INVALID_DOCUMENT: "El diseño no es válido; revise los valores.",
+  IDEMPOTENCY_CONFLICT: "La clave de idempotencia ya se usó con otro contenido.",
+  RESULT_NOT_READY: "El resultado aún no está listo.",
+  INVALID_REQUEST: "La solicitud no es válida.",
 };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -48,6 +53,12 @@ export class ErrorsFilter implements ExceptionFilter {
       // Never leak internals to the client; log class and correlation id only (messages may carry PII).
       const kind = exception instanceof Error ? exception.constructor.name : typeof exception;
       this.log.error(`unhandled ${kind} status=${status} correlationId=${id}`);
+    }
+    if (exception instanceof ApiError) {
+      res.setHeader("x-correlation-id", id);
+      const message = exception.publicMessage ?? MESSAGES[exception.code] ?? MESSAGES[BY_STATUS[status] ?? "INTERNAL_ERROR"];
+      res.status(status).json({ code: exception.code, message, correlationId: id, details: exception.details });
+      return;
     }
     if (!BY_STATUS[status]) status = HttpStatus.INTERNAL_SERVER_ERROR;
     const code = BY_STATUS[status];
