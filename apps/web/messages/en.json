@@ -1,0 +1,11 @@
+{
+  "skipToContent": "Skip to content",
+  "brand": "AUREA",
+  "envBanner": "{env} environment: demo data, not real",
+  "nav": { "label": "Sections", "home": "Home", "projects": "Projects", "orders": "Orders", "inventory": "Inventory", "workshop": "Workshop" },
+  "home": {
+    "title": "Command center",
+    "lead": "Milestone 100 skeleton. Sections switch on with their milestones.",
+    "comingIn": "Available in milestone {milestone}"
+  }
+}

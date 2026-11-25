@@ -241,6 +241,81 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/%40next/env@16.4.6",
+      "name": "@next/env",
+      "version": "16.4.6",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/%40next/env@16.4.6",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "4ae9c18c9eadfa806d79c4b77538dd56e32152880fe700ffbeb18be4456e418335892e0ee6294be751e4889dec3e33334478820a1bebe1d6da4896d1ec5de5c4"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40next/swc-linux-x64-gnu@16.4.6",
+      "name": "@next/swc-linux-x64-gnu",
+      "version": "16.4.6",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/%40next/swc-linux-x64-gnu@16.4.6",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "a0ea5b35af17396d6a08677d56fcc2e1f6e4911c4496ceff588eadcfe6070b4c5103b2a957553b0eb02708f8f35723a4fe46abcd611ea4239c4c80e6c0af05c1"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40next/swc-linux-x64-musl@16.4.6",
+      "name": "@next/swc-linux-x64-musl",
+      "version": "16.4.6",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/%40next/swc-linux-x64-musl@16.4.6",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "68cf0267e391d84c17680630eca1a45b618398d0ec2c12117b530c4590893d3770ff18530f420c5153b8b1fdcaaabcee468b86cf0c0b667df8fa015e55789440"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/%40standard-schema/spec@1.1.0",
       "name": "@standard-schema/spec",
       "version": "1.1.0",
@@ -255,6 +330,31 @@
         {
           "alg": "SHA-512",
           "content": "976685cb98c02e19e21b91e0aab0fa8d72e2feb516acabea37fa89c7aca826c80a85b95577e8aaa94e110976af9bf8cf8adc83a394c2bca327a632a73ab8b2d3"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40swc/helpers@0.5.23",
+      "name": "@swc/helpers",
+      "version": "0.5.23",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "Apache-2.0"
+        }
+      ],
+      "purl": "pkg:npm/%40swc/helpers@0.5.23",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "e654ac30e4d751178f8250dfbee01052a9067a4f47836924b0e61acb69b4f9747ef9bd8d5982ffe2c5b2baf54122cf282a725ac64762f7085a2ffb2a375dda7f"
         }
       ],
       "properties": [
@@ -366,6 +466,56 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/%40types/react-dom@19.3.0",
+      "name": "@types/react-dom",
+      "version": "19.3.0",
+      "scope": "excluded",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/%40types/react-dom@19.3.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "648edb538da66575ca1e7fea34b130d88adb888354ed7e7ebdf81d8b10479023696165e32a07d0fcffaec866f90a338b07d51c9d37a0debca542d5768729b8e1"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40types/react@19.3.0",
+      "name": "@types/react",
+      "version": "19.3.0",
+      "scope": "excluded",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/%40types/react@19.3.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "374ac50ae1fd628c46f7f9bad65f4c7e924a7e62ce554d1e9bb8a9233e9346049292f45e2c1f6f2fce4607ecabf01b3995eaa9be0f7a252c05e194b5b38be242"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/accepts@2.0.0",
       "name": "accepts",
       "version": "2.0.0",
@@ -455,6 +605,31 @@
         {
           "alg": "SHA-512",
           "content": "925a6015258b5b5644b3cb2f8df6fb838a96634612e62988f3675383e41a854bc9f18a806343f5d1493cb53ca1f591ae60464431a789602179045b97e79da1b3"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/baseline-browser-mapping@2.11.39",
+      "name": "baseline-browser-mapping",
+      "version": "2.11.39",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "Apache-2.0"
+        }
+      ],
+      "purl": "pkg:npm/baseline-browser-mapping@2.11.39",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "43d6ee39886bda082b119a4898809e7194c91c209df325e4454a2416550443cba20faa0ff361785b88d69e138765857ec25beb0b9d55ed6cb450bc968e29795a"
         }
       ],
       "properties": [
@@ -591,6 +766,56 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/caniuse-lite@1.0.30001828",
+      "name": "caniuse-lite",
+      "version": "1.0.30001828",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "CC-BY-4.0"
+        }
+      ],
+      "purl": "pkg:npm/caniuse-lite@1.0.30001828",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "ecc59e4fedc396ba6e0f26d358797865bd59f346757cb2e7397b818c35de6f30d572a9c4594955f0971b01283c07c061716f104f6522475280b736052191d960"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/client-only@0.0.1",
+      "name": "client-only",
+      "version": "0.0.1",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/client-only@0.0.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "215dcebb48d233366b777a59e3c9cb913f4303b020d699cfcda8908695bb73745b72aab3bf3cd5bbe2fc81fa8ca7ff08336310b528aa682c6badc7eef08f2b30"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/content-disposition@2.0.1",
       "name": "content-disposition",
       "version": "2.0.1",
@@ -705,6 +930,31 @@
         {
           "alg": "SHA-512",
           "content": "b49b590411c0eaf8c801a17a12721aaba95a0413fd6aafd8de8b9526311fa076d105c1c100761c321ff0f0b0eb9363ef20c32af209a8a5ae43e15f1199baf11b"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/csstype@3.2.4",
+      "name": "csstype",
+      "version": "3.2.4",
+      "scope": "excluded",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/csstype@3.2.4",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "3e829aa0fcd06a99c4a2a5129c7c75bba5ba92ef0254480ab27a669b35379b59f09227693c143c57f66adbe6d636bb0e2a828bc1319d6f1eb117b0573f5ccb55"
         }
       ],
       "properties": [
@@ -1891,6 +2141,31 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/nanoid@3.3.20",
+      "name": "nanoid",
+      "version": "3.3.20",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/nanoid@3.3.20",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "b8a760d86dc63422909fd6f260ea716c6aab4f67c63b9291b7927ff1bde9a24f2b4faab119617a871332262118b407fe155c98b83f6145a0ea5f9b8f15827865"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/negotiator@1.1.0",
       "name": "negotiator",
       "version": "1.1.0",
@@ -1905,6 +2180,31 @@
         {
           "alg": "SHA-512",
           "content": "34c3c144c2608901e36ddf29846dd579b771e246751f5db5adb97922432a78eb1a869b41f412a8fddee8277cd35ea4e06a09f66d694d497921d10506337d5162"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/next@16.4.6",
+      "name": "next",
+      "version": "16.4.6",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/next@16.4.6",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "4192626216992c9328d8aa64406408c2f99defd595b0059e608539e786bc77bcc0ad2dec8bf211cb7941355febb58844ef4a0bc1d2d884f0172cfc7c1f0730b4"
         }
       ],
       "properties": [
@@ -2266,6 +2566,56 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/picocolors@1.1.1",
+      "name": "picocolors",
+      "version": "1.1.1",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "ISC"
+        }
+      ],
+      "purl": "pkg:npm/picocolors@1.1.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "c5c787dac9e1b5be4cf658aa0ec984c39ea57b7efa993664117fe311bfd1c4d1727a036e97b78db250973fd1438ff2dcbb45fc284c8c71e3f69eda5a1eb0c454"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/postcss@8.5.23",
+      "name": "postcss",
+      "version": "8.5.23",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/postcss@8.5.23",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "839d39f3acebe1b666c0589395f94cbbc1346c34dbe48e607abb60c002a6b1d5254d022166dba7cd4943d564b3c1c5563e8015a6cac0eaf95f083ee85ef47082"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/postgres-array@2.0.0",
       "name": "postgres-array",
       "version": "2.0.0",
@@ -2466,6 +2816,56 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/react-dom@19.3.0",
+      "name": "react-dom",
+      "version": "19.3.0",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/react-dom@19.3.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "24393c76089fe753a31680c4ef4f8e4fd202c98afeebd1e59a284dc29d7e36c7db9dadede6c22209af59264b43990e3fd5bfeb9f6ea1200476b985c332be6bd1"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/react@19.3.0",
+      "name": "react",
+      "version": "19.3.0",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/react@19.3.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "13c2d471bb415addb46db9766281dfc7864305dc554df38ab42667f5c0d227897afe7ba8029729201723e3bb76c19a155fc836647b8c1db892860091d53e52a2"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/redis-errors@1.2.0",
       "name": "redis-errors",
       "version": "1.2.0",
@@ -2605,6 +3005,31 @@
         {
           "alg": "SHA-512",
           "content": "619a372bcd920fb462ca2d04d4440fa232f3ee4a5ea6749023d2323db1c78355d75debdbe5d248eeda72376003c467106c71bbbdcc911e4d1c6f0a9c42b894b6"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/scheduler@0.28.0",
+      "name": "scheduler",
+      "version": "0.28.0",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/scheduler@0.28.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "8eea2b7c2988908c3cb53fa9e415d29ba3c98d017fc9c11898acb3511088b7f45a64884bf8fba56d0f58bb6cf51dd3890dda834e5c40d7ec4a0661d726c73303"
         }
       ],
       "properties": [
@@ -2791,6 +3216,31 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/source-map-js@1.2.4",
+      "name": "source-map-js",
+      "version": "1.2.4",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "BSD-3-Clause"
+        }
+      ],
+      "purl": "pkg:npm/source-map-js@1.2.4",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "27b66332f1ddf4ed5f713ff9574f5059a69297605b5b1dc5e8ed3cb2975ef3635a99ff540741b145520f88d6d5b1d2a4a22cc7892a53a1da37be9d9b032f7530"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/split2@4.2.0",
       "name": "split2",
       "version": "4.2.0",
@@ -2905,6 +3355,31 @@
         {
           "alg": "SHA-512",
           "content": "7ba6d6ddf0fa574d433e671b2df36d9f4723b221ef4ca4bf862be06f3a9831f1dbfe72deb38410d07e500719643d06b2178c6fd3c02f952829b46c0df3a11e9b"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/styled-jsx@5.1.6",
+      "name": "styled-jsx",
+      "version": "5.1.6",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/styled-jsx@5.1.6",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "a925720d378ca2d76f418a0758b346c111491c2fa2f99bdd051628b0e1600be5a0d6fc787eb376fd11bf340ed262aaaf28d2dfdfd3f62d2440da9bba9f45d864"
         }
       ],
       "properties": [

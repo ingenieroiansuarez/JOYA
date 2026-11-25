@@ -1,0 +1,24 @@
+{
+  "name": "@aurea/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AUREA command center (Next.js). Hito 100 skeleton: shell, design tokens, ES/EN strings, security headers.",
+  "scripts": {
+    "dev": "NEXT_TELEMETRY_DISABLED=1 next dev --hostname 127.0.0.1 --port 3100",
+    "build": "NEXT_TELEMETRY_DISABLED=1 next build",
+    "start": "NEXT_TELEMETRY_DISABLED=1 next start --hostname 127.0.0.1 --port 3100",
+    "test": "NEXT_TELEMETRY_DISABLED=1 next build && node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@aurea/tokens": "workspace:*",
+    "next": "16.4.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "5.9.3"
+  }
+}

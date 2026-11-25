@@ -1,0 +1,11 @@
+{
+  "skipToContent": "Saltar al contenido",
+  "brand": "AUREA",
+  "envBanner": "Entorno {env}: datos de demostración, no reales",
+  "nav": { "label": "Secciones", "home": "Inicio", "projects": "Proyectos", "orders": "Pedidos", "inventory": "Inventario", "workshop": "Taller" },
+  "home": {
+    "title": "Centro de mando",
+    "lead": "Esqueleto del hito 100. Las secciones se activan con sus hitos.",
+    "comingIn": "Disponible en el hito {milestone}"
+  }
+}
