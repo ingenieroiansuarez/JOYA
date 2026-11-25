@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: AUREA API V1 — contract baseline
-  version: 1.2.0
+  version: 1.3.0
   description: Contratos iniciales; extender por vertical slice. No API implementada.
 servers:
 - url: http://localhost:3000/v1
@@ -462,6 +462,295 @@ paths:
               - baseRevisionId
               - previewJobId
               - accepted
+              additionalProperties: false
+  /projects/{id}/revisions/{revisionId}/submit:
+    post:
+      operationId: submitDesign
+      summary: Enviar revisión a revisión técnica (DRAFT → REVIEW)
+      description: El digest liga el envío al documento exacto; si la revisión cambió, 409.
+      tags:
+      - projects
+      x-permission: project.edit
+      x-first-milestone: '300'
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema: *id002
+      - in: path
+        name: revisionId
+        required: true
+        schema: *id002
+      - in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Revision'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto de versión o idempotencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invariante de negocio incumplida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expectedDigest: *id001
+                note:
+                  type: string
+                  maxLength: 2000
+              required:
+              - expectedDigest
+              additionalProperties: false
+  /projects/{id}/revisions/{revisionId}/approve:
+    post:
+      operationId: approveDesign
+      summary: Aprobar revisión (REVIEW → APPROVED)
+      description: Aprobación humana. El servidor exige un reporte DFM del mismo digest sin BLOCK, y que quien aprueba no sea quien envió (segregación en tiempo de ejecución). Una revisión aprobada es inmutable; cambiarla crea otra revisión.
+      tags:
+      - projects
+      x-permission: design.approve
+      x-first-milestone: '500'
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema: *id002
+      - in: path
+        name: revisionId
+        required: true
+        schema: *id002
+      - in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Revision'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto de versión o idempotencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invariante de negocio incumplida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expectedDigest: *id001
+                dfmReportId: *id002
+                measurementsConfirmed:
+                  type: boolean
+                  const: true
+                note:
+                  type: string
+                  maxLength: 2000
+              required:
+              - expectedDigest
+              - dfmReportId
+              - measurementsConfirmed
+              additionalProperties: false
+  /projects/{id}/revisions/{revisionId}/return:
+    post:
+      operationId: returnDesign
+      summary: Devolver revisión con motivo (REVIEW → DRAFT)
+      tags:
+      - projects
+      x-permission: design.approve
+      x-first-milestone: '500'
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema: *id002
+      - in: path
+        name: revisionId
+        required: true
+        schema: *id002
+      - in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Revision'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto de versión o idempotencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invariante de negocio incumplida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expectedDigest: *id001
+                reason:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+              required:
+              - expectedDigest
+              - reason
               additionalProperties: false
   /projects/{id}/operations:
     post:
@@ -1818,6 +2107,98 @@ paths:
               - expectedDigest
               - termsVersion
               additionalProperties: false
+  /quotes/{id}/reject:
+    post:
+      operationId: rejectQuote
+      summary: Rechazar cotización emitida (ISSUED → REJECTED)
+      description: Lo decide quien puede aceptarla. El digest liga el rechazo a la versión emitida.
+      tags:
+      - quotes
+      x-permission: quote.accept
+      x-first-milestone: '500'
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema: *id002
+      - in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto de versión o idempotencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invariante de negocio incumplida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expectedDigest: *id001
+                reason:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+              required:
+              - expectedDigest
+              - reason
+              additionalProperties: false
   /orders/{id}:
     get:
       operationId: getOrder
@@ -1886,6 +2267,96 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /orders/{id}/cancel:
+    post:
+      operationId: cancelOrder
+      summary: Cancelar pedido (PENDING_PAYMENT o CONFIRMED → CANCELLED)
+      description: 'No reembolsa por sí mismo: un pago confirmado se devuelve con refundPayment, autorizado por finanzas. Libera reservas del pedido en la misma transacción.'
+      tags:
+      - orders
+      x-permission: order.cancel
+      x-first-milestone: '500'
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema: *id002
+      - in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto de versión o idempotencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invariante de negocio incumplida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+              required:
+              - reason
+              additionalProperties: false
   /orders:
     post:
       operationId: createOrder
@@ -2254,7 +2725,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Result'
+                $ref: '#/components/schemas/Payment'
         '400':
           description: Error
           content:

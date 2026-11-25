@@ -159,3 +159,5 @@ stateDiagram-v2
     ISSUED --> RECEIVED: receive
     ISSUED --> CANCELLED: cancel
 ```
+
+`machines.json` es la fuente de verdad. `bindings.json` dice dónde se guarda y expone cada máquina; `transitions.json` dice quién dispara cada acción (API, webhook del proveedor, regla del servidor, worker o pendiente con hito). `tools/contracts/check_contracts.py` lo verifica en CI.

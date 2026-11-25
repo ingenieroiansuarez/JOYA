@@ -1,5 +1,24 @@
 # Contratos — changelog
 
+## 1.3.0 — 2026-11-25 (hito 100, transiciones)
+Fuente nueva: `08_STATE_MACHINES/transitions.json` asigna a cada acción de cada máquina su disparador: `api` (operación de OpenAPI), `provider-webhook`, `system`, `worker` o `pending` con hito. `check_contracts.py` falla si una acción no tiene entrada, si la operación no existe, no es POST, no exige `Idempotency-Key` o no devuelve el estado de su máquina.
+
+Endpoints nuevos (todos con `Idempotency-Key` y motivo o digest obligatorio):
+- `POST /projects/{id}/revisions/{revisionId}/submit` (`submitDesign`, `project.edit`): DRAFT → REVIEW, con `expectedDigest`.
+- `POST /projects/{id}/revisions/{revisionId}/approve` (`approveDesign`, `design.approve`): REVIEW → APPROVED. Exige `expectedDigest`, `dfmReportId` y `measurementsConfirmed: true`. El servidor verifica que el DFM sea del mismo digest y sin BLOCK, y que quien aprueba no sea quien envió.
+- `POST /projects/{id}/revisions/{revisionId}/return` (`returnDesign`, `design.approve`): REVIEW → DRAFT con motivo.
+- `POST /quotes/{id}/reject` (`rejectQuote`, `quote.accept`): ISSUED → REJECTED con `expectedDigest` y motivo.
+- `POST /orders/{id}/cancel` (`cancelOrder`, `order.cancel`): PENDING_PAYMENT o CONFIRMED → CANCELLED con motivo. No reembolsa; libera reservas en la misma transacción.
+
+Cambios:
+- `refundPayment` devuelve `Payment` (con `PaymentState`) en vez del `Result` genérico.
+- Permisos nuevos: `design.approve` (designer, alcance `assigned`; segregación en tiempo de ejecución: aprobador distinto de quien envió) y `order.cancel` (customer `own`, cashier `location`).
+- SQL: `quote.digest char(64) NOT NULL` con CHECK hexadecimal; `state_checks.sql` añade el caso negativo.
+
+Sin endpoint, por diseño: confirmar/fallar/disputar un pago llega solo por evento firmado del proveedor o conciliación autorizada (el endpoint del webhook se define con el proveedor, hito 500); vencer y reemplazar cotizaciones, confirmar/avanzar pedidos y reservar/asignar stock son reglas del servidor; las acciones de taller, custodia, logística, servicio, garantía y compras quedan `pending` con su hito.
+
+Compatibilidad: solo añade operaciones; `refundPayment` cambia su respuesta. No hay clientes ni API implementados.
+
 ## 1.2.0 — 2026-11-25 (hito 100, trabajos y operaciones)
 - `proposeOperation.operation` deja de ser un objeto libre: es `DesignOperation`, un `oneOf` con discriminador `type` generado de las herramientas `PREVIEW` de `13_AI_PROMPTS_AND_TOOLS/tools.json` (`OpCreateRing`, `OpModifyParameter`, ...). Una herramienta `READ`/`CONFIRM` o un tipo desconocido no es una operación válida. La validación semántica (pertenencia, rangos de familia, presupuesto) sigue en el servidor.
 - `create_ring` se verifica contra los rangos de `ring.classic` en `families.json`.
