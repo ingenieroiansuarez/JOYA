@@ -24,10 +24,30 @@ export const EXCEPTIONS = {
   "lightningcss-linux-x64-musl": "MPL-2.0",
 };
 
-/** An SPDX OR-expression is acceptable when at least one alternative is allowed (we take that one). */
+/**
+ * Evaluates an SPDX expression with its grouping: `A OR B` is acceptable when either side is (we take
+ * that one), `A AND B` only when both are. AND binds tighter than OR, as in the SPDX spec. `WITH`
+ * exceptions and anything unparseable are not acceptable, so they go to a human review.
+ */
 export function acceptable(license) {
-  const alternatives = license.replace(/^\(|\)$/g, "").split(/\s+OR\s+/);
-  return alternatives.some((l) => ALLOWED.has(l.trim()));
+  const tokens = license.match(/\(|\)|[^\s()]+/g) ?? [];
+  let i = 0;
+  const fail = () => { throw new Error("unparseable"); };
+  const atom = () => {
+    const t = tokens[i++];
+    if (t === "(") { const v = or(); if (tokens[i++] !== ")") fail(); return v; }
+    if (t === undefined || t === ")" || /^(AND|OR|WITH)$/.test(t)) fail();
+    if (tokens[i] === "WITH") { i += 2; return false; }
+    return ALLOWED.has(t);
+  };
+  const and = () => { let v = atom(); while (tokens[i] === "AND") { i++; v = atom() && v; } return v; };
+  const or = () => { let v = and(); while (tokens[i] === "OR") { i++; v = and() || v; } return v; };
+  try {
+    const v = or();
+    return i === tokens.length && v;
+  } catch {
+    return false;
+  }
 }
 
 export function violations(report) {

@@ -5,6 +5,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-nati
 import type { DiscoveryDocument } from "expo-auth-session";
 import { maybeCompleteAuthSession } from "expo-web-browser";
 import { discover, fetchMe, signIn, signOut, type Me } from "./auth";
+import { canPressSignIn, ensureDiscovery } from "./login";
 import { configFromBuild, ConfigError, type AppConfig } from "./config";
 import { deviceLocale, translator } from "./i18n";
 
@@ -44,11 +45,13 @@ export default function App() {
     );
   }
 
+  // Discovery is fetched again here when the first attempt failed (offline at launch), so Retry recovers.
   const login = async () => {
-    if (!discovery) return;
     setState({ kind: "busy" });
     try {
-      const session = await signIn(discovery);
+      const doc = await ensureDiscovery(discovery, () => discover(config));
+      if (doc !== discovery) setDiscovery(doc);
+      const session = await signIn(doc);
       setState(session ? { kind: "signedIn", me: await fetchMe(config, session) } : { kind: "signedOut" });
     } catch {
       setState({ kind: "failed" });
@@ -74,7 +77,7 @@ export default function App() {
       ) : (
         <Button
           label={state.kind === "failed" ? t("retry") : t("signIn")}
-          disabled={!discovery || state.kind === "busy"}
+          disabled={!canPressSignIn(discovery, state)}
           onPress={login}
         />
       )}
