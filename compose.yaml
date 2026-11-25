@@ -1,0 +1,36 @@
+# Local development only. Images pinned by digest; ports bound to 127.0.0.1.
+# `pnpm bootstrap` writes .env (git-ignored) with random local passwords; both services
+# read them from that file (env_file is required: compose fails without it).
+name: aurea-local
+services:
+  postgres:
+    image: postgres:16.15@sha256:f9a7b9ebf6f56201f949db745e47bc423c0f0f8294bafe991cc10bf74b029657
+    env_file: [.env]
+    environment:
+      POSTGRES_DB: aurea_local
+      POSTGRES_USER: aurea_local
+    ports: ["127.0.0.1:${POSTGRES_PORT:-5432}:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aurea_local -d aurea_local"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  valkey:
+    # Valkey (BSD-3-Clause), Redis-protocol compatible, used by BullMQ (ADR-0005/0007).
+    image: valkey/valkey:8.1.4@sha256:81db6d39e1bba3b3ff32bd3a1b19a6d69690f94a3954ec131277b9a26b95b3aa
+    env_file: [.env]
+    command:
+      - sh
+      - -c
+      - '[ -n "$$VALKEY_PASSWORD" ] || { echo "VALKEY_PASSWORD missing: run pnpm bootstrap" >&2; exit 1; }; exec valkey-server --requirepass "$$VALKEY_PASSWORD" --appendonly yes'
+    ports: ["127.0.0.1:${VALKEY_PORT:-6379}:6379"]
+    volumes: ["valkeydata:/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli -a \"$$VALKEY_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+volumes:
+  pgdata: {}
+  valkeydata: {}

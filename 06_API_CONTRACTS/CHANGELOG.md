@@ -1,5 +1,8 @@
 # Contratos — changelog
 
+## 1.5.1 — 2026-11-25 (corrección)
+- `SyncOperation.branchId` (UUID) pasa a `branch` (`BranchName`): en SQL una rama se identifica por `(project_id, name)` y no tiene id propio. `createBranch.name` usa el mismo `BranchName` (`^[a-z0-9][a-z0-9._-]{0,63}$`), y SQL `branch.name` tiene el mismo CHECK.
+
 ## 1.5.0 — 2026-11-25 (hito 100, sincronización y errores)
 Se cierran los dos últimos objetos libres de la revisión del handoff.
 

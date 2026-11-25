@@ -6,8 +6,9 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 ## Hitos
 | Hito | Estado | Nota |
 |---|---|---|
-| 000 Feasibility | EN CURSO | CAD/DFM con evidencia; Android, AR y mesh IA bloqueados (ver abajo) |
-| 100–1000 | NOT_STARTED | No iniciar 100 sin aprobación del gate 000 |
+| 000 Feasibility | GO CONDICIONAL (ian, 2026-11-25) | CAD/DFM y render con evidencia; AR bloqueado y mesh IA solo simulada (`27_IMPLEMENTATION_ROADMAP/000_GO_NO_GO.md`) |
+| 100 Foundation | EN CURSO | Contratos 1.1–1.5 con verificación en CI; arranque local (pnpm, Compose, migraciones). Falta API, identidad, tokens, apps |
+| 200–1000 | NOT_STARTED | |
 
 ## Backlog 000
 | ID | Tarea | Estado | Evidencia |
@@ -66,6 +67,23 @@ aurea-mesh services/mesh/out --target-mm 24 --confirmed-by joyero   # DFM-01 REV
 - Idempotencia por clave, cancelación y reintento sin duplicar cobro; el simulador se rechaza en `production` y cualquier proveedor real devuelve `PROVIDER_NOT_CONFIGURED`.
 Pendiente: evaluar Meshy/Tripo (permiso, términos comerciales verificados y credenciales de ian), persistencia de trabajos y ledger de cuota, prueba de auto-intersección.
 
+## Hito 100 — Arranque local
+```
+corepack enable            # pnpm 10.28.0 desde packageManager; Node 22.23.5 (.node-version)
+pnpm install --frozen-lockfile
+pnpm bootstrap             # crea .env (ignorado por git) con contraseñas aleatorias; no las imprime
+docker compose up -d --wait   # PostgreSQL 16.15 y Valkey 8.1.4, fijados por digest, solo en 127.0.0.1
+pnpm db:migrate             # lee .env
+TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # 5 pruebas
+```
+- `pnpm db:migrate` carga `.env` si existe (`node --env-file-if-exists`); un `DATABASE_URL` exportado tiene prioridad.
+- Migraciones en `packages/db/migrations` (Drizzle migrator sobre SQL plano, esquema `aurea_migrations`). La prueba crea dos bases nuevas, aplica las migraciones a una y `05_DATABASE/core_reference.sql` a la otra, y exige el mismo catálogo: columnas, restricciones e índices. Una migración alterada hace fallar la prueba (verificado).
+- Migrar dos veces no hace nada. Sin `DATABASE_URL` falla cerrado.
+- Política: una migración que ya está en main no se edita, se añade otra (CI lo bloquea). Roll-forward: no hay down migrations; un cambio se corrige con una migración nueva compatible. Cada migración actualiza también `core_reference.sql`, del que leen los verificadores de contratos.
+- Valkey en lugar de Redis: Redis 7.4+ ya no es BSD (RSALv2/SSPL, AGPL en 8.x). Valkey es BSD-3-Clause, habla el mismo protocolo y BullMQ lo admite. Si se prefiere Redis, es una decisión de licencias.
+- `bootstrap` se niega a correr con `AUREA_ENV` distinto de local/ci; `compose.yaml` exige `.env` y falla sin él.
+- Probado localmente: compose arriba, migración aplicada, `state_checks.sql` sobre la base migrada OK, Valkey rechaza clientes sin contraseña (`NOAUTH`).
+
 ## Hallazgos del hito 000
 - **STEP no determinista**: la cabecera lleva timestamp y OCCT nombra el PRODUCT con un contador por proceso. `services/geometry` fija el nombre al id de componente y publica `canonicalSha256` (sección DATA). Usarlo en caché y manifiestos de taller.
 - **Estado DFM**: DFM.md exige `REVIEW` cuando falta regla, pero `dfm_report.state` en `core_reference.sql` solo admite PASS/WARN/FAIL. Añadir REVIEW en la migración del hito 100.
@@ -88,6 +106,10 @@ Avance (contratos 1.1.0 a 1.5.0, PR #7 a #11 y este): estados alineados, `Job` c
 | vtk, trame* (transitivas) | — | BSD / MIT / Apache-2.0 | Peso grande; evaluar si se pueden evitar en la imagen del worker |
 | jsonschema, pytest | 4.25.1 / 8.4.2 | MIT | |
 | networkx (services/mesh) | 3.7 | BSD-3-Clause | Requerido por `trimesh.repair.fill_holes` |
+| drizzle-orm (packages/db) | 0.45.4 | Apache-2.0 | Migrador |
+| pg y transitivas (packages/db) | 8.23.1 | MIT / ISC | `pnpm licenses list` |
+| PostgreSQL (imagen) | 16.15 | PostgreSQL License | Docker oficial, por digest |
+| Valkey (imagen) | 8.1.4 | BSD-3-Clause | Docker oficial, por digest |
 Lista completa en `services/geometry/requirements.lock`. No es asesoría legal.
 
 ## Bloqueos y decisiones pendientes (ian)
