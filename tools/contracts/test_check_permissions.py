@@ -22,6 +22,13 @@ class PermissionsTest(unittest.TestCase):
             del roles["scopes"][r]["cart.edit"]
         self.assertTrue(any("createCart" in e for e in self.run_check(roles=roles)))
 
+    def test_signed_webhook_needs_no_permission_but_only_when_unauthenticated_and_signed(self):
+        api = copy.deepcopy(self.api)
+        op = api["paths"]["/payments/webhooks/{provider}"]["post"]
+        self.assertEqual(self.run_check(api=api), [])
+        del op["x-signature"]
+        self.assertTrue(any("receivePaymentWebhook: no x-permission" in e for e in self.run_check(api=api)))
+
     def test_role_enum_follows_roles(self):
         api = copy.deepcopy(self.api)
         api["components"]["schemas"]["Role"]["enum"].append("superuser")

@@ -121,6 +121,38 @@
       ]
     },
     {
+      "clientId": "aurea-web",
+      "name": "AUREA web command center (BFF: confidential, Authorization Code + PKCE S256; local only)",
+      "enabled": true,
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${KC_WEB_CLIENT_SECRET}",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://127.0.0.1:3100/auth/callback"
+      ],
+      "webOrigins": [],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://127.0.0.1:3100/"
+      },
+      "protocolMappers": [
+        {
+          "name": "audience aurea-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "aurea-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
       "clientId": "aurea-ci",
       "name": "CI only: client credentials to exercise the API (never in demo or production)",
       "enabled": true,
@@ -170,6 +202,26 @@
       ],
       "realmRoles": [
         "customer"
+      ]
+    },
+    {
+      "username": "dev.equipo",
+      "enabled": true,
+      "email": "dev.equipo@aurea.invalid",
+      "emailVerified": true,
+      "firstName": "Equipo",
+      "lastName": "Demo",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${KC_DEV_STAFF_PASSWORD}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "advisor",
+        "stockkeeper",
+        "finance"
       ]
     }
   ]

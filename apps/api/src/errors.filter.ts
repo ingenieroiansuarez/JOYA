@@ -31,6 +31,18 @@ const MESSAGES: Record<string, string> = {
   IDEMPOTENCY_CONFLICT: "La clave de idempotencia ya se usó con otro contenido.",
   RESULT_NOT_READY: "El resultado aún no está listo.",
   INVALID_REQUEST: "La solicitud no es válida.",
+  GEOMETRY_REQUIRED: "Falta la geometría de esta revisión; genérela antes de cotizar.",
+  DFM_BLOCKED: "El diseño no pasa la revisión de fabricación; no se puede cotizar.",
+  PRICE_CHANGED: "El precio cambió con las reglas vigentes; revise la cotización otra vez.",
+  INSUFFICIENT_STOCK: "No hay material suficiente disponible.",
+  PAYMENT_IN_PROGRESS: "Ya hay un pago en curso para este pedido.",
+  ALREADY_PAID: "El anticipo de este pedido ya está pagado.",
+  AMOUNT_MISMATCH: "El importe no coincide con el que corresponde.",
+  INVALID_SIGNATURE: "Firma no válida.",
+  QUOTE_EXPIRED: "La cotización venció.",
+  DIGEST_MISMATCH: "La cotización cambió; vuelva a cargarla.",
+  INVALID_TRANSITION: "La operación no es posible en el estado actual.",
+  SEGREGATION_REQUIRED: "Esta acción la debe hacer otra persona.",
 };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 

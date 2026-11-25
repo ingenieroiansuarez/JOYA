@@ -30,6 +30,9 @@ def api_permissions(api: dict) -> dict[str, str]:
     for path, ops in api["paths"].items():
         for method, op in ops.items():
             if isinstance(op, dict) and "operationId" in op:
+                # A provider webhook has no caller identity: its signature is the authorization.
+                if op.get("security") == [] and op.get("x-signature") and "x-permission" not in op:
+                    continue
                 out[op["operationId"]] = op.get("x-permission", "")
     return out
 

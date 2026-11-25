@@ -13,6 +13,8 @@ export interface Config {
   design?: import("./design/config").DesignConfig;
   /** Hito 400 AURA gateway (ai/config.ts loadAiConfig + adapter); absent → ai routes answer 503. */
   ai?: import("./ai/ai.controller").AiRuntime;
+  /** Hito 500 commercial slice (commerce/config.ts loadCommerceConfig); absent → pricing and payment routes answer 503. */
+  commerce?: import("./commerce/config").CommerceConfig;
 }
 
 export class ConfigError extends Error {}

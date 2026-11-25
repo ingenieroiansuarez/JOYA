@@ -22,9 +22,17 @@ test("local env wires Keycloak secrets and the OIDC issuer", () => {
   for (const k of ["KC_BOOTSTRAP_ADMIN_PASSWORD", "KC_CI_CLIENT_SECRET", "KC_DEV_USER_PASSWORD"]) {
     assert.match(env[k], /^[0-9a-f]{48}$/, k);
   }
-  assert.equal(new Set(Object.values(env)).size, Object.keys(env).length);
+  const secrets = Object.values(env).filter((v) => /^[0-9a-f]{48}$/.test(v));
+  assert.equal(new Set(secrets).size, secrets.length);
   assert.equal(env.OIDC_ISSUER, "http://127.0.0.1:8181/realms/aurea-local");
   assert.equal(env.OIDC_AUDIENCE, "aurea-api");
+});
+
+test("local env wires the simulated payment provider, the web client and the staff user (hito 500)", () => {
+  const env = parse(localEnv());
+  assert.equal(env.PAYMENT_PROVIDER, "simulated");
+  for (const k of ["PAYMENT_WEBHOOK_SECRET", "KC_WEB_CLIENT_SECRET", "KC_DEV_STAFF_PASSWORD", "WEB_SESSION_SECRET"]) assert.match(env[k], /^[0-9a-f]{48}$/, k);
+  assert.notEqual(env.KC_DEV_STAFF_PASSWORD, env.KC_DEV_USER_PASSWORD);
 });
 
 test("local env wires the geometry worker and distinct signing secrets", () => {

@@ -49,4 +49,4 @@ jobs:
           psql -h localhost -U postgres -v ON_ERROR_STOP=1 -q \
             -f 05_DATABASE/core_reference.sql -f 05_DATABASE/tests/state_checks.sql \
             -f 05_DATABASE/tests/outbox_checks.sql -f 05_DATABASE/tests/design_checks.sql \
-            -f 05_DATABASE/tests/ai_checks.sql
+            -f 05_DATABASE/tests/ai_checks.sql -f 05_DATABASE/tests/commerce_checks.sql

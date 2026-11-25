@@ -29,7 +29,7 @@ interface Attempt { key: string; baseRevisionId: string }
 const STEP = 0.1;
 const round = (v: number) => Math.round(v * 1000) / 1000;
 
-export function EditorScreen({ id, onBack }: { id: string; onBack: () => void }) {
+export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () => void; onQuote?: (revisionId: string) => void }) {
   const { t, locale } = useSession();
   const { store, sync, client, connectivity, version, bump, saw, syncNow, newId } = useDesign();
   const [draft, setDraft] = useState<Draft | null | "loading">("loading");
@@ -216,6 +216,13 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
         <Viewer glb={glb} color={alloyColor(comp.materialId)} label={t("viewerLabel", { name: title })}
           emptyText={t(mesh === "building" ? "viewerBuilding" : mesh === "offline" ? "viewerEmpty" : "viewerBuildFailed")} errorText={t("viewerError")} loadingText={t("viewerLoading")} />
         <Text style={styles.muted}>{t("previewNote")}</Text>
+
+        {onQuote && preview.phase === "none" && !blocked && !offline && (
+          <View style={ed.card}>
+            <Button label={t("requestQuote")} onPress={() => onQuote(local.local.head.id)} />
+            <Text style={styles.muted}>{t("requestQuoteNote", { number: String(local.local.head.number) })}</Text>
+          </View>
+        )}
 
         <AuraPanel projectId={id} baseRevisionId={local.local.head.id} familyId={fam.id}
           disabled={offline ? "offline" : blocked ? "pending" : null}

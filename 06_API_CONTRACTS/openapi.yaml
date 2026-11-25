@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: AUREA API V1 — contract baseline
-  version: 1.10.0
+  version: 1.11.0
   description: Contratos iniciales; extender por vertical slice. No API implementada.
 servers:
 - url: http://localhost:3000/v1
@@ -2268,6 +2268,88 @@ paths:
               - budget
               additionalProperties: false
   /quotes:
+    get:
+      operationId: listQuotes
+      summary: Cotizaciones visibles
+      description: 'Cliente: las suyas. Asesor (alcance assigned): la cola de DRAFT sin asignar y las que emitió. internal solo con pricing.internal.'
+      tags:
+      - quotes
+      x-permission: quote.read
+      x-first-milestone: '500'
+      parameters:
+      - in: query
+        name: state
+        required: false
+        schema:
+          $ref: '#/components/schemas/QuoteState'
+      - in: query
+        name: cursor
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 20
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotePage'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto de versión o idempotencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invariante de negocio incumplida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       operationId: requestQuote
       summary: Solicitar cotización
@@ -2351,6 +2433,7 @@ paths:
               - revisionId
               - currency
               additionalProperties: false
+      description: 'El servidor calcula el precio (reglas versionadas, tarifas con fuente y fecha, masa del CAD) desde una revisión del cliente con geometría SUCCEEDED; nace DRAFT. Una cotización abierta por revisión: pedir otra vez devuelve la abierta. Sin geometría → GEOMETRY_REQUIRED; DFM FAIL/BLOCK → DFM_BLOCKED.'
   /quotes/{id}:
     get:
       operationId: getQuote
@@ -2419,6 +2502,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      description: Con pricing.internal incluye internal (costos y margen).
   /quotes/{id}/issue:
     post:
       operationId: issueQuote
@@ -2501,7 +2585,9 @@ paths:
             schema:
               type: object
               properties:
-                expectedDigest: *id005
+                expectedDigest:
+                  type: string
+                  pattern: ^[0-9a-f]{64}$
                 expiresAt:
                   type: string
                   format: date-time
@@ -2514,6 +2600,7 @@ paths:
               - total
               - termsVersion
               additionalProperties: false
+      description: 'El asesor emite exactamente el DRAFT que revisó (expectedDigest = digest del DRAFT, total igual). El servidor recalcula: si las reglas cambiaron, re-precia el DRAFT y responde PRICE_CHANGED. Quien pidió la cotización no puede emitirla (SEGREGATION_REQUIRED). expiresAt entre ahora y quoteValidityDays. Emitir reemplaza (SUPERSEDED) otras emitidas del mismo proyecto.'
   /quotes/{id}/accept:
     post:
       operationId: acceptQuote
@@ -2602,6 +2689,7 @@ paths:
               - expectedDigest
               - termsVersion
               additionalProperties: false
+      description: 'En una transacción: cotización ACCEPTED, pedido PENDING_PAYMENT y reserva HELD del metal (masa × (1 + reserveAllowance)) bajo bloqueo de lote. Sin stock → INSUFFICIENT_STOCK y nada cambia. Vencida → QUOTE_EXPIRED. Solo el dueño (alcance own), nunca el personal.'
   /quotes/{id}/reject:
     post:
       operationId: rejectQuote
@@ -2765,8 +2853,8 @@ paths:
   /orders/{id}/cancel:
     post:
       operationId: cancelOrder
-      summary: Cancelar pedido (PENDING_PAYMENT o CONFIRMED → CANCELLED)
-      description: 'No reembolsa por sí mismo: un pago confirmado se devuelve con refundPayment, autorizado por finanzas. Libera reservas del pedido en la misma transacción.'
+      summary: Cancelar pedido pendiente de pago (PENDING_PAYMENT → CANCELLED)
+      description: El cliente cancela antes de que se confirme el anticipo; las reservas se liberan en la misma transacción. Un pedido CONFIRMED necesita compensación y a la joyería (INVALID_TRANSITION en hito 500). Un pago que llegue después queda en revisión (ORDER_CANCELLED) y no reabre el pedido.
       tags:
       - orders
       x-permission: order.cancel
@@ -2853,6 +2941,88 @@ paths:
               - reason
               additionalProperties: false
   /orders:
+    get:
+      operationId: listOrders
+      summary: Pedidos visibles
+      description: 'Cliente: los suyos. Asesor: los de cotizaciones que emitió. Finanzas (payment.read organization): todos.'
+      tags:
+      - orders
+      x-permission: order.read
+      x-first-milestone: '500'
+      parameters:
+      - in: query
+        name: state
+        required: false
+        schema:
+          $ref: '#/components/schemas/OrderState'
+      - in: query
+        name: cursor
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 20
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderPage'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto de versión o idempotencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invariante de negocio incumplida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       operationId: createOrder
       summary: Compra directa; personalizado usa aceptación
@@ -3117,15 +3287,21 @@ paths:
             schema:
               type: object
               properties:
-                orderId: *id001
-                installmentId: *id001
+                orderId:
+                  type: string
+                  format: uuid
+                kind:
+                  type: string
+                  enum:
+                  - DEPOSIT
                 amount:
                   $ref: '#/components/schemas/Money'
               required:
               - orderId
-              - installmentId
+              - kind
               - amount
               additionalProperties: false
+      description: 'Anticipo del pedido por exactamente lo pendiente (AMOUNT_MISMATCH si no). Un solo anticipo abierto o confirmado por pedido (índice único payment_one_deposit): otro intento responde PAYMENT_IN_PROGRESS o ALREADY_PAID; la misma Idempotency-Key devuelve el mismo pago. Hito 500: proveedor simulado únicamente; producción lo rechaza al arrancar.'
   /payments/{id}:
     get:
       operationId: getPayment
@@ -3286,23 +3462,30 @@ paths:
   /inventory/lots:
     get:
       operationId: listLots
-      summary: Lotes autorizados por ubicación
+      summary: Lotes con disponible (en mano − reservado)
       tags:
       - inventory
       x-permission: inventory.read
-      x-first-milestone: '700'
+      x-first-milestone: '500'
       parameters:
+      - in: query
+        name: itemKey
+        required: false
+        schema:
+          type: string
+          pattern: ^[a-z0-9][a-z0-9-]{1,63}$
       - in: query
         name: cursor
         required: false
-        schema: *id005
+        schema:
+          type: string
       responses:
         '200':
           description: Resultado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Page'
+                $ref: '#/components/schemas/InventoryLotPage'
         '400':
           description: Error
           content:
@@ -3351,6 +3534,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      description: 'Barre primero, bajo bloqueo de lote, las reservas HELD vencidas. Alcance location: hito 500 tiene una sola ubicación (la asignación de personal a ubicaciones llega en el hito 700).'
   /inventory/reservations:
     post:
       operationId: reserveInventory
@@ -3532,7 +3716,7 @@ paths:
       tags:
       - inventory
       x-permission: inventory.move
-      x-first-milestone: '700'
+      x-first-milestone: '500'
       parameters:
       - in: header
         name: Idempotency-Key
@@ -3547,7 +3731,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Id'
+                $ref: '#/components/schemas/StockMovement'
         '400':
           description: Error
           content:
@@ -3603,18 +3787,31 @@ paths:
             schema:
               type: object
               properties:
-                lotId: *id001
+                lotId:
+                  type: string
+                  format: uuid
+                kind:
+                  type: string
+                  enum:
+                  - RECEIPT
+                  - ADJUSTMENT
                 delta:
                   type: string
                   pattern: ^-?\d+(\.\d{1,6})?$
-                reason: *id005
-                evidenceId: *id001
+                reason:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                evidenceId:
+                  type: string
+                  format: uuid
               required:
               - lotId
+              - kind
               - delta
               - reason
-              - evidenceId
               additionalProperties: false
+      description: Entrada o ajuste anexado a stock_movement (append-only); on hand nunca queda por debajo de lo reservado (INSUFFICIENT_STOCK). evidenceId será obligatorio cuando existan cargas de documentos (hito 700).
   /custody/transfers:
     post:
       operationId: requestTransfer
@@ -5440,6 +5637,208 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /payments/{id}/simulate:
+    post:
+      operationId: simulatePayment
+      summary: Completar el checkout simulado
+      description: 'Solo proveedor simulated (local/ci/demo): hace lo que haría el cliente en la página del proveedor. Firma eventos payment.processing y payment.succeeded/failed y los aplica por el mismo camino que receivePaymentWebhook. No es una confirmación del cliente: es el proveedor simulado.'
+      tags:
+      - payments
+      x-permission: payment.create
+      x-first-milestone: '500'
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto de versión o idempotencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invariante de negocio incumplida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                outcome:
+                  type: string
+                  enum:
+                  - APPROVE
+                  - DECLINE
+              required:
+              - outcome
+              additionalProperties: false
+  /payments/webhooks/{provider}:
+    post:
+      operationId: receivePaymentWebhook
+      summary: Evento firmado del proveedor de pagos
+      description: 'Sin token: la firma HMAC-SHA256 sobre `${t}.${cuerpo}` con PAYMENT_WEBHOOK_SECRET es la autorización (±300 s). Deduplicado por (provider, eventId) en payment_event (append-only): un evento repetido responde DUPLICATE y no cambia nada. Confirmar exige importe y moneda exactos (si no: REVIEW AMOUNT_MISMATCH).'
+      tags:
+      - payments
+      x-first-milestone: '500'
+      parameters:
+      - in: path
+        name: provider
+        required: true
+        schema:
+          type: string
+          enum:
+          - simulated
+      - in: header
+        name: X-Aurea-Signature
+        required: true
+        schema:
+          type: string
+          pattern: ^t=\d+,v1=[0-9a-f]{64}$
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentWebhookResult'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto de versión o idempotencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invariante de negocio incumplida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security: []
+      x-signature: hmac-sha256
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventId:
+                  type: string
+                  pattern: ^[A-Za-z0-9_-]{8,128}$
+                type:
+                  type: string
+                  enum:
+                  - payment.processing
+                  - payment.succeeded
+                  - payment.failed
+                providerPaymentId:
+                  type: string
+                  maxLength: 128
+                amount:
+                  $ref: '#/components/schemas/Money'
+                failureCode:
+                  type: string
+                  pattern: ^[A-Z][A-Z0-9_]{1,63}$
+              required:
+              - eventId
+              - type
+              - providerPaymentId
+              - amount
+              additionalProperties: false
 components:
   parameters:
     AcceptLanguage:
@@ -6093,25 +6492,164 @@ components:
       - createdAt
       additionalProperties: false
     Quote:
+      description: 'Precio calculado por el servidor desde una revisión fija con evidencia de geometría. Emitida, queda congelada (trigger quote_frozen): cambiar reglas o diseño no la altera. state EXPIRED se informa en cuanto vence, aunque la fila pase a EXPIRED al intentar aceptarla.'
       type: object
       properties:
-        id: *id001
-        revisionId: *id001
+        id:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          format: uuid
+        projectTitle:
+          type: string
+        revisionId:
+          type: string
+          format: uuid
+        revisionNumber:
+          type: integer
+          minimum: 1
         state:
           $ref: '#/components/schemas/QuoteState'
         total:
           $ref: '#/components/schemas/Money'
+        subtotal:
+          $ref: '#/components/schemas/Money'
+        tax:
+          type: object
+          properties:
+            code:
+              type: string
+            rate:
+              type: string
+              pattern: ^\d+(\.\d{1,6})?$
+            amount:
+              $ref: '#/components/schemas/Money'
+          required:
+          - code
+          - rate
+          - amount
+          additionalProperties: false
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteLine'
+          description: Desglose comercial; suma exactamente subtotal.
+        deposit:
+          type: object
+          properties:
+            rate:
+              type: string
+              pattern: ^\d+(\.\d{1,6})?$
+            amount:
+              $ref: '#/components/schemas/Money'
+          required:
+          - rate
+          - amount
+          additionalProperties: false
+        bom:
+          type: array
+          items:
+            type: object
+            properties:
+              componentId:
+                type: string
+              materialId:
+                type: string
+              massGrams:
+                type: string
+                pattern: ^\d+\.\d{3}$
+              densityStatus:
+                type: string
+            required:
+            - componentId
+            - materialId
+            - massGrams
+            - densityStatus
+            additionalProperties: false
+        pricing:
+          type: object
+          properties:
+            ruleVersion:
+              type: string
+            termsVersion:
+              type: string
+              description: Términos con los que se emitiría (issueQuote los exige).
+            simulated:
+              type: boolean
+              description: true = reglas sintéticas de demo, no un precio real.
+            ratesSource:
+              type: string
+            ratesDate:
+              type: string
+              format: date
+          required:
+          - ruleVersion
+          - termsVersion
+          - simulated
+          - ratesSource
+          - ratesDate
+          additionalProperties: false
+        dfmState:
+          type: string
+        digest:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+          description: 'DRAFT: SHA-256 del snapshot de precio (expectedDigest de issueQuote). Emitida: SHA-256 del snapshot con términos y vencimiento (expectedDigest de acceptQuote/rejectQuote).'
+        termsVersion:
+          type:
+          - string
+          - 'null'
         expiresAt:
           type: string
           format: date-time
-        digest: *id005
+        createdAt:
+          type: string
+          format: date-time
+        issuedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        acceptedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        decisionReason:
+          type:
+          - string
+          - 'null'
+        orderId:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        internal:
+          $ref: '#/components/schemas/QuoteInternal'
       required:
       - id
+      - projectId
+      - projectTitle
       - revisionId
+      - revisionNumber
       - state
       - total
-      - expiresAt
+      - subtotal
+      - tax
+      - lines
+      - deposit
+      - bom
+      - pricing
+      - dfmState
       - digest
+      - termsVersion
+      - expiresAt
+      - createdAt
+      - issuedAt
+      - acceptedAt
+      - decisionReason
+      - orderId
       additionalProperties: false
     Estimate:
       type: object
@@ -6140,31 +6678,156 @@ components:
       - estimated
       additionalProperties: false
     Payment:
+      description: Solo un evento verificado del proveedor (o una conciliación autorizada) confirma un pago; el cliente nunca.
       type: object
       properties:
-        id: *id001
-        orderId: *id001
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - DEPOSIT
+          - BALANCE
         amount:
           $ref: '#/components/schemas/Money'
         state:
           $ref: '#/components/schemas/PaymentState'
+        provider:
+          type: object
+          properties:
+            id:
+              type: string
+            simulated:
+              type: boolean
+          required:
+          - id
+          - simulated
+          additionalProperties: false
+        failureCode:
+          type:
+          - string
+          - 'null'
+        reviewReason:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+          - AMOUNT_MISMATCH
+          - ORDER_CANCELLED
+          - STOCK_UNAVAILABLE
+          - LATE_EVENT
+          description: Requiere conciliación por una persona; un pago en revisión no cuenta para el anticipo.
+        createdAt:
+          type: string
+          format: date-time
+        confirmedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        checkout:
+          description: 'Solo en la respuesta de createPaymentIntent: cómo completar el pago. SIMULATED = simulatePayment (local/ci/demo).'
+          type: object
+          properties:
+            kind:
+              type: string
+              enum:
+              - SIMULATED
+          required:
+          - kind
+          additionalProperties: false
       required:
       - id
       - orderId
+      - kind
       - amount
       - state
+      - provider
+      - failureCode
+      - reviewReason
+      - createdAt
+      - confirmedAt
       additionalProperties: false
     Order:
+      description: Importes copiados de la cotización congelada. balance = total − anticipos confirmados sin revisión.
       type: object
       properties:
-        id: *id001
-        quoteId: *id001
+        id:
+          type: string
+          format: uuid
+        quoteId:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          format: uuid
+        projectTitle:
+          type: string
+        revisionId:
+          type: string
+          format: uuid
+        revisionNumber:
+          type: integer
+          minimum: 1
         state:
           $ref: '#/components/schemas/OrderState'
+        total:
+          $ref: '#/components/schemas/Money'
+        deposit:
+          type: object
+          properties:
+            required:
+              $ref: '#/components/schemas/Money'
+            paid:
+              $ref: '#/components/schemas/Money'
+            outstanding:
+              $ref: '#/components/schemas/Money'
+          required:
+          - required
+          - paid
+          - outstanding
+          additionalProperties: false
+        balance:
+          $ref: '#/components/schemas/Money'
+        reservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderReservation'
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        cancelReason:
+          type:
+          - string
+          - 'null'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
       - id
       - quoteId
+      - projectId
+      - projectTitle
+      - revisionId
+      - revisionNumber
       - state
+      - total
+      - deposit
+      - balance
+      - reservations
+      - payments
+      - cancelReason
+      - createdAt
+      - updatedAt
       additionalProperties: false
     Reservation:
       type: object
@@ -6474,24 +7137,64 @@ components:
       - customizable
       additionalProperties: false
     InventoryLot:
+      description: onHand y reserved son proyecciones del libro stock_movement y de las reservas; available = onHand − reserved.
       type: object
       properties:
-        id: *id001
-        itemKey: *id005
+        id:
+          type: string
+          format: uuid
+        itemKey:
+          type: string
+        label:
+          type: string
         unit:
           type: string
           enum:
           - g
           - ct
           - ea
-        onHand: *id007
-        reserved: *id007
+        location:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+          required:
+          - id
+          - name
+          additionalProperties: false
+        onHand:
+          type: string
+          pattern: ^\d+(\.\d{1,6})?$
+        reserved:
+          type: string
+          pattern: ^\d+(\.\d{1,6})?$
+        available:
+          type: string
+          pattern: ^\d+(\.\d{1,6})?$
+        held:
+          type: string
+          pattern: ^\d+(\.\d{1,6})?$
+        allocated:
+          type: string
+          pattern: ^\d+(\.\d{1,6})?$
+        demo:
+          type: boolean
+          description: Lote sintético del seed de demo.
       required:
       - id
       - itemKey
+      - label
       - unit
+      - location
       - onHand
       - reserved
+      - available
+      - held
+      - allocated
+      - demo
       additionalProperties: false
     Task:
       type: object
@@ -7039,4 +7742,168 @@ components:
       - usedUnits
       - remainingUnits
       - resetsAt
+      additionalProperties: false
+    QuoteLine:
+      type: object
+      properties:
+        code:
+          type: string
+          pattern: ^[A-Z]+(:[a-z0-9-]+)?$
+          description: METAL:<materialId>, WORKMANSHIP; en costos internos LABOR, FINISHING, PACKAGING.
+        label:
+          type: string
+          description: En el idioma de Accept-Language.
+        amount:
+          $ref: '#/components/schemas/Money'
+      required:
+      - code
+      - label
+      - amount
+      additionalProperties: false
+    QuoteInternal:
+      description: 'Costos privados (COMMERCE.md): solo con pricing.internal (asesor, finanzas, dueño). Nunca a un cliente.'
+      type: object
+      properties:
+        costLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteLine'
+        cost:
+          $ref: '#/components/schemas/Money'
+        margin:
+          type: string
+          pattern: ^\d+(\.\d{1,6})?$
+        grossProfit:
+          $ref: '#/components/schemas/Money'
+      required:
+      - costLines
+      - cost
+      - margin
+      - grossProfit
+      additionalProperties: false
+    QuotePage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Quote'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+      - nextCursor
+      additionalProperties: false
+    OrderReservation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        lotId:
+          type: string
+          format: uuid
+        itemKey:
+          type: string
+        lotLabel:
+          type: string
+        unit:
+          type: string
+          enum:
+          - g
+          - ct
+          - ea
+        quantity:
+          type: string
+          pattern: ^\d+(\.\d{1,6})?$
+        state:
+          $ref: '#/components/schemas/ReservationState'
+        expiresAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - lotId
+      - itemKey
+      - lotLabel
+      - unit
+      - quantity
+      - state
+      - expiresAt
+      additionalProperties: false
+    OrderPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+      - nextCursor
+      additionalProperties: false
+    InventoryLotPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryLot'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+      - nextCursor
+      additionalProperties: false
+    StockMovement:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        lotId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - RECEIPT
+          - ADJUSTMENT
+        delta:
+          type: string
+          pattern: ^-?\d+(\.\d{1,6})?$
+        onHandAfter:
+          type: string
+          pattern: ^\d+(\.\d{1,6})?$
+      required:
+      - id
+      - lotId
+      - kind
+      - delta
+      - onHandAfter
+      additionalProperties: false
+    PaymentWebhookResult:
+      type: object
+      properties:
+        received:
+          type: boolean
+          const: true
+        outcome:
+          type: string
+          enum:
+          - APPLIED
+          - IGNORED
+          - REVIEW
+          - DUPLICATE
+      required:
+      - received
+      - outcome
       additionalProperties: false

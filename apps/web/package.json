@@ -2,12 +2,12 @@
   "name": "@aurea/web",
   "version": "0.1.0",
   "private": true,
-  "description": "AUREA command center (Next.js). Hito 100 skeleton: shell, design tokens, ES/EN strings, security headers.",
+  "description": "AUREA command center (Next.js): staff panel for quotes, orders and inventory behind a BFF session (OIDC code + PKCE).",
   "scripts": {
-    "dev": "NEXT_TELEMETRY_DISABLED=1 next dev --hostname 127.0.0.1 --port 3100",
-    "build": "NEXT_TELEMETRY_DISABLED=1 next build",
-    "start": "NEXT_TELEMETRY_DISABLED=1 next start --hostname 127.0.0.1 --port 3100",
-    "test": "NEXT_TELEMETRY_DISABLED=1 next build && node --test test/*.test.mjs"
+    "dev": "node scripts/next.mjs --repo-env dev --hostname 127.0.0.1 --port 3100",
+    "build": "node scripts/next.mjs build",
+    "start": "node scripts/next.mjs --repo-env start --hostname 127.0.0.1 --port 3100",
+    "test": "node scripts/next.mjs build && node --test test/*.test.mjs"
   },
   "dependencies": {
     "@aurea/tokens": "workspace:*",

@@ -17,6 +17,8 @@ export async function createApp(
 ): Promise<NestExpressApplication> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule.register(config, probes, verifier, extra, pool), {
     logger: config.env === "ci" ? ["error"] : ["error", "warn", "log"],
+    // Provider webhooks are verified over the exact bytes received (commerce/payments.ts).
+    rawBody: true,
   });
   app.setGlobalPrefix("v1", { exclude: ["healthz", "readyz"] });
   app.disable("x-powered-by");

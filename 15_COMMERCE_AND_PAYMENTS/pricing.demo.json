@@ -1,0 +1,36 @@
+{
+  "$comment": "Reglas de precio del demo (hito 500). TODOS los valores son SINTÉTICOS: no son cotizaciones de metal, tarifas de mano de obra, márgenes ni impuestos reales, y no constituyen oferta comercial. Producción rechaza este archivo (status DEMO_SYNTHETIC): antes de cotizar de verdad hay que cargar reglas aprobadas por el joyero, tarifas de metal con fuente y fecha, y la política fiscal validada. Fórmula (COMMERCE.md): costo = metal (masa del CAD × (1 + merma no recuperable) × tarifa/g) + mano de obra de la familia + acabado + empaque; precio preimpuesto = costo / (1 − margen bruto); impuesto sobre el preimpuesto; redondeo por moneda.",
+  "ruleVersion": "demo-2026.11.0",
+  "status": "DEMO_SYNTHETIC",
+  "currency": "COP",
+  "currencyScale": 0,
+  "roundTo": "100",
+  "termsVersion": "demo-terms-2026.11",
+  "rates": {
+    "source": "DEMO_SYNTHETIC",
+    "date": "2026-11-25",
+    "fx": null,
+    "metalPerGram": {
+      "gold-18k-yellow": "310000",
+      "gold-18k-white": "320000",
+      "gold-18k-rose": "310000",
+      "silver-925": "5000",
+      "platinum-950": "180000"
+    }
+  },
+  "lossAllowance": "0.05",
+  "labor": {
+    "ring.classic": "180000",
+    "ring.02": "220000",
+    "pendant.01": "200000",
+    "pendant.02": "240000"
+  },
+  "finishing": "60000",
+  "packaging": "40000",
+  "margin": "0.40",
+  "tax": { "code": "TAX_DEMO", "rate": "0.19", "status": "DEMO_SYNTHETIC" },
+  "depositRate": "0.30",
+  "quoteValidityDays": 7,
+  "reservationHours": 48,
+  "reserveAllowance": "0.10"
+}

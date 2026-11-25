@@ -13,6 +13,8 @@ import { DesignsScreen } from "./screens/DesignsScreen";
 import { EditorScreen } from "./screens/EditorScreen";
 import { FavoritesScreen } from "./screens/FavoritesScreen";
 import { NewDesignScreen } from "./screens/NewDesignScreen";
+import { OrderScreen } from "./screens/OrderScreen";
+import { QuoteScreen } from "./screens/QuoteScreen";
 import { ProductScreen } from "./screens/ProductScreen";
 import { ProfileScreen } from "./screens/ProfileScreen";
 import { SessionProvider, useSession } from "./session";
@@ -93,7 +95,15 @@ function Shell() {
         {route.name === "newDesign" && (
           <NewDesignScreen onBack={back} onCreated={(id) => dispatch({ type: "replace", route: { name: "editor", id } })} />
         )}
-        {route.name === "editor" && <EditorScreen key={route.id} id={route.id} onBack={back} />}
+        {route.name === "editor" && (
+          <EditorScreen key={route.id} id={route.id} onBack={back}
+            onQuote={(revisionId) => dispatch({ type: "push", route: { name: "quote", revisionId } })} />
+        )}
+        {route.name === "quote" && (
+          <QuoteScreen key={route.revisionId} revisionId={route.revisionId} onBack={back}
+            onOrder={(id) => dispatch({ type: "replace", route: { name: "order", id } })} />
+        )}
+        {route.name === "order" && <OrderScreen key={route.id} id={route.id} onBack={back} />}
       </View>
       <View accessibilityRole="tablist" style={[bar.root, { paddingBottom: insets.bottom + s[1] }]}>
         {TABS.map((tab: Tab) => {

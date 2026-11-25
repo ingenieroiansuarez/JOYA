@@ -12,6 +12,7 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 export const REALM_FILE = `${ROOT}infra/keycloak/realm-aurea-local.json`;
 export const ROLES_TS_FILE = `${ROOT}apps/api/src/identity/roles.generated.ts`;
 export const MOBILE_REDIRECT = "com.aurea.customer.dev:/oauthredirect";
+export const WEB_ORIGIN = "http://127.0.0.1:3100";
 
 const audience = {
   name: "audience aurea-api",
@@ -62,6 +63,22 @@ export function buildRealm(rolesDoc) {
         protocolMappers: [audience],
       },
       {
+        clientId: "aurea-web",
+        name: "AUREA web command center (BFF: confidential, Authorization Code + PKCE S256; local only)",
+        enabled: true,
+        publicClient: false,
+        clientAuthenticatorType: "client-secret",
+        secret: "${KC_WEB_CLIENT_SECRET}",
+        standardFlowEnabled: true,
+        implicitFlowEnabled: false,
+        directAccessGrantsEnabled: false,
+        serviceAccountsEnabled: false,
+        redirectUris: [`${WEB_ORIGIN}/auth/callback`],
+        webOrigins: [],
+        attributes: { "pkce.code.challenge.method": "S256", "post.logout.redirect.uris": `${WEB_ORIGIN}/` },
+        protocolMappers: [audience],
+      },
+      {
         clientId: "aurea-ci",
         name: "CI only: client credentials to exercise the API (never in demo or production)",
         enabled: true,
@@ -91,6 +108,17 @@ export function buildRealm(rolesDoc) {
         lastName: "Demo",
         credentials: [{ type: "password", value: "${KC_DEV_USER_PASSWORD}", temporary: false }],
         realmRoles: ["customer"],
+      },
+      {
+        // Local staff for the web panel (hito 500): quotes, stock and payments of the demo store.
+        username: "dev.equipo",
+        enabled: true,
+        email: "dev.equipo@aurea.invalid",
+        emailVerified: true,
+        firstName: "Equipo",
+        lastName: "Demo",
+        credentials: [{ type: "password", value: "${KC_DEV_STAFF_PASSWORD}", temporary: false }],
+        realmRoles: ["advisor", "stockkeeper", "finance"],
       },
     ],
   };
