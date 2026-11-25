@@ -33,7 +33,7 @@ export async function issueQuote(form: FormData): Promise<void> {
       expectedDigest: field(form, "digest"),
       total: { amount: field(form, "amount"), currency: field(form, "currency") },
       termsVersion: field(form, "termsVersion"),
-      expiresAt: expiryFor(date, Number(field(form, "validDays"))),
+      expiresAt: expiryFor(date, field(form, "expiresCap")),
     },
   });
   if (!r.ok) back(path, { error: r.error.code, detail: r.error.message ?? "" });

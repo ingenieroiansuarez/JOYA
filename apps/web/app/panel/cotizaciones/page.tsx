@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { Notice } from "../../../components/Notice";
+import { expiryCap } from "../../../lib/expiry";
 import { formatDate, formatMoney, type Money } from "../../../lib/format";
 import { api } from "../../../lib/server/api";
 import { can, panelContext } from "../../../lib/server/panel";
@@ -81,7 +82,7 @@ export default async function Quotes({ searchParams }: { searchParams: Promise<R
               <input type="hidden" name="amount" value={q.total.amount} />
               <input type="hidden" name="currency" value={q.total.currency} />
               <input type="hidden" name="termsVersion" value={q.pricing.termsVersion} />
-              <input type="hidden" name="validDays" value={validityDays(q)} />
+              <input type="hidden" name="expiresCap" value={expiryCap(validityDays(q))} />
               <input type="hidden" name="idempotencyKey" value={randomBytes(18).toString("base64url")} />
               <label htmlFor={`exp-${q.id}`}>{t("quotes.validUntil")}</label>
               <input id={`exp-${q.id}`} name="expiresOn" type="date" required defaultValue={plusDays(validityDays(q))} min={plusDays(1)} max={plusDays(validityDays(q))} />
