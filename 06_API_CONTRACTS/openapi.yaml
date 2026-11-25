@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: AUREA API V1 — contract baseline
-  version: 1.5.0
+  version: 1.5.1
   description: Contratos iniciales; extender por vertical slice. No API implementada.
 servers:
 - url: http://localhost:3000/v1
@@ -924,7 +924,8 @@ paths:
               type: object
               properties:
                 baseRevisionId: *id002
-                name: *id001
+                name:
+                  $ref: '#/components/schemas/BranchName'
               required:
               - baseRevisionId
               - name
@@ -5241,13 +5242,18 @@ components:
       - issuer
       - publicSummary
       additionalProperties: false
+    BranchName:
+      type: string
+      description: Una rama se identifica por proyecto y nombre (SQL branch(project_id, name)).
+      pattern: ^[a-z0-9][a-z0-9._-]{0,63}$
     SyncOperation:
       type: object
       description: Operación de diseño hecha sin conexión (22_OFFLINE_AND_SYNC/SYNC.md). La operación es un DesignOperation, la misma lista permitida que en línea.
       properties:
         id: *id002
         projectId: *id002
-        branchId: *id002
+        branch:
+          $ref: '#/components/schemas/BranchName'
         baseRevisionId: *id002
         sequence:
           type: integer
@@ -5261,7 +5267,7 @@ components:
       required:
       - id
       - projectId
-      - branchId
+      - branch
       - baseRevisionId
       - sequence
       - createdAt

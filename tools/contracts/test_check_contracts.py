@@ -325,7 +325,7 @@ class ErrorsTest(unittest.TestCase):
 
 class SyncTest(unittest.TestCase):
     OP = {"id": "00000000-0000-0000-0000-000000000001", "projectId": "00000000-0000-0000-0000-000000000002",
-          "branchId": "00000000-0000-0000-0000-000000000003", "baseRevisionId": "00000000-0000-0000-0000-000000000004",
+          "branch": "main", "baseRevisionId": "00000000-0000-0000-0000-000000000004",
           "sequence": 1, "createdAt": "2026-11-25T10:00:00Z", "operation": RING}
 
     def test_operation_is_an_allowlisted_design_operation(self):
@@ -333,7 +333,7 @@ class SyncTest(unittest.TestCase):
         v.validate(self.OP)
         for bad in ({**self.OP, "operation": {"type": "run_python", "code": "x"}},
                     {**self.OP, "operation": {**RING, "innerDiameter": 30}},
-                    {**self.OP, "payload": {}}, {**self.OP, "sequence": 0},
+                    {**self.OP, "payload": {}}, {**self.OP, "sequence": 0}, {**self.OP, "branch": "Main Branch"},
                     {k: x for k, x in self.OP.items() if k != "baseRevisionId"}):
             self.assertFalse(v.is_valid(bad), bad)
 
