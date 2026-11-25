@@ -1,5 +1,5 @@
 # Hito 000 — Revisión de riesgos, ADRs y recomendación go/no-go (P0-07)
-Fecha: 2026-11-25. Autor: equipo de ingeniería (agente). **Esta es una recomendación; la decisión go/no-go es de ian.**
+Fecha: 2026-11-25. Autor: equipo de ingeniería (agente). **Decisión: GO condicional aceptado por ian el 2026-11-25** (AR bloqueado, malla IA solo simulada).
 Gate del hito (`milestones.csv`): evidencia en dispositivos reales o bloqueo explícito; benchmarks de volumen/tolerancia; ADRs con selección.
 
 ## 1. Riesgos del camino crítico (REQ-08-33)
@@ -43,7 +43,7 @@ Condiciones para el hito 100:
 - Medir el render en un Android de gama media en cuanto haya uno.
 
 ## 4. Decisiones abiertas para ian
-1. Aceptar o no este go condicional.
+1. ~~Aceptar o no este go condicional~~: aceptado por ian el 2026-11-25.
 2. Mercado/país piloto y moneda.
 3. Keycloak autogestionado o IdP gestionado.
 4. Permiso y presupuesto para evaluar Meshy/Tripo.
