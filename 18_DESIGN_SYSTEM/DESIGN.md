@@ -8,3 +8,10 @@ AppShell (bottom tabs Home/Boutique/Create/Concierge/My AUREA), ProfessionalShel
 Home: editorial hero → create CTA → curated collections. Boutique: filters, item detail, price and personalization. Atelier: viewport fills screen, bottom controls, live estimate, save/request. Genesis: prompt/photo/voice → proposals → select → editable project. Master: left tree, center viewport, right inspector, bottom history and DFM. Command: dense grid, KPI filters, tables with pagination. Workshop: assigned task cards, scan, evidence, progress. POS: product search, cart, customer and payment, mode showroom. AURA abstract crystal facet, non-human, animated status, voice configurable.
 
 Prototype in `20_UX_FLOWS/prototype/index.html` shows representative navigation and illustrative interactive mesh projection, not final UI, CAD or APK. Build full fidelity component library and validated visual assets during hito 100/300. No screen marked implemented by prototype alone.
+
+## Tokens (hito 100)
+`tokens.json` es la fuente. `packages/tokens` (`@aurea/tokens`) genera `tokens.mjs` (Expo y Next), `tokens.d.ts` y `tokens.css` (variables `--aurea-*`, oscuro por defecto, claro con `data-theme="light"`, movimiento a 0 ms con `prefers-reduced-motion`). CI falla si los generados están desfasados o si un par de un tema no cumple WCAG 2.2 AA: texto y estados 4,5:1 sobre fondo y superficie, texto sobre acento 4,5:1, foco y bordes de campo 3:1 (SC 1.4.11).
+
+Con la paleta original el tema claro no pasaba: antiqueGold 4,45:1 sobre ivory, platinum 2,06:1, success 2,99:1, warning 2,06:1, error 3,31:1, info 3,02:1. Para el tema claro se derivan `*Deep` (mismo tono y saturación, más oscuros, en `derivedColor`). El tema oscuro usa la paleta original sin cambios. Los derivados esperan revisión visual de ian.
+
+Fuentes: Cormorant Garamond, Inter y JetBrains Mono son candidatas con licencia SIL OFL 1.1 según sus proyectos; aún no se empaquetan. Antes de incluirlas: verificar la licencia de los archivos exactos, fijar versión y hash y añadir OFL-1.1 a la lista de licencias permitidas para fuentes. Hasta entonces se usa la fuente del sistema.
