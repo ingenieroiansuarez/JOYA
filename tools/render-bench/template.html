@@ -225,10 +225,15 @@ $("run").addEventListener("click", async () => {
   $("run").disabled = true; $("copy").disabled = true; spin = false;
   let lock = null; try { lock = await navigator.wakeLock?.request("screen"); } catch {}
   const batStart = await battery(); const tStart = Date.now();
+  // Display cadence from an unloaded rAF loop (no rendering), so a slow scene
+  // is never mistaken for the screen's refresh interval.
+  statusEl.textContent = "Midiendo la cadencia de la pantalla…";
+  const cadence = await new Promise(res => { const d = []; let last = null; const t0 = performance.now();
+    (function tick(t) { if (last !== null) d.push(t - last); last = t; if (t - t0 < 1500) requestAnimationFrame(tick); else res(+pct(d, 0.5).toFixed(2)); })(t0); });
   const results = [];
   for (const k of ["base", "vitrina", "estres"]) { statusEl.textContent = `Midiendo ${k}… no toques la pantalla.`; const r = await runScene(k); results.push(r); paintRow(r); }
   // Ramp: more rings (each with a gem) until frame p95 leaves the display cadence.
-  const ramp = []; const cadence = Math.min(...results.map(r => r.p50ms));
+  const ramp = [];
   for (const count of RAMP_COUNTS) {
     statusEl.textContent = `Buscando el límite: ${count} anillos…`;
     const r = await runScene("limite", { count, seconds: 6, warmup: 1 });
