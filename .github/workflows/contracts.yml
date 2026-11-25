@@ -1,4 +1,4 @@
-name: Contracts (state machines, SQL, OpenAPI)
+name: Contracts (state machines, SQL, OpenAPI, permissions)
 on:
   push:
     branches: [main]
@@ -10,6 +10,8 @@ on:
       - "tools/contracts/**"
       - "13_AI_PROMPTS_AND_TOOLS/tools.json"
       - "11_3D_ASSET_LIBRARY/families.json"
+      - "19_SCREEN_INVENTORY/**"
+      - "21_SECURITY/**"
       - ".github/workflows/contracts.yml"
 permissions:
   contents: read
@@ -34,8 +36,10 @@ jobs:
       - run: python -m pip install --no-deps -r tools/contracts/requirements.lock
       - name: Drift check
         run: python tools/contracts/check_contracts.py
+      - name: Permission check
+        run: python tools/contracts/check_permissions.py
       - name: Checker tests
-        run: python -m unittest -v test_check_contracts
+        run: python -m unittest -v test_check_contracts test_check_permissions
         working-directory: tools/contracts
       - name: Apply reference SQL and state constraint tests on PostgreSQL 16
         env:
