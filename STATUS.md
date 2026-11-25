@@ -1,14 +1,15 @@
 # STATUS — AUREA
 
-Hito activo: **000 — Feasibility**. Actualizado: 2026-11-25.
+Hito activo: **200 — Boutique**. Actualizado: 2026-11-25.
 Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5YS
 
 ## Hitos
 | Hito | Estado | Nota |
 |---|---|---|
 | 000 Feasibility | GO CONDICIONAL (ian, 2026-11-25) | CAD/DFM y render con evidencia; AR bloqueado y mesh IA solo simulada (`27_IMPLEMENTATION_ROADMAP/000_GO_NO_GO.md`) |
-| 100 Foundation | EN CURSO | Contratos 1.1–1.6 con verificación en CI; arranque local (pnpm, Compose, migraciones); API con OIDC y permisos por rol; Keycloak local con login PKCE probado. Tokens de diseño con contraste AA verificado. Esqueletos web (Next) y móvil (Expo, login PKCE). Login PKCE real probado en el Z Flip 7 (2026-11-25) |
-| 200–1000 | NOT_STARTED | |
+| 100 Foundation | GATE CUMPLIDO, pendiente aceptación de ian | Gate "arranque limpio, pruebas y login; entorno aislado; sin secretos": CI verde en main, login PKCE real en el Z Flip 7 (debug y release), `.env` fuera de git y `No secrets tracked` en CI. Contratos 1.1–1.7 con verificación en CI; arranque local (pnpm, Compose, migraciones); API con OIDC y permisos por rol; Keycloak local con login PKCE probado. Tokens de diseño con contraste AA verificado. Esqueletos web (Next) y móvil (Expo, login PKCE). Login PKCE real probado en el Z Flip 7 (2026-11-25) |
+| 200 Boutique | EN CURSO | Navegación de invitado, catálogo, detalle, perfil, favoritos, datos demo |
+| 300–1000 | NOT_STARTED | |
 
 ## Backlog 000
 | ID | Tarea | Estado | Evidencia |
