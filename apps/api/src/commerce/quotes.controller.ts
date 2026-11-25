@@ -79,9 +79,13 @@ export class QuotesController {
           WHERE r.id = $1 AND cu.subject = $2`, [revisionId, p.subject]);
       if (!rows[0]) throw new NotFoundException();
       const project = await ownedProject(c, p.subject, rows[0].project_id);
-      // One open quote per revision: asking again returns it.
-      const open = (await c.query<{ id: string }>("SELECT id FROM aurea.quote WHERE revision_id = $1 AND state IN ('DRAFT','ISSUED')", [revisionId])).rows[0];
-      if (open) return toQuote(await visibleQuote(c, p, open.id), locale, false);
+      // One open quote per revision: asking again returns it. An issued offer past its expiry is
+      // closed here (EXPIRED) so the customer gets a fresh draft instead of a dead one.
+      const open = (await c.query<{ id: string; lapsed: boolean }>(
+        "SELECT id, (state = 'ISSUED' AND expires_at <= now()) AS lapsed FROM aurea.quote WHERE revision_id = $1 AND state IN ('DRAFT','ISSUED') FOR UPDATE",
+        [revisionId])).rows[0];
+      if (open?.lapsed) await this.expire(c, await visibleQuote(c, p, open.id), cid);
+      else if (open) return toQuote(await visibleQuote(c, p, open.id), locale, false);
       const snapshot = await this.price(c, project.id, revisionId);
       const customerId = await ensureCustomer(c, p.subject);
       const id = randomUUID();

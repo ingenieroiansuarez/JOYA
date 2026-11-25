@@ -211,23 +211,28 @@ export async function sweepExpired(c: PoolClient, lotIds: string[]): Promise<num
 }
 
 /**
- * Hold `grams` of each material for an order. Locks every lot of each material in a fixed order
- * (no deadlocks between orders), sweeps expired holds, then takes the first lot with enough
- * available. stock_lot's CHECK (reserved <= on_hand) is the last line against overselling.
+ * Lock order for stock (every path takes it the same way, so two transactions never wait on each
+ * other in a cycle): stock_lot rows first, all at once, ordered by id; reservations after.
+ */
+export async function lockLots(c: PoolClient, itemKeys: string[], lotIds: string[] = []): Promise<string[]> {
+  return (await c.query<{ id: string }>(
+    "SELECT id FROM aurea.stock_lot WHERE item_key = ANY($1::text[]) OR id = ANY($2::uuid[]) ORDER BY id FOR UPDATE", [itemKeys, lotIds])).rows.map((r) => r.id);
+}
+
+/**
+ * Hold `grams` of each material for an order. Locks every lot of the needed materials (lockLots),
+ * sweeps expired holds, then takes the first lot with enough available. stock_lot's CHECK
+ * (reserved <= on_hand) is the last line against overselling.
  * One lot per material in hito 500 (no splitting across lots).
  */
 export async function holdStock(c: PoolClient, orderId: string, needs: Map<string, string>, actor: string, hours: number) {
-  for (const itemKey of [...needs.keys()].sort()) {
+  const keys = [...needs.keys()].sort();
+  await sweepExpired(c, await lockLots(c, keys));
+  for (const itemKey of keys) {
     const qty = needs.get(itemKey)!;
-    const lots = (await c.query<{ id: string; available: string }>(
-      `SELECT id, (on_hand - reserved)::text AS available FROM aurea.stock_lot WHERE item_key = $1 AND unit = 'g' ORDER BY id FOR UPDATE`, [itemKey])).rows;
-    if (await sweepExpired(c, lots.map((l) => l.id))) {
-      lots.splice(0, lots.length, ...(await c.query<{ id: string; available: string }>(
-        "SELECT id, (on_hand - reserved)::text AS available FROM aurea.stock_lot WHERE id = ANY($1::uuid[]) ORDER BY id", [lots.map((l) => l.id)])).rows);
-    }
     const lot = (await c.query<{ id: string }>(
-      `SELECT id FROM aurea.stock_lot WHERE id = ANY($1::uuid[]) AND on_hand - reserved >= $2 ORDER BY created_at, id LIMIT 1`,
-      [lots.map((l) => l.id), qty])).rows[0];
+      `SELECT id FROM aurea.stock_lot WHERE item_key = $1 AND unit = 'g' AND on_hand - reserved >= $2 ORDER BY created_at, id LIMIT 1`,
+      [itemKey, qty])).rows[0];
     if (!lot) {
       throw new ApiError(409, "INSUFFICIENT_STOCK", [{ code: "INSUFFICIENT_STOCK", pointer: `/materials/${itemKey}`, message: `not enough ${itemKey} available (${qty} g needed)` }]);
     }
@@ -240,8 +245,8 @@ export async function holdStock(c: PoolClient, orderId: string, needs: Map<strin
 
 /** Release every open reservation of an order (cancel). */
 export async function releaseOrderStock(c: PoolClient, orderId: string): Promise<void> {
-  const lots = (await c.query<{ lot_id: string }>("SELECT DISTINCT lot_id FROM aurea.reservation WHERE order_id = $1 ORDER BY lot_id", [orderId])).rows;
-  if (lots.length) await c.query("SELECT id FROM aurea.stock_lot WHERE id = ANY($1::uuid[]) ORDER BY id FOR UPDATE", [lots.map((l) => l.lot_id)]);
+  const lots = (await c.query<{ lot_id: string }>("SELECT DISTINCT lot_id FROM aurea.reservation WHERE order_id = $1", [orderId])).rows;
+  if (lots.length) await lockLots(c, [], lots.map((l) => l.lot_id));
   const { rows } = await c.query<{ lot_id: string; quantity: string }>(
     `UPDATE aurea.reservation SET state = 'RELEASED', updated_at = now() WHERE order_id = $1 AND state IN ('HELD','ALLOCATED')
      RETURNING lot_id, quantity::text`, [orderId]);

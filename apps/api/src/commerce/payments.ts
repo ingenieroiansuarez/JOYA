@@ -7,7 +7,7 @@ import { ApiError } from "../design/api-error";
 import { sha256 } from "../design/repo";
 import { cmp, dec } from "./money";
 import { reserveByMaterial, type PricingSnapshot } from "./pricing";
-import { audit, emit, holdStock, PAYMENT_COLUMNS, trim, type PaymentRow } from "./repo";
+import { audit, emit, holdStock, lockLots, PAYMENT_COLUMNS, trim, type PaymentRow } from "./repo";
 
 export const SIMULATED = "simulated";
 export interface ProviderEvent {
@@ -104,6 +104,13 @@ export async function applyEvent(c: PoolClient, provider: string, e: ProviderEve
     await record("REVIEW");
     return { outcome: "REVIEW", paymentId: pay.id };
   }
+  if (pay.review_reason === "AMOUNT_MISMATCH") {
+    // An earlier signed success for a different amount: a later "correct" one does not settle it on
+    // its own. The payment stays in processing, flagged, until an authorized reconciliation.
+    await audit(c, `provider:${provider}`, "payment.review", pay.id, cid, { reason: "AMOUNT_MISMATCH", repeated: true });
+    await record("REVIEW");
+    return { outcome: "REVIEW", paymentId: pay.id };
+  }
   const late = order.state !== "PENDING_PAYMENT";
   const v = await bump("CONFIRMED", `, confirmed_at = now()${late ? ", review_reason = $3" : ""}`, late ? [order.state === "CANCELLED" ? "ORDER_CANCELLED" : "LATE_EVENT"] : []);
   await emit(c, "PaymentConfirmed", pay.id, v, cid, { paymentId: pay.id, orderId: pay.order_id, state: "CONFIRMED" });
@@ -126,24 +133,28 @@ export async function applyEvent(c: PoolClient, provider: string, e: ProviderEve
  * otherwise the order waits and the payment is flagged STOCK_UNAVAILABLE for a person.
  */
 async function confirmOrder(c: PoolClient, order: { id: string; version: number }, cid: string, hours: number, paymentId: string) {
-  const held = (await c.query<{ id: string; lot_id: string; quantity: string }>(
-    `SELECT v.id, v.lot_id, v.quantity::text FROM aurea.reservation v
-      WHERE v.order_id = $1 AND v.state = 'HELD' AND v.expires_at <= now() ORDER BY v.lot_id FOR UPDATE OF v`, [order.id])).rows;
   // What the frozen quote needs, minus what is still held or allocated (an expired hold may already
   // have been swept by someone else).
   const snap = (await c.query<{ snapshot: PricingSnapshot }>(
     "SELECT q.snapshot FROM aurea.quote q JOIN aurea.sales_order o ON o.quote_id = q.id WHERE o.id = $1", [order.id])).rows[0].snapshot;
+  const needs = reserveByMaterial(snap);
+  // Lots before reservations, like every other stock path (lockLots): no lock-order deadlock with a
+  // concurrent listing, acceptance or sweep.
+  const ownLots = (await c.query<{ lot_id: string }>("SELECT DISTINCT lot_id FROM aurea.reservation WHERE order_id = $1", [order.id])).rows.map((r) => r.lot_id);
+  await lockLots(c, [...needs.keys()], ownLots);
+  const held = (await c.query<{ id: string; lot_id: string; quantity: string }>(
+    `SELECT v.id, v.lot_id, v.quantity::text FROM aurea.reservation v
+      WHERE v.order_id = $1 AND v.state = 'HELD' AND v.expires_at <= now() ORDER BY v.id FOR UPDATE`, [order.id])).rows;
   try {
     await c.query("SAVEPOINT rehold");
     for (const h of held) {
-      await c.query("SELECT id FROM aurea.stock_lot WHERE id = $1 FOR UPDATE", [h.lot_id]);
       await c.query("UPDATE aurea.reservation SET state = 'RELEASED', updated_at = now() WHERE id = $1", [h.id]);
       await c.query("UPDATE aurea.stock_lot SET reserved = reserved - $2 WHERE id = $1", [h.lot_id, h.quantity]);
     }
     const open = new Map((await c.query<{ item_key: string; qty: string }>(
       `SELECT l.item_key, SUM(v.quantity)::text AS qty FROM aurea.reservation v JOIN aurea.stock_lot l ON l.id = v.lot_id
         WHERE v.order_id = $1 AND v.state IN ('HELD','ALLOCATED') GROUP BY l.item_key`, [order.id])).rows.map((r) => [r.item_key, r.qty]));
-    const missing = new Map([...reserveByMaterial(snap)].filter(([k, q]) => cmp(dec(open.get(k) ?? "0"), dec(q)) < 0));
+    const missing = new Map([...needs].filter(([k, q]) => cmp(dec(open.get(k) ?? "0"), dec(q)) < 0));
     if (missing.size) await holdStock(c, order.id, missing, "system:confirm", hours);
     await c.query("RELEASE SAVEPOINT rehold");
   } catch (err) {

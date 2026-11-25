@@ -332,6 +332,20 @@ describe("commercial slice (hito 500)", { skip }, () => {
     assert.equal((await pool.query("SELECT count(*)::int AS n FROM aurea.sales_order WHERE quote_id = $1", [q.id])).rows[0].n, 0);
   });
 
+  test("asking again for a revision whose offer lapsed closes it and gives a fresh draft", async () => {
+    const { p, q } = await issuedQuote();
+    await pool.query("ALTER TABLE aurea.quote DISABLE TRIGGER quote_frozen");
+    await pool.query("UPDATE aurea.quote SET expires_at = now() - interval '1 minute' WHERE id = $1", [q.id]);
+    await pool.query("ALTER TABLE aurea.quote ENABLE TRIGGER quote_frozen");
+    const again = await requestQuote(p);
+    assert.equal(again.status, 200, JSON.stringify(again.body));
+    assert.notEqual(again.body.id, q.id);
+    assert.equal(again.body.state, "DRAFT");
+    assert.equal((await pool.query("SELECT state FROM aurea.quote WHERE id = $1", [q.id])).rows[0].state, "EXPIRED");
+    assert.equal((await pool.query("SELECT count(*)::int AS n FROM aurea.outbox WHERE event_type = 'QuoteExpired' AND aggregate_id = $1", [q.id])).rows[0].n, 1);
+    assert.equal((await requestQuote(p)).body.id, again.body.id, "the new draft is the open one now");
+  });
+
   test("issuing: validated, segregated, needs geometry, supersedes the previous offer", async () => {
     const p = (await call("POST", "/v1/projects", { body: { title: "Sin geometría", templateId: "ring.classic", materialId: "gold-18k-yellow" } })).body;
     const noGeo = await call("POST", "/v1/quotes", { body: { revisionId: p.headRevisionId, currency: "COP" } });
@@ -416,6 +430,11 @@ describe("commercial slice (hito 500)", { skip }, () => {
     assert.equal(p1.state, "PENDING");
     assert.equal(p1.reviewReason, "AMOUNT_MISMATCH");
     assert.equal((await call("GET", `/v1/orders/${order.id}`)).body.state, "PENDING_PAYMENT");
+    const right = await webhook({ eventId: `evt_${randomUUID().replace(/-/g, "")}`, type: "payment.succeeded", providerPaymentId: providerId, amount: order.deposit.required });
+    assert.equal(right.body.outcome, "REVIEW", "a correct amount after a mismatch does not settle it without reconciliation");
+    const p2 = (await call("GET", `/v1/payments/${pay.id}`)).body;
+    assert.deepEqual([p2.state, p2.reviewReason], ["PENDING", "AMOUNT_MISMATCH"]);
+    assert.equal((await pool.query("SELECT count(*)::int AS n FROM aurea.outbox WHERE event_type = 'PaymentConfirmed' AND aggregate_id = $1", [pay.id])).rows[0].n, 0);
 
     const declined = await call("POST", `/v1/payments/${pay.id}/simulate`, { body: { outcome: "DECLINE" } });
     assert.equal(declined.body.state, "FAILED");
