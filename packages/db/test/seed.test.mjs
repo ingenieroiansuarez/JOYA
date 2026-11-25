@@ -71,7 +71,7 @@ test("seed is idempotent and exact", { skip }, async () => {
 test("demo stock is seeded once with its RECEIPT movement and is never reset", { skip }, async () => {
   await seedDemo(url(), "ci");
   const lots = await query("SELECT id, on_hand::text, reserved::text, demo FROM aurea.stock_lot ORDER BY id");
-  assert.equal(lots.length, 5);
+  assert.equal(lots.length, 8);
   assert.ok(lots.every((l) => l.demo && l.reserved === "0.000000"));
   // A stockkeeper's adjustment survives a re-run of the seed.
   const lot = "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1001";

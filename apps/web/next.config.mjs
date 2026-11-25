@@ -15,6 +15,9 @@ const csp = [
 
 /** @type {import('next').NextConfig} */
 export default {
+  // The demo panel (hito 600, `pnpm demo web`) builds into its own folder so it never replaces the
+  // build a local panel is serving from .next.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
   images: { unoptimized: true }, // no sharp (LGPL libvips); see pnpm-workspace.yaml
   reactStrictMode: true,

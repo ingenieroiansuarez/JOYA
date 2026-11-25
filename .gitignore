@@ -1,5 +1,6 @@
 **/.env.local
 **/.env
+**/.env.demo
 .data/
 **/__pycache__/
 *.keystore
@@ -17,6 +18,7 @@ apps/render-bench-android/.gradle/
 apps/render-bench-android/local.properties
 dist/
 apps/web/.next/
+apps/web/.next-demo/
 apps/web/next-env.d.ts
 apps/mobile/.expo/
 apps/mobile/dist/

@@ -136,6 +136,8 @@ describe("configuration fails closed", () => {
   test("issuer is kept verbatim, trailing slash included", () =>
     assert.equal(loadConfig(ok).oidc.issuer, "http://127.0.0.1:8080/realms/aurea-local/"));
   test("valid local config", () => assert.equal(loadConfig(ok).env, "local"));
+  test("demo on the presenter's laptop: loopback http issuer (hito 600)", () =>
+    assert.equal(loadConfig({ ...ok, AUREA_ENV: "demo", OIDC_ISSUER: "http://127.0.0.1:8180/realms/aurea-demo" }).env, "demo"));
   for (const [name, env, re] of [
     ["missing database", { ...ok, DATABASE_URL: "" }, /missing configuration: DATABASE_URL/],
     ["unknown environment", { ...ok, AUREA_ENV: "staging" }, /AUREA_ENV must be one of/],
@@ -146,7 +148,8 @@ describe("configuration fails closed", () => {
     ["missing issuer", { ...ok, OIDC_ISSUER: "" }, /missing configuration: OIDC_ISSUER/],
     ["missing audience", { ...ok, OIDC_AUDIENCE: undefined }, /missing configuration: OIDC_AUDIENCE/],
     ["plain http issuer off loopback", { ...ok, OIDC_ISSUER: "http://idp.example/realms/x" }, /OIDC_ISSUER must use https/],
-    ["plain http issuer in demo", { ...ok, AUREA_ENV: "demo", OIDC_ISSUER: "http://127.0.0.1:8080/realms/x" }, /OIDC_ISSUER must use https/],
+    ["plain http issuer off loopback in demo", { ...ok, AUREA_ENV: "demo", OIDC_ISSUER: "http://192.168.1.20:8180/realms/x" }, /OIDC_ISSUER must use https/],
+    ["plain http loopback issuer in production", { ...ok, AUREA_ENV: "production", VALKEY_URL: "rediss://:p@127.0.0.1:6379", OIDC_ISSUER: "http://127.0.0.1:8080/realms/x" }, /OIDC_ISSUER must use https/],
     ["issuer with query", { ...ok, OIDC_ISSUER: "https://idp.example/r?x=1" }, /bare issuer/],
   ]) {
     test(name, () => assert.throws(() => loadConfig(env), (e) => e instanceof ConfigError && re.test(e.message)));
