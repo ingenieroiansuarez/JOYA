@@ -79,7 +79,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
             Gltfio.init()  // loads gltfio-jni
         }
 
-        const val TOOL = "aurea-render-bench-android/0.1.2"
+        const val TOOL = "aurea-render-bench-android/0.1.3"
         const val FILAMENT_VERSION = "1.79.0"
         const val ASSET = "showcase.glb"
         const val SCENE_SECONDS = 15.0
@@ -775,7 +775,10 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
         }
         val log = try {
             val proc = Runtime.getRuntime().exec(arrayOf("logcat", "-d", "-v", "time", "--pid=${info.pid}"))
-            proc.inputStream.bufferedReader().readLines().takeLast(80).joinToString("\n")
+            val lines = proc.inputStream.bufferedReader().readLines()
+            val useful = Regex("Filament|gltfio|FEngine|Precondition|Panic|ibl|EGL|GLES|libc")
+            (lines.filter { useful.containsMatchIn(it) }.takeLast(40) + listOf("…") + lines.takeLast(4))
+                .joinToString("\n")
         } catch (t: Throwable) { "logcat no disponible: ${t.message}" }
         pendingRetryExit = info.timestamp
         return buildString {
@@ -785,11 +788,79 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
             append("última etapa=${diagPrefs.getString("stage", "?")}\n")
             append("dispositivo=${Build.MANUFACTURER} ${Build.MODEL} Android ${Build.VERSION.RELEASE}\n")
             diagPrefs.getString("javaCrash", null)?.let { append("\nJava:\n$it\n") }
+            if (info.reason == android.app.ApplicationExitInfo.REASON_CRASH_NATIVE && Build.VERSION.SDK_INT >= 31) {
+                append("\nbacktrace:\n${nativeBacktrace(info)}\n")
+            }
             append("\nlog:\n$log")
         }
     }
 
     private var pendingRetryExit = 0L
+
+    /**
+     * Crashing thread's backtrace from the tombstone Android keeps for this app (API 31+), decoded
+     * from its protobuf (system/core/debuggerd/proto/tombstone.proto) without extra dependencies.
+     */
+    private fun nativeBacktrace(info: android.app.ApplicationExitInfo): String = try {
+        val bytes = info.traceInputStream?.use { it.readBytes() } ?: return "sin tombstone"
+        val top = Proto(bytes).fields()
+        val tid = top.firstOrNull { it.first == 6 }?.second as? Long
+        val abort = top.firstOrNull { it.first == 14 }?.let { Proto.str(it.second) }
+        val out = StringBuilder()
+        if (!abort.isNullOrEmpty()) out.append("abort: $abort\n")
+        for ((field, value) in top) {
+            if (field != 16 || value !is ByteArray) continue          // threads map entry
+            val entry = Proto(value).fields()
+            val thread = entry.firstOrNull { it.first == 2 }?.second as? ByteArray ?: continue
+            val t = Proto(thread).fields()
+            if ((t.firstOrNull { it.first == 1 }?.second as? Long) != tid) continue
+            var i = 0
+            for ((tf, tv) in t) {
+                if (tf != 4 || tv !is ByteArray) continue              // current_backtrace frame
+                val fr = Proto(tv).fields()
+                val relPc = fr.firstOrNull { it.first == 1 }?.second as? Long ?: 0L
+                val fn = fr.firstOrNull { it.first == 4 }?.let { Proto.str(it.second) } ?: ""
+                val off = fr.firstOrNull { it.first == 5 }?.second as? Long ?: 0L
+                val file = fr.firstOrNull { it.first == 6 }?.let { Proto.str(it.second) } ?: ""
+                out.append("#%02d pc %08x %s %s\n".format(i++, relPc, file.substringAfterLast('/'),
+                    if (fn.isNotEmpty()) "($fn+$off)" else ""))
+                if (i >= 24) break
+            }
+        }
+        out.toString().ifEmpty { "tombstone sin frames (${bytes.size} bytes)" }
+    } catch (t: Throwable) { "no se pudo leer el tombstone: ${t.message}" }
+
+    /** Minimal protobuf wire-format reader: varints as Long, length-delimited as ByteArray. */
+    private class Proto(private val b: ByteArray) {
+        private var p = 0
+        private fun varint(): Long {
+            var shift = 0; var r = 0L
+            while (true) {
+                val x = b[p++].toInt() and 0xff
+                r = r or ((x and 0x7f).toLong() shl shift)
+                if (x < 0x80) return r
+                shift += 7
+            }
+        }
+        fun fields(): List<Pair<Int, Any>> {
+            val out = ArrayList<Pair<Int, Any>>()
+            while (p < b.size) {
+                val key = varint()
+                val field = (key ushr 3).toInt()
+                when ((key and 7).toInt()) {
+                    0 -> out.add(field to varint())
+                    1 -> { p += 8; out.add(field to 0L) }
+                    2 -> { val n = varint().toInt(); out.add(field to b.copyOfRange(p, p + n)); p += n }
+                    5 -> { p += 4; out.add(field to 0L) }
+                    else -> return out
+                }
+            }
+            return out
+        }
+        companion object {
+            fun str(v: Any): String = if (v is ByteArray) String(v, Charsets.UTF_8) else v.toString()
+        }
+    }
 
     private fun onRunButton() {
         if (!ready) {
