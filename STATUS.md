@@ -17,8 +17,8 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | P0-03 | CadQuery anillo y dije, volumen analítico, STEP/STL reimport, fixture DFM pared fina | HECHO (PoC) | `pytest services/geometry` — 29 tests pasan |
 | P0-04 | GLB con material y benchmark Filament vs WebView | HECHO (decisión) | Ambos caminos medidos en Z Flip 7; ADR-0003 aceptado: WebView + Three.js. Pendiente revisión óptica humana y gama media |
 | P0-05 | AR anillo/arete | BLOQUEADO | Requiere ≥3 Android físicos y consentimiento de participantes |
-| P0-06 | Adapter mesh IA simulado / proveedor | PARCIAL | Simulador, importación, escala y reparación hechos (`pytest services/mesh`, 33 tests); evaluación de proveedor real bloqueada: requiere permiso y credenciales |
-| P0-07 | Revisión ADRs, riesgos, go/no-go | PENDIENTE | Tras P0-04/05 |
+| P0-06 | Adapter mesh IA simulado / proveedor | PARCIAL | Simulador, importación, escala y reparación hechos (`pytest services/mesh`, 34 tests); evaluación de proveedor real bloqueada: requiere permiso y credenciales |
+| P0-07 | Revisión ADRs, riesgos, go/no-go | HECHO | `27_IMPLEMENTATION_ROADMAP/000_GO_NO_GO.md`: GO condicional al hito 100 aceptado por ian (2026-11-25); AR bloqueado |
 
 ## Entorno de evidencia (nube, Linux x86_64)
 - Python 3.13.18; cadquery 2.8.0; cadquery-ocp 7.9.3.1.1 (OCCT 7.9); trimesh 4.11.1; jsonschema 4.25.1; numpy 2.5.5; pytest 8.4.2.
@@ -57,7 +57,7 @@ Pendiente: revisión visual humana de oro y gema (calidad óptica no medida obje
 Código: `services/mesh` (ver su README). Ruta B: concepto → malla del proveedor → importar, escalar, reparar → DFM → revisión humana.
 ```bash
 pip install -r services/mesh/requirements.lock && pip install --no-deps -e services/mesh
-pytest services/mesh                                                # 33 passed
+pytest services/mesh                                                # 34 passed
 aurea-mesh services/mesh/out --target-mm 24 --confirmed-by joyero   # DFM-01 REVIEW, bbox 24×24×6,22 mm, vol 1674,1519 mm³
 ```
 - El fixture simulado (toroide original con escala sin unidades, Y-up, vértices sin unir, caras invertidas, 2 huecos, triángulos degenerados y duplicados, fragmento suelto) se repara a un volumen cerrado cuyo volumen coincide con el toroide de referencia × factor³ (tolerancia relativa 1e-6). Salidas byte-idénticas entre ejecuciones.
@@ -97,4 +97,3 @@ Lista completa en `services/geometry/requirements.lock`. No es asesoría legal.
 ## Siguiente
 - P0-04: revisión visual del render por ian y medición en un Android de gama media cuando haya uno.
 - P0-06: evaluar un proveedor real de malla solo con permiso y credenciales de ian.
-- P0-07: revisión de ADRs, riesgos y go/no-go.
