@@ -79,7 +79,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
             Gltfio.init()  // loads gltfio-jni
         }
 
-        const val TOOL = "aurea-render-bench-android/0.1.0"
+        const val TOOL = "aurea-render-bench-android/0.1.1"
         const val FILAMENT_VERSION = "1.79.0"
         const val ASSET = "showcase.glb"
         const val SCENE_SECONDS = 15.0
@@ -152,15 +152,27 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
     private var calibrating: Calibration? = null
     private var report: JSONObject? = null
     private var lastHudNanos = 0L
+    private var initFailed = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         buildUi()
-        setupFilament()
-        loadAssets()
-        buildLighting()
-        buildScene("vitrina", null)
+        val previousCrash = lastCrash()
+        try {
+            setupFilament()
+            loadAssets()
+            buildLighting()
+            buildScene("vitrina", null)
+        } catch (t: Throwable) {
+            // Show Java-side failures instead of closing; native aborts are reported on the next launch.
+            runButton.isEnabled = false
+            status.text = "Error al iniciar: ${t.javaClass.simpleName}: ${t.message}"
+            jsonView.text = android.util.Log.getStackTraceString(t)
+            initFailed = true
+            return
+        }
+        if (previousCrash != null) jsonView.text = "Cierre anterior de la app:\n$previousCrash"
         status.text = "Listo. GLB ${"%.1f".format(glbBytes.size / 1024.0)} KB, " +
             "${ringTriangles + gemTriangles} triángulos, parseado en ${"%.1f".format(parseMs)} ms. " +
             "Backend: ${engine.backend.name}."
@@ -344,8 +356,12 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
             }
         }
         buf.flip()
+        // IBLPrefilterContext requires the full mip chain allocated (log2(width)+1 levels) and
+        // generates the mips itself, so the texture must be GEN_MIPMAPPABLE.
+        val levels = 32 - Integer.numberOfLeadingZeros(w)
         val eq = Texture.Builder()
-            .width(w).height(h).levels(1)
+            .width(w).height(h).levels(levels)
+            .usage(Texture.Usage.DEFAULT or Texture.Usage.GEN_MIPMAPPABLE)
             .sampler(Texture.Sampler.SAMPLER_2D)
             .format(Texture.InternalFormat.RGBA16F)
             .build(engine)
@@ -419,6 +435,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
 
     override fun onResume() {
         super.onResume()
+        if (initFailed) return
         choreographer.postFrameCallback(this)
     }
 
@@ -699,11 +716,28 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
         }
     }
 
+    /** Reason and message of this app's last abnormal exit (API 30+), so a crash can be reported from the phone. */
+    private fun lastCrash(): String? {
+        if (Build.VERSION.SDK_INT < 30) return null
+        val am = getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+        val info = am.getHistoricalProcessExitReasons(packageName, 0, 1).firstOrNull() ?: return null
+        val crash = info.reason == android.app.ApplicationExitInfo.REASON_CRASH ||
+            info.reason == android.app.ApplicationExitInfo.REASON_CRASH_NATIVE ||
+            info.reason == android.app.ApplicationExitInfo.REASON_ANR
+        if (!crash) return null
+        val prefs = getSharedPreferences("diag", Context.MODE_PRIVATE)
+        if (prefs.getLong("shownExit", 0L) == info.timestamp) return null
+        prefs.edit().putLong("shownExit", info.timestamp).apply()
+        return "reason=${info.reason} status=${info.status} at=${Instant.ofEpochMilli(info.timestamp)} " +
+            "description=${info.description}"
+    }
+
     // ---------------------------------------------------------------- Teardown
 
     override fun onDestroy() {
         super.onDestroy()
         choreographer.removeFrameCallback(this)
+        if (initFailed) return
         uiHelper.detach()
         if (sceneEntities.isNotEmpty()) scene.removeEntities(sceneEntities)
         many?.let { assetLoader.destroyAsset(it) }
