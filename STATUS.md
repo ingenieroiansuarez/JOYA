@@ -18,7 +18,7 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | P0-04 | GLB con material y benchmark Filament vs WebView | HECHO (decisión) | Ambos caminos medidos en Z Flip 7; ADR-0003 aceptado: WebView + Three.js. Pendiente revisión óptica humana y gama media |
 | P0-05 | AR anillo/arete | BLOQUEADO | Requiere ≥3 Android físicos y consentimiento de participantes |
 | P0-06 | Adapter mesh IA simulado / proveedor | NO INICIADO | Proveedor real requiere permiso y credenciales |
-| P0-07 | Revisión ADRs, riesgos, go/no-go | PENDIENTE | Tras P0-04/05 |
+| P0-07 | Revisión ADRs, riesgos, go/no-go | HECHO | `27_IMPLEMENTATION_ROADMAP/000_GO_NO_GO.md`: GO condicional al hito 100 aceptado por ian (2026-11-25); AR bloqueado |
 
 ## Entorno de evidencia (nube, Linux x86_64)
 - Python 3.13.18; cadquery 2.8.0; cadquery-ocp 7.9.3.1.1 (OCCT 7.9); trimesh 4.11.1; jsonschema 4.25.1; numpy 2.5.5; pytest 8.4.2.
