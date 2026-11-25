@@ -10,8 +10,8 @@ export interface Tokens { accessToken: string; refreshToken: string | null; expi
 export interface Session extends Tokens { id: string; createdAt: number }
 export interface PendingLogin { verifier: string; nonce: string; next: string; createdAt: number }
 
-const SESSION_COOKIE = "aurea_sid";
-const LOGIN_COOKIE = "aurea_login";
+const SESSION_COOKIE = (cfg: WebConfig) => `${cfg.cookiePrefix}_sid`;
+const LOGIN_COOKIE = (cfg: WebConfig) => `${cfg.cookiePrefix}_login`;
 const SESSION_TTL_MS = 30 * 60_000; // matches the realm's SSO idle timeout
 const LOGIN_TTL_MS = 10 * 60_000;
 
@@ -48,15 +48,15 @@ export async function beginLogin(cfg: WebConfig, next: string): Promise<{ state:
   const state = random();
   const login = { verifier: random(48), nonce: random(), next: safeNext(next), createdAt: Date.now() };
   store.logins.set(state, login);
-  (await cookies()).set(LOGIN_COOKIE, seal(cfg.sessionSecret, state), cookieOpts(cfg, LOGIN_TTL_MS / 1000));
+  (await cookies()).set(LOGIN_COOKIE(cfg), seal(cfg.sessionSecret, state), cookieOpts(cfg, LOGIN_TTL_MS / 1000));
   return { state, verifier: login.verifier, nonce: login.nonce };
 }
 
 /** Consumes a login once: the state must match this browser's cookie and not be expired. */
 export async function takeLogin(cfg: WebConfig, state: string | null): Promise<PendingLogin | null> {
   const jar = await cookies();
-  const bound = unseal(cfg.sessionSecret, jar.get(LOGIN_COOKIE)?.value);
-  jar.delete(LOGIN_COOKIE);
+  const bound = unseal(cfg.sessionSecret, jar.get(LOGIN_COOKIE(cfg))?.value);
+  jar.delete(LOGIN_COOKIE(cfg));
   if (!state || !bound || bound !== state) return null;
   const login = store.logins.get(state);
   store.logins.delete(state);
@@ -68,11 +68,11 @@ export async function startSession(cfg: WebConfig, tokens: Tokens): Promise<void
   sweep();
   const id = random();
   store.sessions.set(id, { id, createdAt: Date.now(), ...tokens });
-  (await cookies()).set(SESSION_COOKIE, seal(cfg.sessionSecret, id), cookieOpts(cfg, SESSION_TTL_MS * 16 / 1000));
+  (await cookies()).set(SESSION_COOKIE(cfg), seal(cfg.sessionSecret, id), cookieOpts(cfg, SESSION_TTL_MS * 16 / 1000));
 }
 
 export async function currentSession(cfg: WebConfig): Promise<Session | null> {
-  const id = unseal(cfg.sessionSecret, (await cookies()).get(SESSION_COOKIE)?.value);
+  const id = unseal(cfg.sessionSecret, (await cookies()).get(SESSION_COOKIE(cfg))?.value);
   return id ? store.sessions.get(id) ?? null : null;
 }
 
@@ -87,8 +87,8 @@ export function dropSession(id: string): void {
 
 export async function endSession(cfg: WebConfig): Promise<Session | null> {
   const jar = await cookies();
-  const id = unseal(cfg.sessionSecret, jar.get(SESSION_COOKIE)?.value);
-  jar.delete(SESSION_COOKIE);
+  const id = unseal(cfg.sessionSecret, jar.get(SESSION_COOKIE(cfg))?.value);
+  jar.delete(SESSION_COOKIE(cfg));
   const s = id ? store.sessions.get(id) ?? null : null;
   if (id) store.sessions.delete(id);
   return s;
