@@ -87,5 +87,11 @@
     "issue": {"via": "pending", "milestone": "700"},
     "receive": {"via": "pending", "milestone": "700"},
     "cancel": {"via": "pending", "milestone": "700"}
+  },
+  "AiProposal": {
+    "preview": {"via": "api", "operationId": "previewAiProposal", "returns": "Job", "why": "previewing an option queues a PREVIEW job on the base; the response is the job"},
+    "accept": {"via": "api", "operationId": "createRevision", "returns": "Design", "why": "accepting the finished preview creates the revision (source AI) in the same transaction"},
+    "discard": {"via": "api", "operationId": "discardAiProposal"},
+    "expire": {"via": "system", "by": "applied when read or previewed after expiresAt; createRevision refuses an expired proposal"}
   }
 }

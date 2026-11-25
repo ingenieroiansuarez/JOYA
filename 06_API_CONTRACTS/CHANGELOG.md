@@ -1,5 +1,14 @@
 # Contratos — changelog
 
+## 1.10.0 — 2026-11-25 (hito 400, AURA)
+- Gateway de AURA (tag `ai`): `POST /ai/proposals` (`createAiProposal`) recibe `projectId`, `baseRevisionId` (debe ser la cabeza de main), `prompt` (1–2000) y `locale` opcional, y devuelve `AiProposal` con hasta 3 opciones (`AiProposalOption`: operaciones `OpModifyParameter`/`OpChangeMaterial` de la allowlist, `changes` frente a la base, supuestos, `previewRequired: true`) y `notes` (`AiNote`: fuera de rango, requiere joyero, instrucción ignorada, supuesto…). Nunca cambia el proyecto.
+- `POST /ai/proposals/{id}/preview` (`previewAiProposal`) crea un trabajo PREVIEW con las operaciones de una opción; la revisión nace solo con `createRevision` (`accepted: true`) sobre ese trabajo, con `source: AI`. `POST /ai/proposals/{id}/discard`, `GET /ai/proposals/{id}`, `GET /ai/quota` (`AiQuota`).
+- Máquina `AiProposal` (PROPOSED → PREVIEWING → ACCEPTED; DISCARDED; EXPIRED) en `machines.json`, `bindings.json` y `transitions.json`.
+- `RevisionSummary.source` y `RevisionCreatedPayload.source` suman `AI`.
+- Errores: `QUOTA_EXCEEDED` (429), `AI_PROVIDER_UNAVAILABLE` y `AI_TIMEOUT` (503, la reserva se libera), `PROPOSAL_EXPIRED` (409).
+- SQL (migración 0003): `revision.source` admite `AI`; tablas `ai_proposal` (guarda el SHA-256 y la longitud del prompt, no el texto) y `ai_usage` (libro de cuota append-only con RESERVE/SPEND/RELEASE, una fila por tipo y solicitud).
+- Adaptador: solo el simulado determinista (`aura-sim`, `simulated: true`); producción lo rechaza al arrancar. Un proveedor real requiere autorización de ian y credenciales.
+
 ## 1.9.0 — 2026-11-25 (hito 300, motor de joyería)
 - Proyectos: `GET /projects` (`listProjects`, propios, el más reciente primero, `ProjectPage`). `createProject` pide `title` (1–80), `templateId` (familia implementada) y `materialId`; crea la revisión 1 con los valores por defecto de la familia. `Project` suma `familyId`, `headRevisionNumber`, `createdAt` y `updatedAt`.
 - Revisiones: `listRevisions` devuelve `RevisionPage` de `RevisionSummary` (número, padre, digest, estado, origen `CREATE`/`PREVIEW`/`SYNC`, `changes` respecto del padre). Nuevo `GET /projects/{id}/revisions/{revisionId}` (`getRevision`). `Revision` suma `parentId` y `createdAt`; `digest` es el SHA-256 del JSON canónico.

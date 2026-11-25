@@ -61,5 +61,9 @@
     "sql": null,
     "openapi": null,
     "pending": "purchasing tables: hito 700 (procurement)"
+  },
+  "AiProposal": {
+    "sql": "ai_proposal.state",
+    "openapi": "AiProposalState"
   }
 }

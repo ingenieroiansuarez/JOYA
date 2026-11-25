@@ -291,6 +291,30 @@
       "code": "NO_CHANGE",
       "use": "detail",
       "description": "La operación deja el documento igual que la revisión base; no se crea revisión."
+    },
+    {
+      "code": "QUOTA_EXCEEDED",
+      "http": 429,
+      "use": "error",
+      "description": "Cuota diaria de AURA agotada para esta persona; se renueva a las 00:00 UTC (getAiQuota)."
+    },
+    {
+      "code": "AI_PROVIDER_UNAVAILABLE",
+      "http": 503,
+      "use": "error",
+      "description": "El adaptador de IA falló; la reserva de cuota se liberó y se puede reintentar con la misma Idempotency-Key."
+    },
+    {
+      "code": "AI_TIMEOUT",
+      "http": 503,
+      "use": "error",
+      "description": "El adaptador de IA no respondió a tiempo; la reserva se liberó y se puede reintentar."
+    },
+    {
+      "code": "PROPOSAL_EXPIRED",
+      "http": 409,
+      "use": "error",
+      "description": "La propuesta de AURA venció; hay que pedir propuestas de nuevo sobre la revisión actual."
     }
   ]
 }

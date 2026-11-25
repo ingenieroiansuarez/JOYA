@@ -5,7 +5,7 @@ import { canonicalJson, diffParameters, MAIN_BRANCH, type DesignDocument } from 
 import { isUnavailable } from "../database";
 import { ApiError } from "./api-error";
 
-export type Source = "CREATE" | "PREVIEW" | "SYNC";
+export type Source = "CREATE" | "PREVIEW" | "SYNC" | "AI";
 export interface RevisionRow {
   id: string;
   project_id: string;
