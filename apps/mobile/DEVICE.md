@@ -14,6 +14,7 @@ pnpm bootstrap                      # .env local con contraseñas aleatorias (gi
 docker compose up -d --wait
 # cargar .env en el entorno (PowerShell: Get-Content .env | % { if ($_ -match '^([^#=]+)=(.*)$') { Set-Item "env:$($matches[1])" $matches[2] } })
 pnpm db:migrate
+pnpm db:seed:demo                   # catálogo sintético (solo local/ci/demo)
 API_PORT=3900 pnpm api:start        # o el puerto libre que se quiera
 
 adb reverse tcp:$KC_PORT tcp:$KC_PORT
@@ -27,7 +28,9 @@ EXPO_PUBLIC_API_URL=http://127.0.0.1:3900 \
 EXPO_NO_TELEMETRY=1 \
 pnpm exec expo run:android --variant debug
 ```
-Usuario `dev.cliente`; la contraseña es el valor de `KC_DEV_USER_PASSWORD` en `.env`. Resultado esperado: "Sesión iniciada" y "Roles: customer".
+Resultado esperado (hito 200): la app abre en la pestaña Boutique sin pedir cuenta, con 10 piezas sintéticas en COP, filtros por categoría y detalle de cada pieza (metal, peso en g, piedras en ct). Guardar en favoritos como invitado pide iniciar sesión. Usuario `dev.cliente`; la contraseña es el valor de `KC_DEV_USER_PASSWORD` en `.env`. Con sesión, el corazón guarda la pieza y aparece en Favoritos; Perfil muestra "Roles: customer".
+
+Estados a revisar: con la API apagada, la Boutique muestra "El servicio no responde…" o "Sin conexión…" con Reintentar (nunca una lista vacía). El estado vacío de categoría no aparece con el seed actual (todas tienen piezas) y se cubre en `test/screens.test.tsx`. Con TalkBack, cada tarjeta se lee como "nombre, metal, precio, disponibilidad".
 
 ## Problemas conocidos
 - Si el cable o la depuración USB se cortan, se pierden los `adb reverse`: el login se queda cargando y termina en "No se pudo iniciar sesión". Reconectar y repetir los `adb reverse`.

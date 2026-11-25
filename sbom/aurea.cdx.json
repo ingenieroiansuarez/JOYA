@@ -4891,6 +4891,31 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/%40testing-library/react-native@14.1.0",
+      "name": "@testing-library/react-native",
+      "version": "14.1.0",
+      "scope": "excluded",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/%40testing-library/react-native@14.1.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "b5639a9b953769413c5ea4ad75600dfceb9451d191ce1fef24c83b49f09aa9734ac7ba2b461d38e7dd09a7825b39172d623391a1161f252834e08dbfff09f163"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/%40tokenizer/inflate@0.6.1",
       "name": "@tokenizer/inflate",
       "version": "0.6.1",
@@ -11091,6 +11116,31 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/indent-string@4.0.0",
+      "name": "indent-string",
+      "version": "4.0.0",
+      "scope": "excluded",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/indent-string@4.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "11d0c366ee00d8ec882bb2ebff6cc6fb0e6399bba4d435419c4c11110bc1ceca412640846d16bc1b153596085871a1890a745689b8c35e5abbefd5f5ff2e71c2"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/inflight@1.0.6",
       "name": "inflight",
       "version": "1.0.6",
@@ -14466,6 +14516,31 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/min-indent@1.0.1",
+      "name": "min-indent",
+      "version": "1.0.1",
+      "scope": "excluded",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/min-indent@1.0.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "23d8f0327d3b4b2fc8c0e8f7cd59158a4d894ef8296b29036448a02fa471e8df4b6cccb0c1448cb71113fbb955a032cb7773b7217c09c2fbae9ecf1407f1de02"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/minimatch@10.2.6",
       "name": "minimatch",
       "version": "10.2.6",
@@ -16666,31 +16741,6 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/react-is@18.3.1",
-      "name": "react-is",
-      "version": "18.3.1",
-      "scope": "required",
-      "licenses": [
-        {
-          "expression": "MIT"
-        }
-      ],
-      "purl": "pkg:npm/react-is@18.3.1",
-      "hashes": [
-        {
-          "alg": "SHA-512",
-          "content": "fcb2cc5726acd258e302da1888fa9888bf15597cd451d4e1ae6539fa7db40d9bfe6be0a54687af533c3927153e21e879fdcf3bcada13055f46d4588a7cd25d9a"
-        }
-      ],
-      "properties": [
-        {
-          "name": "aurea:ecosystem",
-          "value": "npm"
-        }
-      ]
-    },
-    {
-      "type": "library",
       "bom-ref": "pkg:npm/react-is@19.3.1",
       "name": "react-is",
       "version": "19.3.1",
@@ -16805,6 +16855,31 @@
         {
           "alg": "SHA-512",
           "content": "13c2d471bb415addb46db9766281dfc7864305dc554df38ab42667f5c0d227897afe7ba8029729201723e3bb76c19a155fc836647b8c1db892860091d53e52a2"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/redent@3.0.0",
+      "name": "redent",
+      "version": "3.0.0",
+      "scope": "excluded",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/redent@3.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "ead0c0f20f7c59ed337741af55e313f5aac43a74f0f6a334dcbf5c2576828eb8a9d4e3bbeb844304b05fac1e1cc333460e3e4e0398a8ca60bd1a48b381624352"
         }
       ],
       "properties": [
@@ -18655,6 +18730,31 @@
         {
           "alg": "SHA-512",
           "content": "06ba6f7cd004ddd72fabb965df156e9b38ca8d9439b48d6c11420aaf752892cd17525e394addc595ab55a9e7fda6b9388d10f3856e96660fb76e4f77cbaa4b8c"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/strip-indent@3.0.0",
+      "name": "strip-indent",
+      "version": "3.0.0",
+      "scope": "excluded",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/strip-indent@3.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "95a2536b725bf95429682e83b1e1e117b75756a1d37c93c24436846e277f76b3a1822b60624bbf95eb4c52a397168595d3320851b8e9747dadfad623e1b40c45"
         }
       ],
       "properties": [

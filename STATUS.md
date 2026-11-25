@@ -7,8 +7,8 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | Hito | Estado | Nota |
 |---|---|---|
 | 000 Feasibility | GO CONDICIONAL (ian, 2026-11-25) | CAD/DFM y render con evidencia; AR bloqueado y mesh IA solo simulada (`27_IMPLEMENTATION_ROADMAP/000_GO_NO_GO.md`) |
-| 100 Foundation | GATE CUMPLIDO, pendiente aceptación de ian | Gate "arranque limpio, pruebas y login; entorno aislado; sin secretos": CI verde en main, login PKCE real en el Z Flip 7 (debug y release), `.env` fuera de git y `No secrets tracked` en CI. Contratos 1.1–1.7 con verificación en CI; arranque local (pnpm, Compose, migraciones); API con OIDC y permisos por rol; Keycloak local con login PKCE probado. Tokens de diseño con contraste AA verificado. Esqueletos web (Next) y móvil (Expo, login PKCE). Login PKCE real probado en el Z Flip 7 (2026-11-25) |
-| 200 Boutique | EN CURSO | Navegación de invitado, catálogo, detalle, perfil, favoritos, datos demo |
+| 100 Foundation | ACEPTADO (ian, 2026-11-25, PR #25) | Gate "arranque limpio, pruebas y login; entorno aislado; sin secretos": CI verde en main, login PKCE real en el Z Flip 7 (debug y release), `.env` fuera de git y `No secrets tracked` en CI. Contratos 1.1–1.7 con verificación en CI; arranque local (pnpm, Compose, migraciones); API con OIDC y permisos por rol; Keycloak local con login PKCE probado. Tokens de diseño con contraste AA verificado. Esqueletos web (Next) y móvil (Expo, login PKCE). Login PKCE real probado en el Z Flip 7 (2026-11-25) |
+| 200 Boutique | EN CURSO | Contratos 1.8.0, migración 0001, seed demo y API de catálogo/favoritos (PR #26). App: navegación de invitado, catálogo, detalle, favoritos, perfil. Falta: prueba del gate en el Z Flip 7 |
 | 300–1000 | NOT_STARTED | |
 
 ## Backlog 000
@@ -98,6 +98,15 @@ TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # db 3, api 45 (5 contra Keycloak)
   - Probado: 9 formas de token malo (sin cabecera, no JWT, vencido, emisor y audiencia ajenos, otra clave, `alg: none`, HS256 con la clave pública, payload alterado) → 401; contra Keycloak real, client credentials → `/v1/me` como auditor, login PKCE de `dev.cliente` → customer, el código no se canjea sin `code_verifier` ni con uno falso, la petición sin `code_challenge` se rechaza y el ID token no sirve contra la API.
   - Pendiente: MFA para personal y step-up (exige pantallas de login de staff, hito 200+), alcance por recurso y ubicación (lo aplica cada módulo cuando exista), revocación/introspección, y desplegar el IdP de producción (Keycloak autogestionado, ADR-0008, decidido el 2026-11-25).
 - Probado localmente: compose arriba, migración aplicada, `state_checks.sql` sobre la base migrada OK, Valkey rechaza clientes sin contraseña (`NOAUTH`).
+
+## Hito 200 — Boutique
+Gate: "APK dev navega el catálogo; estados vacío/error accesibles".
+- Datos: `pnpm db:seed:demo` carga `packages/db/seed/demo-catalog.json` (11 piezas sintéticas en COP: 10 publicadas, 1 borrador; una agotada). Precios, pesos y piedras ficticios, marcados como tales en el archivo y en la app. Se niega con `AUREA_ENV` distinto de local/ci/demo antes de conectar; idempotente. Piedras con origen `LAB_GROWN` para no sugerir gemas naturales.
+- API (contratos 1.8.0): `GET /v1/catalog/products` (cursor keyset, `limit`, `category`, `Accept-Language` es/en) y `/{id}`, públicos y solo publicados (borrador = 404). `/v1/me/favorites` GET/PUT/DELETE con `favorite.read`/`favorite.edit` (cliente, alcance `own`, por `sub` del token), idempotentes. Base caída → 503. 19 pruebas contra base migrada y sembrada, respuestas validadas con OpenAPI.
+- App (`apps/mobile`): pestañas Boutique, Favoritos y Perfil con pila propia y botón atrás de Android; catálogo en cuadrícula con filtros por categoría, paginación y deslizar para recargar; detalle con metal, peso (g) y piedras (ct) exactos, precio formateado como texto (sin flotantes); favoritos optimistas con reversión; el invitado navega sin cuenta y al guardar se le pide iniciar sesión (REQ-02-01). Sesión restaurada al abrir con el refresh token del Keystore; el access token se renueva al vencer y tras un 401 una sola vez.
+- Estados: carga anunciada (región viva), error por tipo (sin conexión / servicio caído / inesperado) con Reintentar y rol `alert`, vacío de categoría con "Ver todas", vacío de favoritos con "Explorar la boutique", pieza retirada con "Volver a la boutique", fallo al cargar más sin perder lo mostrado. Controles ≥ 48 dp con rol y etiqueta. Probado con `@testing-library/react-native` buscando por rol y texto (`test/screens.test.tsx`).
+- Imágenes: no hay fotografías ni renders licenciados; las tarjetas usan una ilustración dibujada con vistas en el tono del metal, anunciada como "Ilustración…, no es una fotografía". Fotos o renders reales quedan pendientes (licencia y material de ian).
+- Pendiente para cerrar el gate: instalar el APK dev en el Z Flip 7 y recorrer catálogo, detalle, favoritos y los estados de error con TalkBack (`apps/mobile/DEVICE.md`).
 
 ## Hallazgos del hito 000
 - **STEP no determinista**: la cabecera lleva timestamp y OCCT nombra el PRODUCT con un contador por proceso. `services/geometry` fija el nombre al id de componente y publica `canonicalSha256` (sección DATA). Usarlo en caché y manifiestos de taller.
