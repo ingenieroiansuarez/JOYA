@@ -222,3 +222,70 @@ describe("design editor", () => {
     r.db.close();
   });
 });
+
+describe("AURA in the editor", () => {
+  it("prompt → three options without changes → preview → explicit acceptance creates the revision", async () => {
+    const server = new FakeDesignServer();
+    const file = join(dir, `${uuid()}.db`);
+    const p = await stored(server, file);
+    const r = await app(server, file, <EditorScreen id={p.id} onBack={() => undefined} />);
+    await screen.findByText("Revision 1", { exact: false });
+    expect(screen.getByText(en.auraSimulated)).toBeTruthy();
+    await fireEvent.changeText(screen.getByLabelText(en.auraInput), "a bit wider, ancho");
+    await fireEvent.press(screen.getByRole("button", { name: en.auraAsk }));
+    expect(await screen.findByText("Option 2 · Balanced")).toBeTruthy();
+    expect(screen.getByText("Band width: 4 mm → 4.5 mm")).toBeTruthy();
+    expect(screen.getByText(en.auraNothingChanges)).toBeTruthy();
+    expect(server.head(p.id).number).toBe(1); // a proposal changes nothing
+    const previews = screen.getAllByRole("button", { name: en.preview });
+    expect(previews).toHaveLength(3);
+    await fireEvent.press(previews[1]);
+    expect(await screen.findByRole("button", { name: en.accept }, slow)).toBeTruthy();
+    expect(screen.getByText("AURA proposal, option 2. Accepting creates a new revision.")).toBeTruthy();
+    expect(server.head(p.id).number).toBe(1); // nor does a preview
+    await fireEvent.press(screen.getByRole("button", { name: en.accept }));
+    expect(await screen.findByText(/Revision 2/)).toBeTruthy();
+    expect(server.head(p.id).document.components[0].parameters.bandWidth).toBe(5);
+    // The proposal was made on revision 1: once the head moves it is cleared.
+    await waitFor(() => expect(screen.queryByText("Option 2 · Balanced")).toBeNull());
+    await r.unmount();
+    r.db.close();
+  });
+
+  it("notes are shown without options; a provider failure can be retried with the same key", async () => {
+    const server = new FakeDesignServer();
+    const file = join(dir, `${uuid()}.db`);
+    const p = await stored(server, file);
+    const r = await app(server, file, <EditorScreen id={p.id} onBack={() => undefined} />);
+    await screen.findByText("Revision 1", { exact: false });
+    await fireEvent.changeText(screen.getByLabelText(en.auraInput), "ponle un diamante");
+    await fireEvent.press(screen.getByRole("button", { name: en.auraAsk }));
+    expect(await screen.findByText("A jeweler reviews stones.")).toBeTruthy();
+    expect(screen.getByText(en.auraNoOptions)).toBeTruthy();
+    r.api.aiFailures = 1;
+    await fireEvent.changeText(screen.getByLabelText(en.auraInput), "ancho, si falla reintenta");
+    await fireEvent.press(screen.getByRole("button", { name: en.auraAsk }));
+    expect(await screen.findByText(en.auraDown)).toBeTruthy();
+    const keysBefore = r.api.calls.filter((c) => c === "POST /ai/proposals").length;
+    await fireEvent.press(screen.getByRole("button", { name: en.retry }));
+    expect(await screen.findByText("Option 1 · Subtle")).toBeTruthy();
+    expect(r.api.calls.filter((c) => c === "POST /ai/proposals").length).toBe(keysBefore + 1);
+    await r.unmount();
+    r.db.close();
+  });
+
+  it("offline, AURA says it needs a connection and cannot be asked", async () => {
+    const server = new FakeDesignServer();
+    const file = join(dir, `${uuid()}.db`);
+    const p = await stored(server, file);
+    server.online = false;
+    const r = await app(server, file, <EditorScreen id={p.id} onBack={() => undefined} />);
+    await screen.findByText("Revision 1", { exact: false });
+    await fireEvent.changeText(screen.getByLabelText(en.auraInput), "wider");
+    await fireEvent.press(screen.getByRole("button", { name: en.auraAsk }));
+    expect(await screen.findAllByText(en.auraOffline)).not.toHaveLength(0);
+    expect(r.api.calls.includes("POST /ai/proposals")).toBe(false);
+    await r.unmount();
+    r.db.close();
+  });
+});

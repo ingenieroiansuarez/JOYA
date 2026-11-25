@@ -7,15 +7,16 @@ import { useDesign } from "../design/DesignContext";
 import { alloyColor, alloyName, describeIssue, describeOp, familyName, mm, paramLabel, parseMm } from "../design/describe";
 import { GlbIntegrityError, loadGlb, waitForJob } from "../design/glb";
 import type { Draft } from "../design/sync";
-import type { DesignOperation, Job } from "../design/types";
+import type { AiProposal, AiProposalOption, DesignOperation, Job } from "../design/types";
 import { Viewer } from "../design/viewer/Viewer";
 import { formatDecimal } from "../format";
 import { useSession } from "../session";
 import { Button, c, Header, Loading, Notice, s, styles, type } from "../ui";
+import { AuraPanel } from "./AuraPanel";
 
 type Preview =
   | { phase: "none" }
-  | { phase: "computing" }
+  | { phase: "computing"; aura?: number }
   | { phase: "failed"; code: string }
   | { phase: "offline" }
   // `mesh` is this preview's own verified GLB (null if it could not be loaded: the metrics stand alone).
@@ -40,6 +41,8 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
   // Why there is no mesh yet: being built, no connection, or the build failed. Never "offline" while building.
   const [mesh, setMesh] = useState<"building" | "offline" | "failed">("building");
   const [syncing, setSyncing] = useState<"idle" | "busy" | "offline">("idle");
+  // Option of the AURA proposal whose preview is on screen (null: a manual change or none).
+  const [auraOption, setAuraOption] = useState<number | null>(null);
   const alive = useRef({ aborted: false });
   useEffect(() => () => { alive.current.aborted = true; }, []);
 
@@ -94,6 +97,7 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
   const propose = (next: DesignOperation, name: string) => {
     if (!local) return;
     setPreview({ phase: "none" });
+    setAuraOption(null);
     const r = applyOperation(local.document, next);
     if (!r.ok) {
       setOp(null);
@@ -140,6 +144,29 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
     }
   };
 
+  /** AURA option → the same preview and acceptance flow as a manual change. */
+  const runAuraPreview = async (proposal: AiProposal, option: AiProposalOption) => {
+    setOp(null);
+    setIssue(null);
+    setAuraOption(option.index);
+    setPreview({ phase: "computing", aura: option.index });
+    try {
+      const queued = await client.previewAiProposal(proposal.id, option.index, newId());
+      const job = await waitForJob(client, queued.id, { signal: alive.current });
+      saw(undefined);
+      if (job.state !== "SUCCEEDED") { setPreview({ phase: "failed", code: job.errorCode ?? job.state }); setAuraOption(null); return; }
+      const mesh = await loadGlb(client, job).catch((err) => { if (err instanceof GlbIntegrityError) throw err; return null; });
+      if (mesh) setGlb(mesh);
+      setPreview({ phase: "ready", job, op: option.operations[0], mesh });
+    } catch (e) {
+      saw(e);
+      setAuraOption(null);
+      if (e instanceof ApiError && e.kind === "offline") setPreview({ phase: "failed", code: "offline" });
+      else if (e instanceof ApiError && e.code === "VERSION_CONFLICT") { setPreview({ phase: "failed", code: "VERSION_CONFLICT" }); await sync.refresh(id).catch(() => undefined); bump(); }
+      else setPreview({ phase: "failed", code: e instanceof ApiError ? e.code ?? e.kind : e instanceof GlbIntegrityError ? "GLB_INTEGRITY" : "UNEXPECTED" });
+    }
+  };
+
   const accept = async () => {
     if (preview.phase !== "ready" && preview.phase !== "acceptFailed") return;
     const { job, op: accepted, mesh } = preview;
@@ -152,6 +179,7 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
       if (mesh) await store?.putGlb(rev.digest, mesh);
       saw(undefined);
       setPreview({ phase: "none" });
+      setAuraOption(null);
       bump();
     } catch (e) {
       saw(e);
@@ -188,6 +216,11 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
         <Viewer glb={glb} color={alloyColor(comp.materialId)} label={t("viewerLabel", { name: title })}
           emptyText={t(mesh === "building" ? "viewerBuilding" : mesh === "offline" ? "viewerEmpty" : "viewerBuildFailed")} errorText={t("viewerError")} loadingText={t("viewerLoading")} />
         <Text style={styles.muted}>{t("previewNote")}</Text>
+
+        <AuraPanel projectId={id} baseRevisionId={local.local.head.id} familyId={fam.id}
+          disabled={offline ? "offline" : blocked ? "pending" : null}
+          previewing={auraOption !== null && preview.phase !== "none" && preview.phase !== "failed" ? auraOption : null}
+          onPreview={runAuraPreview} />
 
         {local.problems.length > 0 && (
           <View style={ed.card}>
@@ -295,7 +328,7 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
         )}
         {preview.phase === "failed" && (
           <Text accessibilityRole="alert" style={[styles.body, { color: c.danger }]}>
-            {preview.code === "VERSION_CONFLICT" ? t("acceptConflict") : t("previewFailed", { code: preview.code })}
+            {preview.code === "VERSION_CONFLICT" ? t("acceptConflict") : preview.code === "offline" ? t("auraOffline") : t("previewFailed", { code: preview.code })}
           </Text>
         )}
         {summary && metrics && (
@@ -315,8 +348,10 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
             <Metric k={t("metricWall")} v={mm(metrics.minWallMm, locale)} />
             <Text style={[styles.body, { color: c.warning }]}>{t("dfmReview")}</Text>
             <Button label={preview.phase === "accepting" ? t("accepting") : t("accept")} disabled={preview.phase === "accepting"} onPress={accept} />
+            {auraOption !== null && <Text style={styles.muted}>{t("auraFromOption", { n: String(auraOption + 1) })}</Text>}
             <Button variant="secondary" label={t("discardPreview")} disabled={preview.phase === "accepting"} onPress={() => {
               setPreview({ phase: "none" });
+              setAuraOption(null);
               setOp(null);
               setTexts(Object.fromEntries(Object.entries(comp.parameters).map(([k, v]) => [k, formatDecimal(String(v), "", locale).trim()])));
               void store?.glb(local.local.head.digest).then(setGlb);

@@ -1,7 +1,7 @@
 // Design endpoints on top of Api.send. Every creating call carries an Idempotency-Key the caller
 // chooses, so a retry after a dropped answer returns the first result instead of creating twice.
 import type { Api } from "../api";
-import type { ArtifactDownload, DesignOperation, Job, Project, ProjectPage, Revision, SyncOperation, SyncResult } from "./types";
+import type { AiProposal, AiQuota, ArtifactDownload, DesignOperation, Job, Project, ProjectPage, Revision, SyncOperation, SyncResult } from "./types";
 
 export type WithToken = <T>(fn: (token: string) => Promise<T>) => Promise<T>;
 
@@ -46,5 +46,18 @@ export class DesignClient {
   }
   push(deviceId: string, operations: SyncOperation[], idempotencyKey: string): Promise<SyncResult> {
     return this.call("POST", "/sync/push", { body: { deviceId, operations }, idempotencyKey });
+  }
+  /** AURA: proposals only; nothing changes until a preview is accepted with acceptPreview. */
+  createAiProposal(body: { projectId: string; baseRevisionId: string; prompt: string; locale: "es" | "en" }, idempotencyKey: string): Promise<AiProposal> {
+    return this.call("POST", "/ai/proposals", { body, idempotencyKey });
+  }
+  previewAiProposal(proposalId: string, optionIndex: number, idempotencyKey: string): Promise<Job> {
+    return this.call("POST", `/ai/proposals/${encodeURIComponent(proposalId)}/preview`, { body: { optionIndex }, idempotencyKey });
+  }
+  discardAiProposal(proposalId: string, idempotencyKey: string): Promise<AiProposal> {
+    return this.call("POST", `/ai/proposals/${encodeURIComponent(proposalId)}/discard`, { idempotencyKey });
+  }
+  getAiQuota(): Promise<AiQuota> {
+    return this.call("GET", "/ai/quota");
   }
 }

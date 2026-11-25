@@ -133,6 +133,10 @@ export class DesignApi extends Api {
   accepted = new Map<string, Revision>();
   /** The next acceptance is committed but its answer is lost. */
   dropNextAccept = false;
+  proposals = new Map<string, unknown>();
+  aiUsed = 0;
+  /** Proposals whose prompt contains "falla" fail this many times first. */
+  aiFailures = 0;
   constructor(readonly server: FakeDesignServer) {
     super({ env: "ci", issuer: "http://127.0.0.1:8080/realms/aurea-local", apiUrl: "http://127.0.0.1:3000" }, "en");
   }
@@ -200,6 +204,44 @@ export class DesignApi extends Api {
     if ((m = /^\/jobs\/([^/]+)\/artifacts\/([^/]+)$/.exec(path))) {
       const sha = this.jobs.get(m[1])!.artifacts[0].sha256;
       return { url: `http://files.test/${sha}`, expiresAt: "", sha256: sha } as T;
+    }
+    // AURA: deterministic stand-in for apps/api's gateway (its rules are tested there).
+    if (method === "GET" && path === "/ai/quota") return { day: "2026-11-25", limitUnits: 30, usedUnits: this.aiUsed, remainingUnits: 30 - this.aiUsed, resetsAt: "2026-11-26T00:00:00Z" } as T;
+    if (method === "POST" && path === "/ai/proposals") {
+      const prompt = String(body!.prompt);
+      if (/falla/.test(prompt) && this.aiFailures-- > 0) throw new ApiError("unavailable", 503, "AI_PROVIDER_UNAVAILABLE");
+      const prior = opts.idempotencyKey ? this.proposals.get(`key:${opts.idempotencyKey}`) : undefined;
+      if (prior) return prior as T;
+      const head = s.head(String(body!.projectId));
+      if (body!.baseRevisionId !== head.id) throw new ApiError("conflict", 409, "VERSION_CONFLICT");
+      this.aiUsed++;
+      const comp = head.document.components[0];
+      const w = Number(comp.parameters.bandWidth);
+      const options = /ancho|wider/.test(prompt) ? [0.5, 1, 1.5].map((d, index) => ({
+        index, title: ["Subtle", "Balanced", "Bold"][index], summary: "", previewRequired: true as const, assumptions: [],
+        operations: [{ type: "modify_parameter", componentId: comp.id, name: "bandWidth", value: w + d }],
+        changes: [{ componentId: comp.id, name: "bandWidth", from: w, to: w + d }],
+      })) : [];
+      const notes = /diamante/.test(prompt) ? [{ code: "NEEDS_JEWELER", message: "A jeweler reviews stones." }] : [];
+      const proposal = {
+        id: uuid(), projectId: body!.projectId, baseRevisionId: head.id, state: "PROPOSED", provider: { id: "aura-sim", model: "m", simulated: true },
+        locale: "en", understood: options.length ? ["band width +"] : [], notes, options, previewOptionIndex: null, previewJobId: null, revisionId: null,
+        createdAt: "2026-11-25T00:00:00Z", expiresAt: "2026-11-25T00:30:00Z",
+      };
+      this.proposals.set(proposal.id, proposal);
+      if (opts.idempotencyKey) this.proposals.set(`key:${opts.idempotencyKey}`, proposal);
+      return proposal as T;
+    }
+    if (method === "POST" && (m = /^\/ai\/proposals\/([^/]+)\/preview$/.exec(path))) {
+      const proposal = this.proposals.get(m[1]) as { projectId: string; baseRevisionId: string; options: { operations: DesignOperation[] }[] };
+      const head = s.head(proposal.projectId);
+      if (proposal.baseRevisionId !== head.id) throw new ApiError("conflict", 409, "VERSION_CONFLICT");
+      const op = proposal.options[Number(body!.optionIndex)].operations[0];
+      const r = applyOperation(head.document, op);
+      if (!r.ok) throw new Error("fixture");
+      const job = this.job(proposal.projectId, head.id, "PREVIEW", r.document, head.document);
+      (job as Job & { op?: unknown }).op = op;
+      return job as T;
     }
     if (method === "POST" && path === "/sync/push") return c.push(body!.deviceId, body!.operations) as Promise<T>;
     throw new Error(`unrouted ${method} ${path}`);
