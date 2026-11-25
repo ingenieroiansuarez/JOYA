@@ -31,11 +31,13 @@ class Finding:
 
 def evaluate(document: dict, built: list, exports: dict[str, dict]) -> dict:
     findings: list[Finding] = []
-    walls = {
-        c["target"]: float(c["parameters"]["minMm"])
-        for c in document["constraints"]
-        if c["type"] == "min_wall"
-    }
+    # Several min_wall constraints on one component: the strictest one applies,
+    # independent of array order.
+    walls: dict[str, float] = {}
+    for c in document["constraints"]:
+        if c["type"] == "min_wall":
+            mm = float(c["parameters"]["minMm"])
+            walls[c["target"]] = max(mm, walls.get(c["target"], mm))
     for comp in built:
         rt = exports[comp.id]["roundtrip"]
         ok = comp.solid.isValid() and rt["stepValid"] and rt["stlWatertight"] and rt["stlWindingConsistent"]

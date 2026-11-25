@@ -43,3 +43,11 @@ def test_operations_are_refused_not_ignored(ring_doc):
 def test_digest_is_key_order_independent(ring_doc):
     reordered = dict(reversed(list(ring_doc.items())))
     assert canonical_digest(reordered) == canonical_digest(ring_doc)
+
+
+def test_empty_design_rejected(ring_doc):
+    ring_doc["components"] = []
+    ring_doc["constraints"] = []
+    with pytest.raises(InvalidDocument) as e:
+        validate_document(ring_doc)
+    assert [i.code for i in e.value.issues] == ["EMPTY_DESIGN"]

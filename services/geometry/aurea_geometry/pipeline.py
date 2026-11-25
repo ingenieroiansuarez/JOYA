@@ -20,6 +20,7 @@ def kernel_version() -> str:
 
 def regenerate(document: dict, out_dir: Path) -> dict:
     validate_document(document)
+    out_dir.mkdir(parents=True, exist_ok=True)
     built = [build_component(c) for c in document["components"]]
     exports = {b.id: export_component(b.solid, out_dir, b.id) for b in built}
     components = []

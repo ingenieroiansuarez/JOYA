@@ -14,7 +14,7 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 |---|---|---|---|
 | P0-01 | Repo, STATUS, entorno | HECHO | Este archivo; entorno abajo |
 | P0-02 | Licencias y versiones, lockfile PoC | PARCIAL | `services/geometry/requirements.lock`, tabla de licencias abajo; falta revisión legal de OCCT/casadi |
-| P0-03 | CadQuery anillo y dije, volumen analítico, STEP/STL reimport, fixture DFM pared fina | HECHO (PoC) | `pytest services/geometry` — 26 tests pasan |
+| P0-03 | CadQuery anillo y dije, volumen analítico, STEP/STL reimport, fixture DFM pared fina | HECHO (PoC) | `pytest services/geometry` — 29 tests pasan |
 | P0-04 | GLB con material y benchmark Filament vs WebView | PARCIAL / BLOQUEADO | GLB m/Y-up generado y verificado; **sin material PBR**; benchmark requiere Android físico |
 | P0-05 | AR anillo/arete | BLOQUEADO | Requiere ≥3 Android físicos y consentimiento de participantes |
 | P0-06 | Adapter mesh IA simulado / proveedor | NO INICIADO | Proveedor real requiere permiso y credenciales |
@@ -28,7 +28,7 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 ```bash
 python -m unittest discover -s 23_SIMULATORS -p "test_*.py" -v   # 23 OK (simulador de referencia, no QA de producto)
 pip install -r services/geometry/requirements.lock && pip install --no-deps -e services/geometry
-pytest services/geometry                                            # 26 passed
+pytest services/geometry                                            # 29 passed
 aurea-geometry 09_JEWELRY_ENGINE/fixtures/ring.json services/geometry/out   # DFM REVIEW, vol 447.8654 mm³
 ```
 La PoC original (`10_CAD_AND_GEOMETRY/poc/ring_poc.py`) se re-ejecutó: volúmenes idénticos al `report.json`; STL/GLB mismo hash; STEP hash distinto.

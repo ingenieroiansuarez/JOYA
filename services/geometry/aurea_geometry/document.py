@@ -63,6 +63,9 @@ def validate_document(document: dict, schema_path: Path | None = None) -> None:
     if issues:
         raise InvalidDocument(issues)
 
+    if not document["components"]:
+        raise InvalidDocument([ValidationIssue("EMPTY_DESIGN", "/components", "at least one component required")])
+
     ids = [c["id"] for c in document["components"]]
     seen: set[str] = set()
     for i, cid in enumerate(ids):

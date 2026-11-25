@@ -100,3 +100,14 @@ def test_mass_estimate_requires_density():
     assert mass_grams(1000, 15.5) == pytest.approx(15.5)
     with pytest.raises(ValueError):
         mass_grams(1000, 0)
+
+
+@pytest.mark.parametrize("order", [(1.2, 0.8), (0.8, 1.2)])
+def test_strictest_min_wall_applies_regardless_of_order(order, tmp_path):
+    doc = load(FIXTURES / "ring_thin_wall.json")  # radialThickness 0.9
+    doc["constraints"] = [
+        {"type": "min_wall", "target": "ring-base", "parameters": {"minMm": mm}} for mm in order
+    ]
+    dfm = regenerate(doc, tmp_path / "out")["dfm"]
+    f = next(f for f in dfm["findings"] if f["rule"] == "DFM-02")
+    assert (dfm["state"], f["result"], f["threshold"]) == ("FAIL", "FAIL", 1.2)
