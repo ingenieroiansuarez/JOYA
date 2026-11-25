@@ -9,7 +9,8 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const ENV = `${ROOT}.env`;
 export const OIDC_REALM = "aurea-local";
 
-export function localEnv({ pgPort = 5432, valkeyPort = 6379, kcPort = 8080, random = () => randomBytes(24).toString("hex") } = {}) {
+export function localEnv({ pgPort = 5432, valkeyPort = 6379, kcPort = 8080, workerPort = 3910, artifactDir = `${ROOT}.data/artifacts`,
+  random = () => randomBytes(24).toString("hex") } = {}) {
   const pg = random();
   const vk = random();
   return [
@@ -27,6 +28,12 @@ export function localEnv({ pgPort = 5432, valkeyPort = 6379, kcPort = 8080, rand
     `KC_DEV_USER_PASSWORD=${random()}`,
     `OIDC_ISSUER=http://127.0.0.1:${kcPort}/realms/${OIDC_REALM}`,
     "OIDC_AUDIENCE=aurea-api",
+    // Hito 300: geometry worker (services/geometry, run with the same secret) and signed downloads.
+    `GEOMETRY_WORKER_URL=http://127.0.0.1:${workerPort}`,
+    `GEOMETRY_WORKER_PORT=${workerPort}`,
+    `GEOMETRY_WORKER_SECRET=${random()}`,
+    `FILE_URL_SECRET=${random()}`,
+    `ARTIFACT_DIR=${artifactDir}`,
     "",
   ].join("\n");
 }

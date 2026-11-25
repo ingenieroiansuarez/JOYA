@@ -1,5 +1,6 @@
 **/.env.local
 **/.env
+.data/
 **/__pycache__/
 *.keystore
 *.jks

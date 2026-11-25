@@ -20,6 +20,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@aurea/design':
+        specifier: workspace:*
+        version: link:../../packages/design
       '@nestjs/common':
         specifier: 12.6.1
         version: 12.6.1(reflect-metadata@0.2.2)(rxjs@7.8.2)

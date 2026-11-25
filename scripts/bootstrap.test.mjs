@@ -27,6 +27,15 @@ test("local env wires Keycloak secrets and the OIDC issuer", () => {
   assert.equal(env.OIDC_AUDIENCE, "aurea-api");
 });
 
+test("local env wires the geometry worker and distinct signing secrets", () => {
+  const env = parse(localEnv({ workerPort: 3999, artifactDir: "/x/.data/artifacts" }));
+  assert.equal(env.GEOMETRY_WORKER_URL, "http://127.0.0.1:3999");
+  assert.equal(env.GEOMETRY_WORKER_PORT, "3999");
+  for (const k of ["GEOMETRY_WORKER_SECRET", "FILE_URL_SECRET"]) assert.match(env[k], /^[0-9a-f]{48}$/, k);
+  assert.notEqual(env.GEOMETRY_WORKER_SECRET, env.FILE_URL_SECRET);
+  assert.equal(env.ARTIFACT_DIR, "/x/.data/artifacts");
+});
+
 test("an existing .env only gains missing keys, never new values", () => {
   const current = "# old\nAUREA_ENV=local\nPOSTGRES_PASSWORD=keep\n";
   const add = missingLines(current, localEnv());
