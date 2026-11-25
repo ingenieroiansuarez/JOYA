@@ -10,6 +10,8 @@ export interface WebConfig {
   apiUrl: string;
   sessionSecret: string;
   secureCookies: boolean;
+  /** Cookie name prefix: the demo panel's own, so a demo and a local panel on 127.0.0.1 (cookies ignore the port) never overwrite each other's session. */
+  cookiePrefix: string;
 }
 
 export class WebConfigError extends Error {}
@@ -34,5 +36,6 @@ export function webConfig(env: NodeJS.ProcessEnv = process.env): WebConfig {
     apiUrl,
     sessionSecret: env.WEB_SESSION_SECRET!,
     secureCookies: origin.startsWith("https://"),
+    cookiePrefix: env.AUREA_ENV === "demo" ? "aurea_demo" : "aurea",
   };
 }
