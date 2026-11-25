@@ -137,6 +137,36 @@ test("an unreachable identity provider is 503, never a pass", async () => {
   }
 });
 
+test("an issuer ending in / is discovered and compared verbatim", async () => {
+  const http = await import("node:http");
+  const { generateKeyPair, exportJWK, SignJWT } = await import("jose");
+  const k = await generateKeyPair("ES256");
+  const jwk = { ...(await exportJWK(k.publicKey)), kid: "e1", alg: "ES256" };
+  const seen = [];
+  const server = http.createServer((req, res) => {
+    seen.push(req.url);
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const body = req.url === "/tenant/.well-known/openid-configuration"
+      ? { issuer: `${base}/tenant/`, jwks_uri: `${base}/tenant/keys` }
+      : req.url === "/tenant/keys" ? { keys: [jwk] } : null;
+    res.writeHead(body ? 200 : 404, { "content-type": "application/json" }).end(JSON.stringify(body ?? {}));
+  });
+  await new Promise((r) => server.listen(0, "127.0.0.1", r));
+  try {
+    const issuer = `http://127.0.0.1:${server.address().port}/tenant/`;
+    const verifier = await createVerifier({ ...CONFIG, oidc: { issuer, audience: "aurea-api" } });
+    const jwt = await new SignJWT({}).setProtectedHeader({ alg: "ES256", kid: "e1" }).setIssuer(issuer)
+      .setAudience("aurea-api").setSubject("s").setIssuedAt().setExpirationTime("5m").sign(k.privateKey);
+    assert.equal((await verifier.verify(jwt)).iss, issuer);
+    const noSlash = await new SignJWT({}).setProtectedHeader({ alg: "ES256", kid: "e1" }).setIssuer(issuer.slice(0, -1))
+      .setAudience("aurea-api").setSubject("s").setIssuedAt().setExpirationTime("5m").sign(k.privateKey);
+    await assert.rejects(verifier.verify(noSlash), (e) => !(e instanceof VerifierUnavailable));
+    assert.ok(seen.includes("/tenant/.well-known/openid-configuration"));
+  } finally {
+    server.close();
+  }
+});
+
 test("route permissions match OpenAPI x-permission", () => {
   const op = api.paths["/me"].get;
   assert.equal(op.operationId, "getMe");
