@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "AUREA (dev)",
+    "slug": "aurea",
+    "version": "0.1.0",
+    "scheme": "com.aurea.customer.dev",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0C0C0D",
+    "android": {
+      "package": "com.aurea.customer.dev",
+      "allowBackup": false
+    },
+    "plugins": ["expo-secure-store", "expo-web-browser"]
+  }
+}

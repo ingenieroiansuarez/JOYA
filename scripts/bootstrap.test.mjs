@@ -51,4 +51,9 @@ test("license gate rejects copyleft and unknown licenses", async () => {
   assert.deepEqual(violations({ "CC-BY-4.0": [{ name: "caniuse-lite", versions: ["1.0.0"] }, { name: "other", versions: ["1.0.0"] }] }),
     ["other@1.0.0: CC-BY-4.0"]);
   assert.deepEqual(violations({ "GPL-3.0": [{ name: "caniuse-lite", versions: ["1.0.0"] }] }), ["caniuse-lite@1.0.0: GPL-3.0"]);
+  // OR-expressions pass when one alternative is allowed; AND or all-copyleft alternatives do not.
+  assert.deepEqual(violations({ "(BSD-3-Clause OR GPL-2.0)": [{ name: "f", versions: ["1.0.0"] }] }), []);
+  assert.deepEqual(violations({ "(GPL-2.0 OR LGPL-3.0)": [{ name: "f", versions: ["1.0.0"] }] }), ["f@1.0.0: (GPL-2.0 OR LGPL-3.0)"]);
+  assert.deepEqual(violations({ "(MIT AND GPL-2.0)": [{ name: "f", versions: ["1.0.0"] }] }), ["f@1.0.0: (MIT AND GPL-2.0)"]);
+  assert.deepEqual(violations({ "MPL-2.0": [{ name: "lightningcss-x", versions: ["1.0.0"] }] }), ["lightningcss-x@1.0.0: MPL-2.0"]);
 });

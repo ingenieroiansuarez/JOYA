@@ -3,18 +3,37 @@
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-export const ALLOWED = new Set(["MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "0BSD"]);
+export const ALLOWED = new Set([
+  "MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "0BSD",
+  // Permissive, no copyleft, added with the Expo app (hito 100; ian's OK in that PR):
+  "MIT-0", "BlueOak-1.0.0", "Unlicense", "Python-2.0",
+]);
 /**
- * Named exceptions: one package, one license, one reason. Never copyleft. Each needs ian's OK in its PR.
+ * Named exceptions: one package, one license, one reason. Strong copyleft never. Each needs ian's OK in its PR.
  * caniuse-lite is browser-support data (not code) bundled by Next's build tooling; CC-BY-4.0 asks only
  * for attribution, which the SBOM and STATUS.md record. It does not ship in the browser bundle.
+ *
+ * lightningcss (MPL-2.0, file-level weak copyleft) is the CSS transformer inside Expo's Metro config:
+ * a build tool used unmodified, not bundled into the app. Any change to its files would have to be
+ * published under MPL-2.0; we make none.
  */
-export const EXCEPTIONS = { "caniuse-lite": "CC-BY-4.0" };
+export const EXCEPTIONS = {
+  "caniuse-lite": "CC-BY-4.0",
+  lightningcss: "MPL-2.0",
+  "lightningcss-linux-x64-gnu": "MPL-2.0",
+  "lightningcss-linux-x64-musl": "MPL-2.0",
+};
+
+/** An SPDX OR-expression is acceptable when at least one alternative is allowed (we take that one). */
+export function acceptable(license) {
+  const alternatives = license.replace(/^\(|\)$/g, "").split(/\s+OR\s+/);
+  return alternatives.some((l) => ALLOWED.has(l.trim()));
+}
 
 export function violations(report) {
   const out = [];
   for (const [license, pkgs] of Object.entries(report)) {
-    if (ALLOWED.has(license)) continue;
+    if (acceptable(license)) continue;
     for (const p of pkgs) if (EXCEPTIONS[p.name] !== license) out.push(`${p.name}@${p.versions.join(",")}: ${license}`);
   }
   return out.sort();

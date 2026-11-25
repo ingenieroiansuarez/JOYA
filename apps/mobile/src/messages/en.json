@@ -1,0 +1,12 @@
+{
+  "envBanner": "{env} environment: demo data, not real",
+  "configError": "The app is not configured. Check EXPO_PUBLIC_* before building.",
+  "welcome": "Welcome to AUREA",
+  "signIn": "Sign in",
+  "signingIn": "Opening sign-in…",
+  "signOut": "Sign out",
+  "signInFailed": "Sign-in failed.",
+  "retry": "Retry",
+  "signedInAs": "Signed in",
+  "roles": "Roles: {roles}"
+}
