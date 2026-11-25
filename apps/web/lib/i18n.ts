@@ -1,21 +1,11 @@
 import en from "../messages/en.json";
 import es from "../messages/es.json";
 
-export const LOCALES = ["es", "en"] as const;
-export type Locale = (typeof LOCALES)[number];
-export const DEFAULT_LOCALE: Locale = "es";
+import { type Locale } from "./locale";
+export { DEFAULT_LOCALE, LOCALES, pickLocale, type Locale } from "./locale";
 type Messages = typeof es;
 
 const catalogs: Record<Locale, Messages> = { es, en };
-
-/** Picks the first supported language from an Accept-Language header; Spanish otherwise. */
-export function pickLocale(acceptLanguage: string | null): Locale {
-  for (const part of (acceptLanguage ?? "").split(",")) {
-    const tag = part.split(";")[0].trim().toLowerCase().split("-")[0];
-    if ((LOCALES as readonly string[]).includes(tag)) return tag as Locale;
-  }
-  return DEFAULT_LOCALE;
-}
 
 /** Looks up a dotted key and fills {placeholders}. A missing key throws: no silent fallback text. */
 export function translator(locale: Locale) {
