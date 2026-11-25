@@ -1,0 +1,10 @@
+# Resolved on Python 3.13.18, Linux x86_64 (hito 000). Install with --no-deps for the package itself.
+numpy==2.5.5
+scipy==1.18.1
+networkx==3.7
+trimesh==4.11.1
+pytest==8.4.2
+iniconfig==2.3.1
+packaging==26.4
+pluggy==1.7.0
+Pygments==2.21.0

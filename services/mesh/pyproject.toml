@@ -1,0 +1,29 @@
+[project]
+name = "aurea-mesh"
+version = "0.0.1"
+description = "AUREA AI mesh adapter (hito 000 PoC): simulated provider, import, scale, repair and DFM-01. Concept mesh only, not certified CAD."
+requires-python = ">=3.11,<3.14"
+license = { text = "UNLICENSED" }
+# Exact pins, same versions as services/geometry where shared. Do not float.
+dependencies = [
+  "trimesh==4.11.1",
+  "numpy==2.5.5",
+  "scipy==1.18.1",
+  "networkx==3.7",  # trimesh.repair.fill_holes
+]
+
+[project.optional-dependencies]
+test = ["pytest==8.4.2"]
+
+[project.scripts]
+aurea-mesh = "aurea_mesh.cli:main"
+
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["aurea_mesh"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
