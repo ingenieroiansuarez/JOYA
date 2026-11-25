@@ -1,0 +1,37 @@
+name: Mesh adapter (hito 000)
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "services/mesh/**"
+      - ".github/workflows/mesh.yml"
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install locked dependencies
+        run: |
+          python -m pip install -r services/mesh/requirements.lock
+          python -m pip install --no-deps -e services/mesh
+      - name: Tests
+        run: python -m pytest -v services/mesh
+      - name: Simulated provider end to end (twice, must be byte-identical)
+        run: |
+          aurea-mesh services/mesh/out --target-mm 24 --confirmed-by joyero
+          aurea-mesh services/mesh/out2 --target-mm 24 --confirmed-by joyero
+          diff <(cd services/mesh/out && sha256sum *) <(cd services/mesh/out2 && sha256sum *)
+      - name: Production refuses the simulator
+        run: |
+          if aurea-mesh services/mesh/out3 --target-mm 24 --confirmed-by joyero --environment production; then
+            echo "simulator ran in production"; exit 1; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mesh-evidence
+          path: services/mesh/out/

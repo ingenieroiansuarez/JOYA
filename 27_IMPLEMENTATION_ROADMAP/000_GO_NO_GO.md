@@ -9,7 +9,7 @@ Gate del hito (`milestones.csv`): evidencia en dispositivos reales o bloqueo exp
 | Exportación reproducible | STEP no determinista en origen; `canonicalSha256` lo resuelve | **Mitigado (PoC)** | Caché y manifiestos usan solo `canonicalSha256` |
 | Render 3D en Android | Ambos caminos medidos en Z Flip 7; ADR-0003 aceptado (WebView + Three.js) | **Mitigado en gama alta**; falta gama media y revisión óptica | Propuesta: imagen estática pre-renderizada si un dispositivo no alcanza 30 FPS |
 | AR anillo/arete (P0-05) | Ninguna: requiere ≥ 3 Android físicos y ≥ 10 participantes con consentimiento | **Bloqueado** | Virtual Mirror y Smart Fit desactivados; se ofrece modo foto con ajuste manual y visor 3D. La talla nunca se mide por foto sin referencia |
-| Malla IA (P0-06) | `pytest services/mesh` 33 pasan con proveedor simulado; reparación, escala explícita, DFM sin PASS | **Parcial**: proveedor real sin evaluar (permiso y credenciales) | Ruta B desactivada fuera de demo; solo ruta A (texto → parámetros → familia). En demo, banner "SIMULADO" |
+| Malla IA (P0-06) | `pytest services/mesh` 34 pasan con proveedor simulado; reparación, escala explícita, DFM sin PASS | **Parcial**: proveedor real sin evaluar (permiso y credenciales) | Ruta B desactivada fuera de demo; solo ruta A (texto → parámetros → familia). En demo, banner "SIMULADO" |
 | Licencias y SBOM (REQ-08-32) | Tabla de licencias en `STATUS.md`; versiones fijadas en lockfiles | **Parcial**: sin SBOM generado; OCCT (LGPL-2.1 con excepción) y casadi (LGPL-3.0) sin revisión legal | No se distribuye el binario del worker CAD fuera del backend hasta la revisión |
 
 ## 2. Revisión de ADRs

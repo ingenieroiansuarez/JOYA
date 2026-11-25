@@ -17,7 +17,7 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | P0-03 | CadQuery anillo y dije, volumen analítico, STEP/STL reimport, fixture DFM pared fina | HECHO (PoC) | `pytest services/geometry` — 29 tests pasan |
 | P0-04 | GLB con material y benchmark Filament vs WebView | HECHO (decisión) | Ambos caminos medidos en Z Flip 7; ADR-0003 aceptado: WebView + Three.js. Pendiente revisión óptica humana y gama media |
 | P0-05 | AR anillo/arete | BLOQUEADO | Requiere ≥3 Android físicos y consentimiento de participantes |
-| P0-06 | Adapter mesh IA simulado / proveedor | NO INICIADO | Proveedor real requiere permiso y credenciales |
+| P0-06 | Adapter mesh IA simulado / proveedor | PARCIAL | Simulador, importación, escala y reparación hechos (`pytest services/mesh`, 34 tests); evaluación de proveedor real bloqueada: requiere permiso y credenciales |
 | P0-07 | Revisión ADRs, riesgos, go/no-go | HECHO | `27_IMPLEMENTATION_ROADMAP/000_GO_NO_GO.md`: GO condicional al hito 100 aceptado por ian (2026-11-25); AR bloqueado |
 
 ## Entorno de evidencia (nube, Linux x86_64)
@@ -53,6 +53,19 @@ Lectura: para la carga real (1 anillo o decenas en vitrina) ambos cumplen el NFR
 Hallazgo: en Filament 1.79.0, destruir `IBLPrefilterContext` tras crear el IBL liberaba la cámara de la vista (SIGSEGV en `FView::computeCameraInfo`); mitigado manteniendo el contexto vivo (APK 0.1.5).
 Pendiente: revisión visual humana de oro y gema (calidad óptica no medida objetivamente), medición en un Android de gama media, térmica sostenida. Las escenas no son idénticas (la web dibuja la gema aparte y usa clearcoat).
 
+## P0-06 — Adapter de malla IA (simulado)
+Código: `services/mesh` (ver su README). Ruta B: concepto → malla del proveedor → importar, escalar, reparar → DFM → revisión humana.
+```bash
+pip install -r services/mesh/requirements.lock && pip install --no-deps -e services/mesh
+pytest services/mesh                                                # 34 passed
+aurea-mesh services/mesh/out --target-mm 24 --confirmed-by joyero   # DFM-01 REVIEW, bbox 24×24×6,22 mm, vol 1674,1519 mm³
+```
+- El fixture simulado (toroide original con escala sin unidades, Y-up, vértices sin unir, caras invertidas, 2 huecos, triángulos degenerados y duplicados, fragmento suelto) se repara a un volumen cerrado cuyo volumen coincide con el toroide de referencia × factor³ (tolerancia relativa 1e-6). Salidas byte-idénticas entre ejecuciones.
+- La escala nunca se adivina: exige una medida en mm confirmada por una persona (`SCALE_REQUIRED` si falta).
+- DFM nunca da PASS: DFM-01 es BLOCK si no queda un volumen cerrado y REVIEW si queda (auto-intersecciones no medidas); DFM-02..10 REVIEW. `fabricable: false` siempre.
+- Idempotencia por clave, cancelación y reintento sin duplicar cobro; el simulador se rechaza en `production` y cualquier proveedor real devuelve `PROVIDER_NOT_CONFIGURED`.
+Pendiente: evaluar Meshy/Tripo (permiso, términos comerciales verificados y credenciales de ian), persistencia de trabajos y ledger de cuota, prueba de auto-intersección.
+
 ## Hallazgos del hito 000
 - **STEP no determinista**: la cabecera lleva timestamp y OCCT nombra el PRODUCT con un contador por proceso. `services/geometry` fija el nombre al id de componente y publica `canonicalSha256` (sección DATA). Usarlo en caché y manifiestos de taller.
 - **Estado DFM**: DFM.md exige `REVIEW` cuando falta regla, pero `dfm_report.state` en `core_reference.sql` solo admite PASS/WARN/FAIL. Añadir REVIEW en la migración del hito 100.
@@ -72,6 +85,7 @@ Detalle en la revisión. Resumen: estados de Payment/Design/Order divergen entre
 | numpy, scipy | 2.5.5 / 1.18.1 | BSD | |
 | vtk, trame* (transitivas) | — | BSD / MIT / Apache-2.0 | Peso grande; evaluar si se pueden evitar en la imagen del worker |
 | jsonschema, pytest | 4.25.1 / 8.4.2 | MIT | |
+| networkx (services/mesh) | 3.7 | BSD-3-Clause | Requerido por `trimesh.repair.fill_holes` |
 Lista completa en `services/geometry/requirements.lock`. No es asesoría legal.
 
 ## Bloqueos y decisiones pendientes (ian)
@@ -82,4 +96,4 @@ Lista completa en `services/geometry/requirements.lock`. No es asesoría legal.
 
 ## Siguiente
 - P0-04: revisión visual del render por ian y medición en un Android de gama media cuando haya uno.
-- P0-06: adapter de mesh IA simulado con fixture, reparación y escala.
+- P0-06: evaluar un proveedor real de malla solo con permiso y credenciales de ian.
