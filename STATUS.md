@@ -1,6 +1,6 @@
 # STATUS — AUREA
 
-Hito activo: **400** (300 — Jewelry Engine aceptado). Actualizado: 2026-11-25.
+Hito activo: **400 AURA** (300 — Jewelry Engine aceptado). Actualizado: 2026-11-25.
 Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5YS
 
 ## Hitos
@@ -10,7 +10,8 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | 100 Foundation | ACEPTADO (ian, 2026-11-25, PR #25) | Gate "arranque limpio, pruebas y login; entorno aislado; sin secretos": CI verde en main, login PKCE real en el Z Flip 7 (debug y release), `.env` fuera de git y `No secrets tracked` en CI. Contratos 1.1–1.7 con verificación en CI; arranque local (pnpm, Compose, migraciones); API con OIDC y permisos por rol; Keycloak local con login PKCE probado. Tokens de diseño con contraste AA verificado. Esqueletos web (Next) y móvil (Expo, login PKCE). Login PKCE real probado en el Z Flip 7 (2026-11-25) |
 | 200 Boutique | ACEPTADO (ian, 2026-11-25, PR #30) | Gate "APK dev navega el catálogo; estados vacío/error accesibles": APK debug en el Z Flip 7 navega catálogo, detalle y favoritos contra la API; error "Sin conexión" con Reintentar visto con la API apagada (2026-11-25). Contratos 1.8.0, migración 0001, seed demo, API (PR #26), app (PR #27–#29). Pendiente: recorrido con TalkBack |
 | 300 Jewelry Engine | ACEPTADO (ian, 2026-11-25, PR #35) | Gate "parámetro con geometría real; entrada inválida rechazada; reinicio sin conexión; roundtrip STEP/STL": probado en el Z Flip 7 contra API y worker reales (2026-11-25, 12:34–12:50). PR #31–#34 y la de cierre |
-| 400–1000 | NOT_STARTED | |
+| 400 AURA | GATE CUMPLIDO (falta aceptación de ian) | Gate "Prompt → proposal → authorized revision; failure/quota tests": API, panel y golden set (PR #36); pruebas automáticas y prueba en el Z Flip 7 (2026-11-25) pasan. Proveedor LLM real y trabajos de concepto/malla quedan pendientes de autorización |
+| 500–1000 | NOT_STARTED | |
 
 ## Backlog 000
 | ID | Tarea | Estado | Evidencia |
@@ -99,6 +100,30 @@ TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # db 3, api 45 (5 contra Keycloak)
   - Probado: 9 formas de token malo (sin cabecera, no JWT, vencido, emisor y audiencia ajenos, otra clave, `alg: none`, HS256 con la clave pública, payload alterado) → 401; contra Keycloak real, client credentials → `/v1/me` como auditor, login PKCE de `dev.cliente` → customer, el código no se canjea sin `code_verifier` ni con uno falso, la petición sin `code_challenge` se rechaza y el ID token no sirve contra la API.
   - Pendiente: MFA para personal y step-up (exige pantallas de login de staff, hito 200+), alcance por recurso y ubicación (lo aplica cada módulo cuando exista), revocación/introspección, y desplegar el IdP de producción (Keycloak autogestionado, ADR-0008, decidido el 2026-11-25).
 - Probado localmente: compose arriba, migración aplicada, `state_checks.sql` sobre la base migrada OK, Valkey rechaza clientes sin contraseña (`NOAUTH`).
+
+## Hito 400 — AURA
+Gate: "Prompt → proposal → authorized revision; failure/quota tests".
+- API (contratos 1.10.0, migración 0003, PR #36): `POST /v1/ai/proposals` devuelve hasta 3 opciones con operaciones de la allowlist (`modify_parameter`, `change_material`) validadas contra la revisión base, sin cambiar el proyecto. `POST /v1/ai/proposals/{id}/preview` crea un trabajo PREVIEW normal; solo `createRevision` con `accepted: true` crea la revisión, con `source = AI` y `source_id` = propuesta. Base desactualizada → `VERSION_CONFLICT`; propuesta vencida (30 min) → `PROPOSAL_EXPIRED`; descartar → `DISCARDED`.
+- Adaptador: **simulado determinista** (`aura-sim`, reglas ES/EN), marcado `simulated: true` y en la app "Modo demostración: AURA por reglas, sin modelo de IA". No hay modelo de IA real: requiere autorización de ian, términos comerciales verificados y credenciales. Producción rechaza el simulador al arrancar (`AI_PROVIDER`).
+- Lo que AURA no hace lo dice como nota y no genera operación: valores fuera de rango (no ajusta solo), piedras y certificación (al joyero), precios (cotización del joyero), grabado, otra pieza, leyes distintas de 18k/925/950, unidades distintas de mm/cm, instrucciones que no son de diseño ("ignora tus instrucciones", "aprueba", "fabrica").
+- Salida no confiable: el gateway reconstruye cada operación desde la allowlist y la aplica con las reglas del editor; descarta lo inválido, lo repetido y lo que no cambia nada.
+- Cuota: libro `ai_usage` append-only (RESERVE/SPEND/RELEASE) por persona y día UTC, `AI_DAILY_UNITS` (30 por defecto), reserva serializada (5 pedidos concurrentes con límite 2: pasan 2). Caída o timeout del adaptador liberan la reserva y la misma Idempotency-Key se puede reintentar. No se guarda el texto del prompt: solo SHA-256 y longitud.
+- App: tarjeta AURA en el editor (pedido, cuota, notas, opciones, "Ver vista previa" con la geometría real y "Aceptar"). Sin conexión o con cambios pendientes no se puede pedir y lo dice.
+- Prueba en dispositivo (2026-11-25, Z Flip 7 SM-F766B, Android 17, build debug desde main 7649237 por USB con `adb reverse`; API, Keycloak, worker y PostgreSQL locales en el portátil de ian). Horas locales (UTC−5); datos tomados de la base local sin datos personales:
+  1. 14:15:22 — `dev.cliente` crea un anillo Clásico: revisión 1 (source CREATE).
+  2. 14:15:44 — pedido a AURA (29 caracteres; el texto no se guarda): propuesta con 3 opciones, `aura-sim`, `simulated=true`; la revisión sigue en 1. Vista previa de la opción 2 con la geometría real → Aceptar → revisión 2 a las 14:16:21 con `source = AI` y `source_id` = la propuesta, que queda ACCEPTED.
+  3. 14:16:42 — "ponle un diamante": 0 opciones, nota NEEDS_JEWELER ("Engastar piedras aún no está en el editor…"); la revisión no cambia (captura de ian).
+  4. 14:17:02 — "ancho 20 mm": 0 opciones, nota OUT_OF_RANGE ("pediste 20 mm y el rango es 1,5–12 mm. No lo ajusto solo."); la revisión no cambia (captura de ian).
+  5. Cuota: cada pedido dejó RESERVE + SPEND de 1 unidad en `ai_usage` (6 filas), sin RELEASE; la app mostró 28/30 → 27/30. Revisiones del proyecto: solo 1 (CREATE) y 2 (AI), sin duplicados. Las propuestas sin opciones quedan PROPOSED y vencen por TTL.
+  Captura del editor en "Revisión 2" con la tarjeta AURA y la etiqueta de modo demostración (captura de ian). Los casos de caída, timeout, cuota agotada y concurrencia se prueban de forma automática (`ai.test.mjs`), no en el teléfono.
+- Herramienta local: `pnpm dev:password` escribe la contraseña de `dev.cliente` en el campo enfocado del teléfono por `adb` (solo `AUREA_ENV=local`, solo valores hexadecimales de `pnpm bootstrap`, no la imprime).
+- Evaluación: `12_AI_ORCHESTRATION/golden/cases.json`, 30 casos del adaptador + 5 del gateway; `apps/api/test/golden.test.mjs` falla si el adaptador propone algo que el gateway descartaría.
+```bash
+TEST_DATABASE_URL=… pnpm test      # api: ai 13, golden 31; mobile 59; db 10
+python tools/contracts/check_contracts.py   # 14 machines (AiProposal nueva)
+psql … -f 05_DATABASE/tests/ai_checks.sql   # ai checks OK
+```
+- Pendiente: barrido de reservas huérfanas (si la API cae entre reservar y guardar, la unidad cuenta hasta el día siguiente); proveedor LLM real y trabajos de concepto/malla (`/ai/jobs`), ambos sujetos a autorización; recorrido con TalkBack.
 
 ## Hito 300 — Jewelry Engine
 Gate: "Parameter update real geometry; rejected invalid input; restart offline; STEP/STL roundtrip".
