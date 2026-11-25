@@ -1,0 +1,83 @@
+{
+  "tool": "aurea-render-bench/0.1.0",
+  "path": "webview-threejs",
+  "three": "160",
+  "measuredAt": "2026-11-25T07:03:38.559Z",
+  "asset": {
+    "file": "ring-base.glb (ring.classic 18/4/1.8 mm)",
+    "bytes": 19196,
+    "sha256": "7c016f4f6a76f8f8556c6a61bd62384105631a4266e3a7dc97584dc91a60ce7c",
+    "sha256Verified": true,
+    "triangles": 1008,
+    "parseMs": 5.1
+  },
+  "firstFrameMs": 556,
+  "device": {
+    "userAgent": "Mozilla/5.0 (Linux; Android 10; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/157.0.0.0 Mobile Safari/537.36 Claude/1.261120.19",
+    "gpu": "ANGLE ((Samsung Xclipse 950) on Vulkan 1.3.304)",
+    "webgl2": true,
+    "devicePixelRatio": 3,
+    "renderPixelRatio": 3,
+    "canvasPx": [
+      984,
+      738
+    ],
+    "cores": 10,
+    "deviceMemoryGB": 8
+  },
+  "jsHeapMB": 26.3,
+  "battery": {
+    "start": {
+      "level": 0.79,
+      "charging": false
+    },
+    "end": {
+      "level": 0.78,
+      "charging": false
+    },
+    "seconds": 45
+  },
+  "sceneSeconds": 15,
+  "warmupSeconds": 2,
+  "results": [
+    {
+      "scene": "base",
+      "frames": 781,
+      "fpsMean": 60.1,
+      "p50ms": 16.6,
+      "p95ms": 16.8,
+      "p99ms": 16.9,
+      "over33msPct": 0,
+      "drawCalls": 1,
+      "trianglesPerFrame": 1008
+    },
+    {
+      "scene": "vitrina",
+      "frames": 781,
+      "fpsMean": 60.1,
+      "p50ms": 16.6,
+      "p95ms": 16.8,
+      "p99ms": 17,
+      "over33msPct": 0,
+      "drawCalls": 3,
+      "trianglesPerFrame": 2096
+    },
+    {
+      "scene": "estres",
+      "frames": 781,
+      "fpsMean": 60.1,
+      "p50ms": 16.6,
+      "p95ms": 16.7,
+      "p99ms": 16.9,
+      "over33msPct": 0,
+      "drawCalls": 75,
+      "trianglesPerFrame": 52400
+    }
+  ],
+  "_context": {
+    "reportedBy": "ian, pasted in the project thread 2026-11-25",
+    "device": "Samsung Galaxy Z Flip 7 per ian (unconfirmed); GPU string Xclipse 950 is consistent",
+    "runtime": "Claude Android app WebView (UA 'wv'), not Chrome",
+    "caveat": "All scenes at the 60 Hz rAF cap: this is a floor, not headroom. Android 10 in the UA is Chrome's reduced UA, not the real OS version."
+  }
+}
