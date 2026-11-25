@@ -1,6 +1,7 @@
 // What the app keeps on the phone for designs: the last known head of each project (so editing works
 // offline and after a restart), the outbox of offline operations with their base revision (SYNC.md:
-// persisted, ordered, never last-write-wins) and the last preview mesh per revision digest.
+// persisted, ordered, never last-write-wins), the last preview mesh per revision digest and one
+// picture per project taken from the 3D viewer for the designs list.
 // Everything is scoped to the signed-in customer: another account on the same phone sees none of it,
 // and signing out keeps unsent work for when the same customer signs in again.
 import type { Project, Revision, SyncOperation } from "./types";
@@ -30,6 +31,9 @@ export interface DesignStore {
   deviceId(make: () => string): Promise<string>;
   glb(digest: string): Promise<string | null>;
   putGlb(digest: string, base64: string): Promise<void>;
+  /** Picture of a project's design taken from the 3D viewer, with the revision it shows. */
+  thumb(projectId: string): Promise<{ revisionId: string; jpeg: string } | null>;
+  putThumb(projectId: string, revisionId: string, jpeg: string): Promise<void>;
 }
 
 /** Subset of expo-sqlite's SQLiteDatabase this store uses (also met by a node:sqlite shim in tests). */
@@ -50,6 +54,8 @@ CREATE TABLE IF NOT EXISTS design_outbox (owner TEXT NOT NULL, id TEXT NOT NULL,
 CREATE TABLE IF NOT EXISTS design_meta (owner TEXT NOT NULL, key TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY (owner, key));
 CREATE TABLE IF NOT EXISTS design_glb (owner TEXT NOT NULL, digest TEXT NOT NULL, data TEXT NOT NULL, stored_at INTEGER NOT NULL,
   PRIMARY KEY (owner, digest));
+CREATE TABLE IF NOT EXISTS design_thumb (owner TEXT NOT NULL, project_id TEXT NOT NULL, revision_id TEXT NOT NULL, jpeg TEXT NOT NULL,
+  PRIMARY KEY (owner, project_id));
 `;
 /** Preview meshes kept per customer; older ones are dropped (they can be rebuilt online). */
 export const GLB_KEEP = 12;
@@ -140,5 +146,16 @@ export class SqliteDesignStore implements DesignStore {
     await this.db.runAsync(
       `DELETE FROM design_glb WHERE owner = ? AND digest NOT IN
          (SELECT digest FROM design_glb WHERE owner = ? ORDER BY stored_at DESC LIMIT ${GLB_KEEP})`, [this.owner, this.owner]);
+  }
+  async thumb(projectId: string) {
+    const r = await this.db.getFirstAsync<{ revision_id: string; jpeg: string }>(
+      "SELECT revision_id, jpeg FROM design_thumb WHERE owner = ? AND project_id = ?", [this.owner, projectId]);
+    return r ? { revisionId: r.revision_id, jpeg: r.jpeg } : null;
+  }
+  async putThumb(projectId: string, revisionId: string, jpeg: string) {
+    await this.db.runAsync(
+      `INSERT INTO design_thumb(owner, project_id, revision_id, jpeg) VALUES (?, ?, ?, ?)
+       ON CONFLICT(owner, project_id) DO UPDATE SET revision_id = excluded.revision_id, jpeg = excluded.jpeg`,
+      [this.owner, projectId, revisionId, jpeg]);
   }
 }

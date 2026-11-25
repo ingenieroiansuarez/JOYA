@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { ApiError } from "../api";
 import { useDesign } from "../design/DesignContext";
 import { familyName } from "../design/describe";
@@ -8,7 +8,7 @@ import { useSession } from "../session";
 import { FamilyArt } from "../design/art";
 import { Button, c, errorKey, fonts, Header, Loading, Notice, s, styles, type } from "../ui";
 
-type Row = LocalProject & { pending: number; problems: number };
+type Row = LocalProject & { pending: number; problems: number; thumb: string | null };
 type State = { phase: "loading" } | { phase: "ready"; rows: Row[]; refreshed: boolean; error: ApiError | null };
 
 const MAX_PAGES = 5;
@@ -22,7 +22,12 @@ export function DesignsScreen({ onOpen, onNew }: { onOpen: (id: string) => void;
     if (!store) return [];
     const [projects, outbox] = await Promise.all([store.projects(), store.outbox()]);
     const count = (id: string, f: (e: OutboxEntry) => boolean) => outbox.filter((e) => e.op.projectId === id && f(e)).length;
-    return projects.map((p) => ({ ...p, pending: count(p.project.id, (e) => e.status === "PENDING"), problems: count(p.project.id, (e) => e.status !== "PENDING") }));
+    // A picture from the viewer only while it still shows the current revision; otherwise the family render.
+    const thumbs = await Promise.all(projects.map((p) => store.thumb(p.project.id).catch(() => null)));
+    return projects.map((p, i) => ({
+      ...p, pending: count(p.project.id, (e) => e.status === "PENDING"), problems: count(p.project.id, (e) => e.status !== "PENDING"),
+      thumb: thumbs[i]?.revisionId === p.head.id ? thumbs[i]!.jpeg : null,
+    }));
   }, [store]);
 
   const load = useCallback(async () => {
@@ -87,7 +92,9 @@ export function DesignsScreen({ onOpen, onNew }: { onOpen: (id: string) => void;
             return (
               <Pressable accessibilityRole="button" accessibilityLabel={[item.project.title, ...lines].join(", ")}
                 onPress={() => onOpen(item.project.id)} style={({ pressed }) => [list.row, pressed && { opacity: 0.7 }]}>
-                <FamilyArt familyId={item.project.familyId} materialId={item.head.document.components[0]?.materialId ?? ""} label="" style={list.thumb} />
+                {item.thumb
+                  ? <Image testID="design-thumb" source={{ uri: item.thumb }} style={[list.thumb, list.shot]} accessibilityIgnoresInvertColors />
+                  : <FamilyArt familyId={item.project.familyId} materialId={item.head.document.components[0]?.materialId ?? ""} label="" style={list.thumb} />}
                 <View style={list.body}>
                   <Text style={list.kind}>{lines[0]}</Text>
                   <Text style={list.title} numberOfLines={2}>{item.project.title}</Text>
@@ -113,6 +120,7 @@ const list = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(197,160,89,0.22)",
   },
   thumb: { width: 88, borderRadius: 8 },
+  shot: { aspectRatio: 1, backgroundColor: "#141416" },
   body: { flex: 1, gap: 2 },
   kind: { color: c.textMuted, fontSize: type[0], letterSpacing: 1.2, textTransform: "uppercase" },
   title: { color: c.text, fontSize: type[3], fontFamily: fonts.display },

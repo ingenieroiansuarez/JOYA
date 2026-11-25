@@ -39,6 +39,8 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
   const [issue, setIssue] = useState<{ name: string; issue: Issue } | null>(null);
   const [preview, setPreview] = useState<Preview>({ phase: "none" });
   const [glb, setGlb] = useState<string | null>(null);
+  // The head's own mesh (not a proposal's preview): only its picture becomes the list thumbnail.
+  const headMesh = useRef<{ revisionId: string; glb: string } | null>(null);
   // Why there is no mesh yet: being built, no connection, or the build failed. Never "offline" while building.
   const [mesh, setMesh] = useState<"building" | "offline" | "failed">("building");
   const [syncing, setSyncing] = useState<"idle" | "busy" | "offline">("idle");
@@ -78,13 +80,17 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
     (async () => {
       const cached = await store.glb(headDigest);
       if (cancelled) return;
-      if (cached) { setGlb(cached); return; }
+      if (cached) { headMesh.current = { revisionId: headId, glb: cached }; setGlb(cached); return; }
       setGlb(null);
       setMesh("building");
       try {
         const job = await waitForJob(client, (await client.buildRevision(headId, newId())).id, { signal: alive.current });
         if (cancelled) return;
-        if (job.state === "SUCCEEDED") setGlb(await loadGlb(client, job, { store, cacheKey: headDigest }));
+        if (job.state === "SUCCEEDED") {
+          const mesh = await loadGlb(client, job, { store, cacheKey: headDigest });
+          headMesh.current = { revisionId: headId, glb: mesh };
+          setGlb(mesh);
+        }
         else setMesh("failed");
         saw(undefined);
       } catch (e) {
@@ -215,6 +221,15 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
       {offline && <Text accessibilityRole="alert" style={styles.banner}>{t("offlineBanner")}</Text>}
       <ScrollView contentContainerStyle={ed.content} keyboardShouldPersistTaps="handled">
         <Viewer glb={glb} color={studioColor(comp.materialId)} label={t("viewerLabel", { name: title })}
+          onSnapshot={(shown, jpeg) => {
+            // Only a picture of the head as saved: its mesh and its alloy (a pending offline change of
+            // material recolours the same mesh, and that is not the head yet).
+            const head = headMesh.current;
+            const headMaterial = local.local.head.document.components[0]?.materialId ?? "";
+            if (store && head && head.revisionId === local.local.head.id && shown.glb === head.glb && shown.color === studioColor(headMaterial)) {
+              void store.putThumb(id, head.revisionId, jpeg).catch(() => undefined);
+            }
+          }}
           emptyText={t(mesh === "building" ? "viewerBuilding" : mesh === "offline" ? "viewerEmpty" : "viewerBuildFailed")} errorText={t("viewerError")} loadingText={t("viewerLoading")} />
         <Text style={styles.muted}>{t("previewNote")}</Text>
 

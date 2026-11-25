@@ -87,14 +87,31 @@ canvas.addEventListener("pointermove", (e) => {
 canvas.addEventListener("pointerup", () => { dragging = null; });
 canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); post({ type: "error", code: "CONTEXT_LOST" }); });
 
-function frame() {
-  if (!dragging && !reduced && current && ++idle > 90) yaw += 0.004; // slow turn after 1.5 s without touch
-  camera.position.set(distance * Math.cos(pitch) * Math.sin(yaw), distance * Math.sin(pitch), distance * Math.cos(pitch) * Math.cos(yaw));
+function place(y, p) {
+  camera.position.set(distance * Math.cos(p) * Math.sin(y), distance * Math.sin(p), distance * Math.cos(p) * Math.cos(y));
   camera.lookAt(0, 0, 0);
   key.position.set(distance, distance * 1.2, distance * 0.6);
   rim.position.set(-distance, distance * 0.4, -distance);
+}
+
+function frame() {
+  if (!dragging && !reduced && current && ++idle > 90) yaw += 0.004; // slow turn after 1.5 s without touch
+  place(yaw, pitch);
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
+}
+
+// Square picture of the shown mesh from the starting pose, for the designs list. Rendered and read in
+// the same task (the drawing buffer is not preserved), cropped to the centre and scaled down.
+const SNAPSHOT_PX = 256;
+function snapshot() {
+  place(0.5, 0.3);
+  renderer.render(scene, camera);
+  const w = canvas.width, h = canvas.height, side = Math.min(w, h);
+  const out = document.createElement("canvas");
+  out.width = out.height = SNAPSHOT_PX;
+  out.getContext("2d").drawImage(canvas, (w - side) / 2, (h - side) / 2, side, side, 0, 0, SNAPSHOT_PX, SNAPSHOT_PX);
+  return out.toDataURL("image/jpeg", 0.82);
 }
 requestAnimationFrame(frame);
 
@@ -105,15 +122,15 @@ function bytes(b64) {
   return out.buffer;
 }
 
-function show({ glb, color }) {
+function show({ glb, color, snap, seq }) {
   try {
-    parse(bytes(glb), color);
+    parse(bytes(glb), color, snap === true ? seq : null);
   } catch {
     post({ type: "error", code: "GLB_INVALID" }); // the loader throws synchronously on a non-glTF buffer
   }
 }
 
-function parse(buffer, color) {
+function parse(buffer, color, snap) {
   new GLTFLoader().parse(buffer, "", (gltf) => {
     if (current) {
       pivot.remove(current);
@@ -149,6 +166,9 @@ function parse(buffer, color) {
     pivot.add(current);
     idle = 0;
     post({ type: "shown", triangles: Math.round(triangles), sizeM: box.getSize(new THREE.Vector3()).toArray() });
+    if (snap !== null) {
+      try { post({ type: "snapshot", seq: snap, data: snapshot() }); } catch { /* a missing picture is not an error of the viewer */ }
+    }
   }, () => post({ type: "error", code: "GLB_INVALID" }));
 }
 
