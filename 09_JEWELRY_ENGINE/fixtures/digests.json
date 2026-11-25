@@ -1,0 +1,90 @@
+{
+  "$comment": "Canonical JSON (RFC 8785 subset) and SHA-256 written by ECMAScript JSON.stringify with sorted keys. services/geometry (Python) and packages/design (TypeScript) must reproduce every entry.",
+  "cases": [
+    {
+      "name": "handoff ring fixture",
+      "value": {
+        "schemaVersion": "1.0.0",
+        "projectId": "00000000-0000-4000-8000-000000000001",
+        "revision": 1,
+        "units": "mm",
+        "components": [
+          {
+            "id": "ring-base",
+            "family": "ring.classic",
+            "familyVersion": "0.1.0",
+            "materialId": "gold-18k-yellow",
+            "parameters": {
+              "innerDiameter": 18,
+              "bandWidth": 4,
+              "radialThickness": 1.8
+            },
+            "transform": {
+              "translation": [
+                0,
+                0,
+                0
+              ],
+              "rotationQuaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            "dependsOn": []
+          }
+        ],
+        "operations": [],
+        "constraints": [
+          {
+            "type": "min_wall",
+            "target": "ring-base",
+            "parameters": {
+              "minMm": 1.2
+            }
+          }
+        ]
+      },
+      "canonical": "{\"components\":[{\"dependsOn\":[],\"family\":\"ring.classic\",\"familyVersion\":\"0.1.0\",\"id\":\"ring-base\",\"materialId\":\"gold-18k-yellow\",\"parameters\":{\"bandWidth\":4,\"innerDiameter\":18,\"radialThickness\":1.8},\"transform\":{\"rotationQuaternion\":[0,0,0,1],\"translation\":[0,0,0]}}],\"constraints\":[{\"parameters\":{\"minMm\":1.2},\"target\":\"ring-base\",\"type\":\"min_wall\"}],\"operations\":[],\"projectId\":\"00000000-0000-4000-8000-000000000001\",\"revision\":1,\"schemaVersion\":\"1.0.0\",\"units\":\"mm\"}",
+      "sha256": "0d4d10ed4c066dddd698afc4f418f6ba67919f4394e3886bc8fb72806676066d"
+    },
+    {
+      "name": "numbers",
+      "value": {
+        "a": 18,
+        "b": 0.1,
+        "c": 1e-7,
+        "d": 1.5e+21,
+        "e": 0.000001,
+        "f": -2.5,
+        "g": 12345678901234567000,
+        "h": 100000000000000000000,
+        "i": 1.23e-18,
+        "j": 0,
+        "k": 0.30000000000000004,
+        "l": 5e-324
+      },
+      "canonical": "{\"a\":18,\"b\":0.1,\"c\":1e-7,\"d\":1.5e+21,\"e\":0.000001,\"f\":-2.5,\"g\":12345678901234567000,\"h\":100000000000000000000,\"i\":1.23e-18,\"j\":0,\"k\":0.30000000000000004,\"l\":5e-324}",
+      "sha256": "8958be375bdc87d4db47dced90a0cf1e4343748b4ddbb381e3a46e929b626722"
+    },
+    {
+      "name": "key order and strings",
+      "value": {
+        "é": 1,
+        "z": [
+          true,
+          false,
+          null
+        ],
+        "A": "line\nbreak \"q\" \\ \u001f tab\t",
+        "aa": {},
+        "a": [],
+        "€": "€",
+        "😀": "emoji"
+      },
+      "canonical": "{\"A\":\"line\\nbreak \\\"q\\\" \\\\ \\u001f tab\\t\",\"a\":[],\"aa\":{},\"z\":[true,false,null],\"é\":1,\"€\":\"€\",\"😀\":\"emoji\"}",
+      "sha256": "c5cdb8084937919510f181b42e7b943ccfdcf5b908ff9c092c84b14b7578dfce"
+    }
+  ]
+}

@@ -6,7 +6,6 @@ checked here and reported as structured errors, never silently fixed.
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 import os
@@ -16,6 +15,7 @@ from pathlib import Path
 
 import jsonschema
 
+from .canonical import canonical_digest  # noqa: F401  (re-exported: pipeline, tests)
 from .families import FAMILIES
 
 # Repo layout: services/geometry/aurea_geometry/ -> repo root is parents[3].
@@ -41,12 +41,6 @@ class InvalidDocument(ValueError):
     def __init__(self, issues: list[ValidationIssue]):
         self.issues = issues
         super().__init__("; ".join(f"{i.code} {i.path}: {i.message}" for i in issues))
-
-
-def canonical_digest(document: dict) -> str:
-    """SHA-256 over canonical JSON (sorted keys, no whitespace)."""
-    data = json.dumps(document, sort_keys=True, separators=(",", ":"), allow_nan=False)
-    return hashlib.sha256(data.encode("utf-8")).hexdigest()
 
 
 def _schema_code(err: jsonschema.ValidationError) -> str:
