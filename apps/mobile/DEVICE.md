@@ -33,3 +33,10 @@ Usuario `dev.cliente`; la contraseña es el valor de `KC_DEV_USER_PASSWORD` en `
 - Si el cable o la depuración USB se cortan, se pierden los `adb reverse`: el login se queda cargando y termina en "No se pudo iniciar sesión". Reconectar y repetir los `adb reverse`.
 - Windows: el ninja de CMake 3.22.1 del SDK falla con rutas de más de 260 caracteres (pnpm las genera). Usar ninja ≥ 1.12 y apuntar `cmake.dir` en `apps/mobile/android/local.properties` (git-ignored) a una copia de CMake con ese ninja.
 - Si Docker Desktop corta la descarga de capas grandes (EOF), reiniciarlo; si persiste, descargar las capas fuera de Docker, verificar el sha256 contra el digest de `compose.yaml` y cargarlas con `docker load`.
+
+## Build release (Hermes, minificado)
+Mismos servicios, `adb reverse` y variables `EXPO_PUBLIC_*` que arriba, y luego:
+```sh
+pnpm exec expo run:android --variant release
+```
+Android bloquea http en release. Para builds `local`/`ci`, `plugins/with-dev-cleartext.js` permite http solo hacia los hosts del emisor y la API (aquí `127.0.0.1`) y `localhost`; todo lo demás sigue siendo solo https. En `demo` y `production` el plugin no añade nada. El APK release local se firma con la clave de depuración de Android: sirve para probar, no para distribuir (la firma de distribución llega con el pipeline de releases).
