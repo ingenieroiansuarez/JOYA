@@ -79,7 +79,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
             Gltfio.init()  // loads gltfio-jni
         }
 
-        const val TOOL = "aurea-render-bench-android/0.1.1"
+        const val TOOL = "aurea-render-bench-android/0.1.2"
         const val FILAMENT_VERSION = "1.79.0"
         const val ASSET = "showcase.glb"
         const val SCENE_SECONDS = 15.0
@@ -153,26 +153,46 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
     private var report: JSONObject? = null
     private var lastHudNanos = 0L
     private var initFailed = false
+    private var ready = false
+    private var diagnostic: String? = null
+    private var renderStagePending: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         buildUi()
-        val previousCrash = lastCrash()
+        installJavaCrashMarker()
+        val previousCrash = previousCrashReport()
+        if (previousCrash != null) {
+            // Do not start Filament again: a native abort would close the app before anything is shown.
+            status.text = "La app se cerró la vez anterior. Toca \"Copiar diagnóstico\", pégalo en el chat y luego toca \"Reintentar\"."
+            jsonView.text = previousCrash
+            diagnostic = previousCrash
+            runButton.text = "Reintentar"
+            copyButton.text = "Copiar diagnóstico"
+            copyButton.isEnabled = true
+            return
+        }
+        initFilament()
+    }
+
+    private fun initFilament() {
         try {
-            setupFilament()
-            loadAssets()
-            buildLighting()
+            stage("setupFilament"); setupFilament()
+            stage("loadAssets"); loadAssets()
+            stage("buildLighting"); buildLighting()
             buildScene("vitrina", null)
         } catch (t: Throwable) {
-            // Show Java-side failures instead of closing; native aborts are reported on the next launch.
+            stage("java-exception-init")
             runButton.isEnabled = false
             status.text = "Error al iniciar: ${t.javaClass.simpleName}: ${t.message}"
             jsonView.text = android.util.Log.getStackTraceString(t)
             initFailed = true
             return
         }
-        if (previousCrash != null) jsonView.text = "Cierre anterior de la app:\n$previousCrash"
+        ready = true
+        choreographer.removeFrameCallback(this)
+        choreographer.postFrameCallback(this)
         status.text = "Listo. GLB ${"%.1f".format(glbBytes.size / 1024.0)} KB, " +
             "${ringTriangles + gemTriangles} triángulos, parseado en ${"%.1f".format(parseMs)} ms. " +
             "Backend: ${engine.backend.name}."
@@ -208,8 +228,8 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
         root.addView(stage, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, width * 3 / 4))
 
         val buttons = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setPadding(0, 16, 0, 8) }
-        runButton = Button(this).apply { text = "Ejecutar la prueba"; setOnClickListener { startRun() } }
-        copyButton = Button(this).apply { text = "Copiar resultados"; isEnabled = false; setOnClickListener { copyReport() } }
+        runButton = Button(this).apply { text = "Ejecutar la prueba"; setOnClickListener { onRunButton() } }
+        copyButton = Button(this).apply { text = "Copiar resultados"; isEnabled = false; setOnClickListener { onCopyButton() } }
         buttons.addView(runButton); buttons.addView(copyButton)
         root.addView(buttons)
 
@@ -383,8 +403,9 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
     // ---------------------------------------------------------------- Scenes
 
     private fun buildScene(kind: String, count: Int?) {
-        if (sceneEntities.isNotEmpty()) scene.removeEntities(sceneEntities)
         val n = count ?: if (kind == "estres") 25 else 1
+        stage("scene:$kind:$n")
+        if (sceneEntities.isNotEmpty()) scene.removeEntities(sceneEntities)
         val entities = ArrayList<Int>()
         val roots = IntArray(n)
         val offsets = FloatArray(n * 2)
@@ -411,6 +432,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
         val withGem = kind != "base"
         currentRenderables = n * (if (withGem) 2 else 1)
         currentTriangles = n * (ringTriangles + if (withGem) gemTriangles else 0)
+        renderStagePending = "$kind:$n"
         val camZ = if (n > 1) max(0.26, grid * GRID_STEP * 1.9) else 0.055
         camera.lookAt(0.0, 0.012, camZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
     }
@@ -435,7 +457,8 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
 
     override fun onResume() {
         super.onResume()
-        if (initFailed) return
+        if (!ready) return
+        choreographer.removeFrameCallback(this)
         choreographer.postFrameCallback(this)
     }
 
@@ -458,10 +481,13 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
         spin(frameTimeNanos)
         val sc = swapChain ?: return
         if (!uiHelper.isReadyToRender) return
+        val pendingStage = renderStagePending
+        if (pendingStage != null) stage("render:$pendingStage")
         val cpuStart = System.nanoTime()
         if (renderer.beginFrame(sc, frameTimeNanos)) {
             renderer.render(view)
             renderer.endFrame()
+            if (pendingStage != null) { stage("ok:$pendingStage"); renderStagePending = null }
             val cpuMs = (System.nanoTime() - cpuStart) / 1e6
             if (firstFrameMs == null) firstFrameMs = (SystemClock.elapsedRealtimeNanos() - t0) / 1e6
             measuring?.onRendered(frameTimeNanos, cpuMs)
@@ -662,12 +688,6 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
     private fun row(name: String, r: JSONObject) =
         "%-12s %5.1f %6.2f %6.2f %5.1f%%\n".format(name, r.getDouble("fpsMean"), r.getDouble("p50ms"), r.getDouble("p95ms"), r.getDouble("over33msPct"))
 
-    private fun copyReport() {
-        val text = report?.toString(2) ?: return
-        val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        cm.setPrimaryClip(ClipData.newPlainText("aurea-render-bench", text))
-        status.text = "Resultados copiados."
-    }
 
     // ---------------------------------------------------------------- Device facts
 
@@ -716,20 +736,78 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
         }
     }
 
-    /** Reason and message of this app's last abnormal exit (API 30+), so a crash can be reported from the phone. */
-    private fun lastCrash(): String? {
+    // ---------------------------------------------------------------- Diagnostics
+
+    private val diagPrefs by lazy { getSharedPreferences("diag", Context.MODE_PRIVATE) }
+
+    /** Last step reached, written synchronously so it survives a native abort. */
+    private fun stage(name: String) {
+        diagPrefs.edit().putString("stage", name).putLong("stageAt", System.currentTimeMillis()).commit()
+    }
+
+    private fun installJavaCrashMarker() {
+        val previous = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, error ->
+            try {
+                diagPrefs.edit().putString("javaCrash", android.util.Log.getStackTraceString(error).take(4000)).commit()
+            } catch (ignored: Throwable) {}
+            previous?.uncaughtException(thread, error)
+        }
+    }
+
+    /**
+     * Report of this app's last abnormal exit: Android's exit reason (API 30+), the last step the
+     * app reached, any Java stack trace, and the app's own log lines from that process (Filament
+     * writes its precondition failures there). Null when the last exit was normal or already retried.
+     */
+    private fun previousCrashReport(): String? {
         if (Build.VERSION.SDK_INT < 30) return null
         val am = getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
         val info = am.getHistoricalProcessExitReasons(packageName, 0, 1).firstOrNull() ?: return null
         val crash = info.reason == android.app.ApplicationExitInfo.REASON_CRASH ||
             info.reason == android.app.ApplicationExitInfo.REASON_CRASH_NATIVE ||
             info.reason == android.app.ApplicationExitInfo.REASON_ANR
-        if (!crash) return null
-        val prefs = getSharedPreferences("diag", Context.MODE_PRIVATE)
-        if (prefs.getLong("shownExit", 0L) == info.timestamp) return null
-        prefs.edit().putLong("shownExit", info.timestamp).apply()
-        return "reason=${info.reason} status=${info.status} at=${Instant.ofEpochMilli(info.timestamp)} " +
-            "description=${info.description}"
+        if (!crash || diagPrefs.getLong("retriedExit", 0L) == info.timestamp) return null
+        val reason = when (info.reason) {
+            android.app.ApplicationExitInfo.REASON_CRASH -> "CRASH (Java)"
+            android.app.ApplicationExitInfo.REASON_CRASH_NATIVE -> "CRASH_NATIVE"
+            else -> "ANR"
+        }
+        val log = try {
+            val proc = Runtime.getRuntime().exec(arrayOf("logcat", "-d", "-v", "time", "--pid=${info.pid}"))
+            proc.inputStream.bufferedReader().readLines().takeLast(80).joinToString("\n")
+        } catch (t: Throwable) { "logcat no disponible: ${t.message}" }
+        pendingRetryExit = info.timestamp
+        return buildString {
+            append("AUREA render bench $TOOL — diagnóstico\n")
+            append("motivo=$reason estado=${info.status} hora=${Instant.ofEpochMilli(info.timestamp)}\n")
+            append("descripción=${info.description}\n")
+            append("última etapa=${diagPrefs.getString("stage", "?")}\n")
+            append("dispositivo=${Build.MANUFACTURER} ${Build.MODEL} Android ${Build.VERSION.RELEASE}\n")
+            diagPrefs.getString("javaCrash", null)?.let { append("\nJava:\n$it\n") }
+            append("\nlog:\n$log")
+        }
+    }
+
+    private var pendingRetryExit = 0L
+
+    private fun onRunButton() {
+        if (!ready) {
+            diagPrefs.edit().putLong("retriedExit", pendingRetryExit).remove("javaCrash").commit()
+            runButton.text = "Ejecutar la prueba"
+            copyButton.text = "Copiar resultados"; copyButton.isEnabled = false
+            diagnostic = null; jsonView.text = ""
+            initFilament()
+            return
+        }
+        startRun()
+    }
+
+    private fun onCopyButton() {
+        val text = diagnostic ?: report?.toString(2) ?: return
+        val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        cm.setPrimaryClip(ClipData.newPlainText("aurea-render-bench", text))
+        status.text = if (diagnostic != null) "Diagnóstico copiado." else "Resultados copiados."
     }
 
     // ---------------------------------------------------------------- Teardown
@@ -737,7 +815,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
     override fun onDestroy() {
         super.onDestroy()
         choreographer.removeFrameCallback(this)
-        if (initFailed) return
+        if (!ready) return
         uiHelper.detach()
         if (sceneEntities.isNotEmpty()) scene.removeEntities(sceneEntities)
         many?.let { assetLoader.destroyAsset(it) }
