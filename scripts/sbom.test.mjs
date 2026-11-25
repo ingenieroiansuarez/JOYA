@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { test } from "node:test";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-import { buildBom, composeImages, lockIntegrity, npmPurl, parseRequirements, prodSet, pypiPurl, SBOM_FILE } from "./sbom.mjs";
+import { buildBom, completeLicenses, composeImages, installedPackages, lockIntegrity, npmPurl, parseRequirements, prodSet, pypiPurl, SBOM_FILE } from "./sbom.mjs";
 
 const schema = (f) => JSON.parse(readFileSync(new URL(`../tools/sbom/schema/${f}`, import.meta.url), "utf8"));
 
@@ -61,4 +63,19 @@ test("compose images are recorded by digest", () => {
   const imgs = composeImages(readFileSync(new URL("../compose.yaml", import.meta.url), "utf8"));
   assert.ok(imgs.length >= 3);
   for (const i of imgs) assert.match(i.digest, /^sha256:[0-9a-f]{64}$/);
+});
+
+test("a version pnpm licenses leaves out (installed only under an alias) still gets a component", () => {
+  const dir = mkdtempSync(join(tmpdir(), "aurea-store-"));
+  for (const [d, name, license] of [["react-is@18.3.1", "react-is", "MIT"], ["react-is@19.3.1", "react-is", "MIT"], ["@scope+x@1.0.0_peer@2", "@scope/x", "ISC"]]) {
+    mkdirSync(join(dir, d, "node_modules", name), { recursive: true });
+    writeFileSync(join(dir, d, "node_modules", name, "package.json"), JSON.stringify({ name, license }));
+  }
+  const installed = installedPackages(dir);
+  assert.deepEqual(installed.map((p) => `${p.name}@${p.version}`), ["@scope/x@1.0.0", "react-is@18.3.1", "react-is@19.3.1"]);
+  const listed = { MIT: [{ name: "react-is", versions: ["19.3.1"] }] };
+  const out = completeLicenses(listed, installed);
+  assert.deepEqual(out.MIT, [{ name: "react-is", versions: ["19.3.1", "18.3.1"] }]);
+  assert.deepEqual(out.ISC, [{ name: "@scope/x", versions: ["1.0.0"] }]);
+  assert.deepEqual(listed.MIT[0].versions, ["19.3.1"]); // input untouched
 });

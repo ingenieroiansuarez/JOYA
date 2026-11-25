@@ -3,25 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "main": "index.ts",
-  "description": "AUREA customer app (Expo SDK 58). Hito 100 skeleton: shell, design tokens, ES/EN strings, OIDC Authorization Code + PKCE against Keycloak.",
+  "description": "AUREA customer app (Expo SDK 58): boutique, favorites and the jewelry design editor (hito 300), OIDC Authorization Code + PKCE against Keycloak.",
   "scripts": {
-    "start": "EXPO_NO_TELEMETRY=1 expo start",
-    "typecheck": "tsc --noEmit",
-    "test": "tsc --noEmit && jest --ci && pnpm run bundle",
-    "bundle": "EXPO_NO_TELEMETRY=1 EXPO_PUBLIC_AUREA_ENV=ci EXPO_PUBLIC_OIDC_ISSUER=http://127.0.0.1:8080/realms/aurea-local EXPO_PUBLIC_API_URL=http://127.0.0.1:3000 expo export --platform android --output-dir dist"
+    "start": "node scripts/viewer-html.mjs && EXPO_NO_TELEMETRY=1 expo start",
+    "typecheck": "node scripts/viewer-html.mjs && tsc --noEmit",
+    "test": "node scripts/viewer-html.mjs && tsc --noEmit && jest --ci && pnpm run bundle",
+    "bundle": "EXPO_NO_TELEMETRY=1 EXPO_PUBLIC_AUREA_ENV=ci EXPO_PUBLIC_OIDC_ISSUER=http://127.0.0.1:8080/realms/aurea-local EXPO_PUBLIC_API_URL=http://127.0.0.1:3000 expo export --platform android --output-dir dist",
+    "viewer": "node scripts/viewer-html.mjs"
   },
   "dependencies": {
+    "@aurea/design": "workspace:*",
     "@aurea/tokens": "workspace:*",
     "expo": "58.0.24",
     "expo-auth-session": "58.0.17",
     "expo-constants": "58.0.15",
     "expo-crypto": "58.0.7",
     "expo-secure-store": "58.0.2",
+    "expo-sqlite": "58.0.16",
     "expo-status-bar": "58.0.4",
     "expo-web-browser": "58.0.7",
     "react": "19.3.0",
     "react-native": "0.88.1",
-    "react-native-safe-area-context": "5.11.1"
+    "react-native-safe-area-context": "5.11.1",
+    "react-native-webview": "14.0.1"
   },
   "devDependencies": {
     "@jest/globals": "30.5.2",
@@ -32,6 +36,7 @@
     "jest": "30.5.2",
     "jest-expo": "58.0.14",
     "test-renderer": "1.3.0",
+    "three": "0.187.0",
     "typescript": "5.9.3"
   },
   "jest": {
@@ -48,6 +53,11 @@
           ]
         }
       ]
+    },
+    "moduleNameMapper": {
+      "viewer\\.generated$": "<rootDir>/test/viewerStub.ts",
+      "^react-native-webview$": "<rootDir>/test/webviewMock.tsx",
+      "^expo-sqlite$": "<rootDir>/test/sqliteMock.ts"
     }
   }
 }

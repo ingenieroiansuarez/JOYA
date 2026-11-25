@@ -23,6 +23,8 @@ jest.mock("../src/auth", () => ({
   signIn: async () => null,
   signOut: async () => undefined,
   fetchMe: async () => ({ subject: "s", roles: ["customer"], permissions: [] }),
+  rememberSubject: async () => undefined,
+  rememberedSubject: async () => null,
 }));
 import { SessionProvider, useSession } from "../src/session";
 import { ProductScreen } from "../src/screens/ProductScreen";

@@ -124,6 +124,39 @@ export function buildBom({ licenses, prod, integrity, python, images, version })
   };
 }
 
+/**
+ * name@version of every package pnpm installed, from the store layout (`@scope+name@1.2.3_peers`).
+ * `pnpm licenses list` sometimes drops a version that is installed only under an alias (react-is@18
+ * as @jest/react-is-18), so the SBOM would change between identical installs. The directory listing
+ * does not.
+ */
+export function installedPackages(storeDir) {
+  if (!existsSync(storeDir)) return [];
+  return readdirSync(storeDir).sort().flatMap((d) => {
+    const m = /^((?:@[^+]+\+)?[^@]+)@([^_]+)/.exec(d);
+    if (!m) return [];
+    const name = m[1].replace("+", "/");
+    return [{ name, version: m[2], manifest: `${storeDir}/${d}/node_modules/${name}/package.json` }];
+  });
+}
+
+/** Add installed versions missing from `pnpm licenses list`, with the license their package.json declares. */
+export function completeLicenses(licenses, installed, readManifest = (file) => JSON.parse(readFileSync(file, "utf8"))) {
+  const out = Object.fromEntries(Object.entries(licenses).map(([l, ps]) => [l, ps.map((p) => ({ ...p, versions: [...p.versions] }))]));
+  const have = new Set(Object.values(out).flat().flatMap((p) => p.versions.map((v) => `${p.name}@${v}`)));
+  for (const { name, version, manifest } of installed) {
+    if (have.has(`${name}@${version}`)) continue;
+    const declared = readManifest(manifest).license;
+    const license = typeof declared === "string" ? declared : "Unknown";
+    out[license] ??= [];
+    const entry = out[license].find((p) => p.name === name);
+    if (entry) entry.versions.push(version);
+    else out[license].push({ name, versions: [version] });
+    have.add(`${name}@${version}`);
+  }
+  return out;
+}
+
 function collect() {
   const lockText = readFileSync(`${ROOT}pnpm-lock.yaml`, "utf8");
   const run = (args) => JSON.parse(execFileSync("pnpm", args, { cwd: ROOT, encoding: "utf8", maxBuffer: 64 << 20 }));
@@ -132,7 +165,7 @@ function collect() {
     .sort()
     .map((s) => ({ service: s, reqs: parseRequirements(readFileSync(`${ROOT}services/${s}/requirements.lock`, "utf8")) }));
   return {
-    licenses: run(["licenses", "list", "--json"]),
+    licenses: completeLicenses(run(["licenses", "list", "--json"]), installedPackages(`${ROOT}node_modules/.pnpm`)),
     prod: prodSet(parseYaml(lockText, { maxAliasCount: -1 })),
     integrity: lockIntegrity(lockText),
     python,

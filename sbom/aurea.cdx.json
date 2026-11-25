@@ -6141,6 +6141,31 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/await-lock@2.2.2",
+      "name": "await-lock",
+      "version": "2.2.2",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/await-lock@2.2.2",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "683733003be5bd319a8d30e3723a4932a464385e90773dd86cf666fcfc96ead28f931da1958073c4c844cb033fb54ef61eb5598e0979542751b8c940ee967c1b"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/babel-jest@29.7.0",
       "name": "babel-jest",
       "version": "29.7.0",
@@ -8991,6 +9016,31 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/escape-string-regexp@4.0.0",
+      "name": "escape-string-regexp",
+      "version": "4.0.0",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/escape-string-regexp@4.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "4eda5c349dd7033c771aaf2c591cc96956a346cd2e57103660091d6f58e6d9890fcf81ba7a05050320379f9bed10865e7cf93959ae145db2ae4b97ca90959d80"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/esprima@4.0.1",
       "name": "esprima",
       "version": "4.0.1",
@@ -9530,6 +9580,31 @@
         {
           "alg": "SHA-512",
           "content": "8e8ec8eae1e73f939060ac77fbb95ba5d5559ce130163dabc8391075ab94412c208761ee3149221575942157b4d6db3a0cb4687dfe54d13bfeb8d6f708cabf93"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/expo-sqlite@58.0.16",
+      "name": "expo-sqlite",
+      "version": "58.0.16",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/expo-sqlite@58.0.16",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "012417f0d04d0e5fc0e3499c35dc2cbb7b871162a6cdaf29bec41fb866e8feb80f50b6e16a2653aabba0f9b2b55eda174f9227ff8be37398075109c707e7ec82"
         }
       ],
       "properties": [
@@ -16741,6 +16816,31 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/react-is@18.3.1",
+      "name": "react-is",
+      "version": "18.3.1",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/react-is@18.3.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "fcb2cc5726acd258e302da1888fa9888bf15597cd451d4e1ae6539fa7db40d9bfe6be0a54687af533c3927153e21e879fdcf3bcada13055f46d4588a7cd25d9a"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/react-is@19.3.1",
       "name": "react-is",
       "version": "19.3.1",
@@ -16780,6 +16880,31 @@
         {
           "alg": "SHA-512",
           "content": "c8296d5d7c21c29e36bcca9f840b07e415a0032b1b2cd8307e7dcf0f03693a7fc28307ccf9e31681271921b1db33325834b8b96ca2443885041b847028d88408"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/react-native-webview@14.0.1",
+      "name": "react-native-webview",
+      "version": "14.0.1",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/react-native-webview@14.0.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "94152ebc5938e7d328fb9bd436ac331af9fe23cac3244eb3bceba51b68565ae75e10e25f593b10c0e7ee62746efb6edd8d4217ac44857c2f84404dcf1aef8558"
         }
       ],
       "properties": [
@@ -19180,6 +19305,31 @@
         {
           "alg": "SHA-512",
           "content": "0d7c87bfb26b5660dce5d2a97d51c5849d04be8fc4158dd3aa536df0247ae6e6b7482b08d3d2bf9900c999850e9d9cf7e8600d62a8e9d00a5e44447f98ec64b5"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/three@0.187.0",
+      "name": "three",
+      "version": "0.187.0",
+      "scope": "excluded",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/three@0.187.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "422bbb47e0a687c0acb59b18d6e24e4969d595fa3b66d34b57b985f0996d9372c1dc0b43bbd71166572744a90093c638cfa28ac37e73ed8ed4addee3598f1eb4"
         }
       ],
       "properties": [

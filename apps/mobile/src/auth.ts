@@ -14,6 +14,19 @@ import * as SecureStore from "expo-secure-store";
 import { CLIENT_ID, REDIRECT_URI, type AppConfig } from "./config";
 
 const REFRESH_KEY = "aurea.refreshToken";
+// The subject (an opaque id, not PII) of the account whose refresh token is stored. Lets the app open
+// that account's local designs after a restart without connection; never used to call the API.
+const SUBJECT_KEY = "aurea.subject";
+
+export async function rememberSubject(subject: string): Promise<void> {
+  await SecureStore.setItemAsync(SUBJECT_KEY, subject);
+}
+
+/** The remembered subject, only while its refresh token is still stored (not signed out or revoked). */
+export async function rememberedSubject(): Promise<string | null> {
+  const [token, subject] = await Promise.all([SecureStore.getItemAsync(REFRESH_KEY), SecureStore.getItemAsync(SUBJECT_KEY)]);
+  return token && subject ? subject : null;
+}
 
 /** Authorization Code with PKCE S256 (RFC 7636). Public client: no secret exists to leak. */
 export function buildAuthRequest(): AuthRequest {
@@ -76,6 +89,7 @@ export async function refresh(discovery: DiscoveryDocument): Promise<Session | n
     // TokenError: the IdP answered with an OAuth error (invalid_grant…). Anything else is the network.
     if (err instanceof TokenError) {
       await SecureStore.deleteItemAsync(REFRESH_KEY);
+      await SecureStore.deleteItemAsync(SUBJECT_KEY);
       return null;
     }
     throw err;
@@ -87,6 +101,7 @@ export async function refresh(discovery: DiscoveryDocument): Promise<Session | n
 export async function signOut(discovery: DiscoveryDocument): Promise<void> {
   const refresh = await SecureStore.getItemAsync(REFRESH_KEY);
   await SecureStore.deleteItemAsync(REFRESH_KEY);
+  await SecureStore.deleteItemAsync(SUBJECT_KEY);
   if (refresh && discovery.revocationEndpoint) {
     await revokeAsync({ clientId: CLIENT_ID, token: refresh, tokenTypeHint: TokenTypeHint.RefreshToken }, discovery).catch(() => undefined);
   }
