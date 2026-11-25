@@ -47,4 +47,8 @@ test("license gate rejects copyleft and unknown licenses", async () => {
   assert.deepEqual(violations({ MIT: [{ name: "a", versions: ["1.0.0"] }] }), []);
   assert.deepEqual(violations({ "GPL-3.0": [{ name: "g", versions: ["2.0.0"] }], Unknown: [{ name: "u", versions: ["0.1.0"] }] }),
     ["g@2.0.0: GPL-3.0", "u@0.1.0: Unknown"]);
+  // An exception covers one package under one license only.
+  assert.deepEqual(violations({ "CC-BY-4.0": [{ name: "caniuse-lite", versions: ["1.0.0"] }, { name: "other", versions: ["1.0.0"] }] }),
+    ["other@1.0.0: CC-BY-4.0"]);
+  assert.deepEqual(violations({ "GPL-3.0": [{ name: "caniuse-lite", versions: ["1.0.0"] }] }), ["caniuse-lite@1.0.0: GPL-3.0"]);
 });
