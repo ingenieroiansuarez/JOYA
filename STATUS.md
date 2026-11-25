@@ -15,7 +15,7 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | P0-01 | Repo, STATUS, entorno | HECHO | Este archivo; entorno abajo |
 | P0-02 | Licencias y versiones, lockfile PoC | PARCIAL | `services/geometry/requirements.lock`, tabla de licencias abajo; falta revisión legal de OCCT/casadi |
 | P0-03 | CadQuery anillo y dije, volumen analítico, STEP/STL reimport, fixture DFM pared fina | HECHO (PoC) | `pytest services/geometry` — 29 tests pasan |
-| P0-04 | GLB con material y benchmark Filament vs WebView | PARCIAL | WebView/Three.js medido en Z Flip 7: 60 FPS en las 3 escenas (ver abajo); Filament nativo pendiente de APK |
+| P0-04 | GLB con material y benchmark Filament vs WebView | HECHO (decisión) | Ambos caminos medidos en Z Flip 7; ADR-0003 aceptado: WebView + Three.js. Pendiente revisión óptica humana y gama media |
 | P0-05 | AR anillo/arete | BLOQUEADO | Requiere ≥3 Android físicos y consentimiento de participantes |
 | P0-06 | Adapter mesh IA simulado / proveedor | NO INICIADO | Proveedor real requiere permiso y credenciales |
 | P0-07 | Revisión ADRs, riesgos, go/no-go | PENDIENTE | Tras P0-04/05 |
@@ -33,19 +33,25 @@ aurea-geometry 09_JEWELRY_ENGINE/fixtures/ring.json services/geometry/out   # DF
 ```
 La PoC original (`10_CAD_AND_GEOMETRY/poc/ring_poc.py`) se re-ejecutó: volúmenes idénticos al `report.json`; STL/GLB mismo hash; STEP hash distinto.
 
-## P0-04 — Render en Android (ruta WebView/Three.js)
-Evidencia: `tools/render-bench/results/2026-11-25-zflip7-webview.json` (pegado por ian el 2026-11-25).
-Dispositivo: Samsung Galaxy Z Flip 7 según ian (GPU reportada `Samsung Xclipse 950`, ANGLE sobre Vulkan 1.3), dentro del WebView de la app de Claude, DPR 3 (canvas 984×738 px).
+## P0-04 — Render en Android: WebView/Three.js vs Filament nativo
+Decisión: **ADR-0003 aceptado el 2026-11-25 por ian**: WebView + Three.js como camino principal; Filament nativo como alternativa documentada.
+Dispositivo: Samsung Galaxy Z Flip 7 (SM-F766B, Android 17, GPU Xclipse 950, ANGLE sobre Vulkan), pantalla limitada a 60 Hz. Superficie 984×738 px, MSAA 4× en ambos.
 
-| Escena | Triángulos/frame | Draw calls | FPS medio | p95 ms | > 33 ms |
-|---|---|---|---|---|---|
-| Base (anillo) | 1 008 | 1 | 60,1 | 16,8 | 0 % |
-| Vitrina (anillo + gema con transmisión) | 2 096 | 3 | 60,1 | 16,8 | 0 % |
-| Estrés (25 anillos + gemas) | 52 400 | 75 | 60,1 | 16,7 | 0 % |
+Evidencia:
+- `tools/render-bench/results/2026-11-25-zflip7-webview.json` (banco web 0.1.0, sin rampa).
+- `tools/render-bench/results/2026-11-25-zflip7-webview-threejs-v0.2.json` (banco web 0.2.0, three r160, sin cargar).
+- `tools/render-bench/results/2026-11-25-zflip7-native-filament.json` (APK 0.1.5, Filament 1.79.0, medido cargando).
 
-GLB 18,7 KB parseado en 5,1 ms; primer frame 556 ms desde la carga del script; heap JS 26 MB; batería −1 % en 45 s.
-Lectura: la escena de referencia cumple el NFR (≥ 30 FPS, 60 deseable) con margen; las tres escenas están en el tope de 60 Hz de `requestAnimationFrame`, así que esto es un piso, no el margen real. La v0.2.0 del banco añade una rampa (100 → 2500 anillos) para medir ese margen.
-Pendiente: comparación con Filament nativo (APK), calidad óptica comparada, y medición en un Android de gama media (el Z Flip 7 es gama alta y no representa a todos los clientes).
+| | WebView + Three.js (0.2.0) | Filament nativo (0.1.5) |
+|---|---|---|
+| Base / vitrina / estrés (25 anillos) | 60,1 FPS, p95 16,7 ms | 60,1 FPS, p95 16,7 ms |
+| Máximo sostenido en rampa (p95 ≤ 1,1 × cadencia) | 2500 anillos, 5,24 M triángulos, 7500 draw calls | 400 anillos, 435 k triángulos; a 900 p95 33,3 ms |
+| Primer cuadro | 301 ms | 584 ms |
+| Memoria | 61 MB heap JS (sin GPU ni proceso) | 347 MB PSS del proceso |
+
+Lectura: para la carga real (1 anillo o decenas en vitrina) ambos cumplen el NFR con margen amplio; la web tuvo más techo en esta prueba. Hipótesis no verificada: el ubershader de gltfio y el pipeline HDR limitan a Filament.
+Hallazgo: en Filament 1.79.0, destruir `IBLPrefilterContext` tras crear el IBL liberaba la cámara de la vista (SIGSEGV en `FView::computeCameraInfo`); mitigado manteniendo el contexto vivo (APK 0.1.5).
+Pendiente: revisión visual humana de oro y gema (calidad óptica no medida objetivamente), medición en un Android de gama media, térmica sostenida. Las escenas no son idénticas (la web dibuja la gema aparte y usa clearcoat).
 
 ## Hallazgos del hito 000
 - **STEP no determinista**: la cabecera lleva timestamp y OCCT nombra el PRODUCT con un contador por proceso. `services/geometry` fija el nombre al id de componente y publica `canonicalSha256` (sección DATA). Usarlo en caché y manifiestos de taller.
@@ -75,5 +81,5 @@ Lista completa en `services/geometry/requirements.lock`. No es asesoría legal.
 4. Permiso y presupuesto para evaluar un proveedor de mesh IA (Meshy/Tripo).
 
 ## Siguiente
-- P0-04: correr la rampa v0.2.0 en el Z Flip 7; decidir si Filament nativo sigue siendo necesario para la demo (ADR-0003).
+- P0-04: revisión visual del render por ian y medición en un Android de gama media cuando haya uno.
 - P0-06: adapter de mesh IA simulado con fixture, reparación y escala.
