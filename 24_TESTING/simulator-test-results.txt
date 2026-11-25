@@ -1,0 +1,28 @@
+test_accept_idempotent (test_simulator.TestSim.test_accept_idempotent) ... ok
+test_ai_determinism (test_simulator.TestSim.test_ai_determinism) ... ok
+test_approved_revision_immutable (test_simulator.TestSim.test_approved_revision_immutable) ... ok
+test_certificate_gate (test_simulator.TestSim.test_certificate_gate) ... ok
+test_duplicate_payment (test_simulator.TestSim.test_duplicate_payment) ... ok
+test_end_to_end (test_simulator.TestSim.test_end_to_end) ... ok
+test_feed_outage (test_simulator.TestSim.test_feed_outage) ... ok
+test_invalid_margin (test_simulator.TestSim.test_invalid_margin) ... ok
+test_invalid_volume (test_simulator.TestSim.test_invalid_volume) ... ok
+test_logistics_delay (test_simulator.TestSim.test_logistics_delay) ... ok
+test_overpayment (test_simulator.TestSim.test_overpayment) ... ok
+test_price (test_simulator.TestSim.test_price) ... ok
+test_quote_expired (test_simulator.TestSim.test_quote_expired) ... ok
+test_release_gate (test_simulator.TestSim.test_release_gate) ... ok
+test_reservation_payload (test_simulator.TestSim.test_reservation_payload) ... ok
+test_reserve_unique (test_simulator.TestSim.test_reserve_unique) ... ok
+test_sync_conflict (test_simulator.TestSim.test_sync_conflict) ... ok
+test_sync_duplicate (test_simulator.TestSim.test_sync_duplicate) ... ok
+test_sync_invalid (test_simulator.TestSim.test_sync_invalid) ... ok
+test_unverified_payment (test_simulator.TestSim.test_unverified_payment) ... ok
+test_volume (test_simulator.TestSim.test_volume) ... ok
+test_wrong_currency (test_simulator.TestSim.test_wrong_currency) ... ok
+test_wrong_revision (test_simulator.TestSim.test_wrong_revision) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 0.011s
+
+OK

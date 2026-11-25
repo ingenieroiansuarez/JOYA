@@ -1,0 +1,26 @@
+﻿id,requirement,contract,scenario,expected,status
+Q01,REQ-05-13,reserveInventory,Two concurrent transactions same unique gem,"Exactly one success, other 409; no negative balance",PLANNED_PRODUCT_TEST
+Q02,REQ-05-08,createPaymentIntent,Duplicate verified webhook and wrong amount,One ledger effect; mismatch rejected/review,PLANNED_PRODUCT_TEST
+Q03,REQ-03-18,createRevision,Edit accepted revision,"New revision, old quote unchanged",PLANNED_PRODUCT_TEST
+Q04,REQ-03-15,validateDesign,Invalid BREP or open mesh,BLOCK; cannot release,PLANNED_PRODUCT_TEST
+Q05,REQ-04-06,proposeOperation,LLM incompatible parameter,422; original revision preserved,PLANNED_PRODUCT_TEST
+Q06,REQ-08-16,syncPush,"Offline edit, kill app, reconnect","Durable operation, no duplicate",PLANNED_PRODUCT_TEST
+Q07,REQ-02-08,syncPush,Two edits same component,Conflict branch preserved,PLANNED_PRODUCT_TEST
+Q08,REQ-06-21,financeReport,Worker reads financial endpoint,403 and audit,PLANNED_PRODUCT_TEST
+Q09,REQ-03-21,releaseWorkOrder,No deposit or human approval,422; no production release,PLANNED_PRODUCT_TEST
+Q10,REQ-06-11,recordMovement,Mass discrepancy,Blocked reconciliation / supervisor review,PLANNED_PRODUCT_TEST
+Q11,REQ-06-16,issueCertificate,QA missing,No certificate,PLANNED_PRODUCT_TEST
+Q12,REQ-08-25,restore,Backup restore drill,Document actual RPO/RTO,PLANNED_PRODUCT_TEST
+Q13,REQ-04-22,createAiJob,Attachment prompt injection,No unauthorized tool calls or disclosure,PLANNED_PRODUCT_TEST
+Q14,REQ-04-20,createAiJob,Quota exhaustion and fallback,No unapproved spend,PLANNED_PRODUCT_TEST
+Q15,REQ-07-21,UI,TalkBack + keyboard + reduced motion,Core flows accessible,PLANNED_PRODUCT_TEST
+Q16,REQ-08-05,geometry,Android scene benchmark,>=30 FPS p95 frame time target 33ms; report memory,PLANNED_PRODUCT_TEST
+Q17,REQ-03-08,export,STEP/STL roundtrip with mm,Tolerance within workshop threshold,PLANNED_PRODUCT_TEST
+Q18,REQ-04-15,AR,Calibration missing,No confirmed size,PLANNED_PRODUCT_TEST
+Q19,REQ-05-05,acceptQuote,Expired quote,409/422 no order,PLANNED_PRODUCT_TEST
+Q20,REQ-08-20,deploy,Demo credentials in production,Startup fails closed,PLANNED_PRODUCT_TEST
+Q21,REQ-06-22,recordMovement,Same actor second approval,Denied,PLANNED_PRODUCT_TEST
+Q22,REQ-05-18,checkout,Disabled market,No purchase,PLANNED_PRODUCT_TEST
+Q23,REQ-03-07,families,160 family fixtures,Every family validated separately,PLANNED_PRODUCT_TEST
+Q24,REQ-08-32,SBOM,Unknown asset license,Publication blocked,PLANNED_PRODUCT_TEST
+Q25,REQ-07-26,E2E,Demo mobile to panel,Project/quote/revision sync matches,PLANNED_PRODUCT_TEST

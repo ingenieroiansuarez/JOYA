@@ -1,0 +1,534 @@
+[
+  {
+    "name": "create_ring",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "innerDiameter": {
+          "type": "number",
+          "minimum": 14,
+          "maximum": 24
+        },
+        "bandWidth": {
+          "type": "number",
+          "minimum": 1.5,
+          "maximum": 12
+        },
+        "radialThickness": {
+          "type": "number",
+          "minimum": 0.8,
+          "maximum": 4
+        },
+        "materialId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "innerDiameter",
+        "bandWidth",
+        "radialThickness",
+        "materialId"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "project.edit",
+    "executionMode": "PREVIEW",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "create_setting",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "familyId": {
+          "type": "string"
+        },
+        "anchorId": {
+          "type": "string"
+        },
+        "stoneId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "familyId",
+        "anchorId",
+        "stoneId"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "project.edit",
+    "executionMode": "PREVIEW",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "place_gemstone",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "componentId": {
+          "type": "string"
+        },
+        "stoneId": {
+          "type": "string"
+        },
+        "anchorId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "componentId",
+        "stoneId",
+        "anchorId"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "project.edit",
+    "executionMode": "PREVIEW",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "modify_parameter",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "componentId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "componentId",
+        "name",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "project.edit",
+    "executionMode": "PREVIEW",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "change_material",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "componentId": {
+          "type": "string"
+        },
+        "materialId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "componentId",
+        "materialId"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "project.edit",
+    "executionMode": "PREVIEW",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "boolean_union",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "componentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "componentIds"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "project.edit",
+    "executionMode": "PREVIEW",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "engrave_surface",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "componentId": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "depthMm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "componentId",
+        "text",
+        "depthMm"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "project.edit",
+    "executionMode": "PREVIEW",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "pattern_on_curve",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "componentId": {
+          "type": "string"
+        },
+        "curveId": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "componentId",
+        "curveId",
+        "count"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "project.edit",
+    "executionMode": "PREVIEW",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "calculate_volume",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "revisionId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "revisionId"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "project.read",
+    "executionMode": "READ",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "validate_design",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "revisionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "rulesVersion": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "revisionId",
+        "rulesVersion"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "project.validate",
+    "executionMode": "READ",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "estimate_price",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "revisionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "currency": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "revisionId",
+        "currency"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "pricing.estimate",
+    "executionMode": "READ",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "render_preview",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "revisionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "quality": {
+          "type": "string",
+          "enum": [
+            "INTERACTIVE",
+            "LUXURY",
+            "PHOTOREAL"
+          ]
+        }
+      },
+      "required": [
+        "revisionId",
+        "quality"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "project.read",
+    "executionMode": "READ",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "catalog_search",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "query",
+        "currency"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "catalog.read",
+    "executionMode": "READ",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "check_inventory",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "itemId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "itemId"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "catalog.read",
+    "executionMode": "READ",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "request_quote_draft",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "revisionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "currency": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "revisionId",
+        "currency"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "quote.request",
+    "executionMode": "CONFIRM",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "business_report",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "metric": {
+          "type": "string",
+          "enum": [
+            "SALES",
+            "MARGIN",
+            "LEAD_TIME",
+            "STOCK_AGE"
+          ]
+        },
+        "dateFrom": {
+          "type": "string"
+        },
+        "dateTo": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "metric",
+        "dateFrom",
+        "dateTo",
+        "locationId"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "finance.read",
+    "executionMode": "READ",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  },
+  {
+    "name": "create_revision",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "baseRevisionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "previewJobId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "baseRevisionId",
+        "previewJobId"
+      ],
+      "additionalProperties": false
+    },
+    "permission": "project.edit",
+    "executionMode": "CONFIRM",
+    "contextRequired": [
+      "actorId",
+      "projectId",
+      "baseRevisionId",
+      "correlationId"
+    ],
+    "note": "Validate target ownership, semantic constraints and budget in server; do not trust arguments from LLM."
+  }
+]

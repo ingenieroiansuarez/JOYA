@@ -1,0 +1,12 @@
+﻿id,name,depends_on,deliverables,exit_gate,status
+000,Feasibility,none,CAD ring/pendant BREP and mesh roundtrip; Android Filament vs WebView; AR SDK comparison; mesh AI; license inventory,Evidence on real devices or explicit blocker; volume/tolerance benchmarks; ADRs with selection,NOT_STARTED
+100,Foundation,000,"Monorepo, Node/Expo/Next/Python pinned; compose; schema migrations; identity; tokens; CI; baseline contracts","Clean bootstrap, test and login; isolated env; no committed secrets",NOT_STARTED
+200,Boutique,100,"Guest navigation, catalog, product detail, profile, favorite, demo seed",APK dev browses catalog; accessible empty/error states,NOT_STARTED
+300,Jewelry Engine,"100,200",Core ring and pendant families; preview and CAD regeneration; revisions; offline sync; export,Parameter update real geometry; rejected invalid input; restart offline; STEP/STL roundtrip,NOT_STARTED
+400,AURA,300,"Gateway, tool allowlist, deterministic adapter, real optional providers, concepts/mesh jobs",Prompt → proposal → authorized revision; failure/quota tests,NOT_STARTED
+500,Commercial slice,"300,400","Pricing, quote, acceptance, order, simulated deposit, inventory and panel","E2E from Android to web, snapshot, duplicate payment and stock tests",NOT_STARTED
+600,Demo Edition,500,"Signed APK, synthetic dataset, presenter script, optional offline fixture, panel",Install physical device; full demo rehearsal; no production credentials,NOT_STARTED
+700,Professional operations,"500,600","CRM, workshop, inventory/custody, procurement, QA, finance and staff UI","Real transactional operations in staging; mass ledger, permission tests",NOT_STARTED
+800,Commercial MVP,700,"Enable approved market, real payment/insurance/fiscal adapters, AR ring/earring, POS, warranty, security","Pilot acceptance, legal/market validation, backup restore, payment reconciliation, physical QA",NOT_STARTED
+900,Professional,800,"Expand 160 families, surfaces/sculpture, collaboration, marketing, private service, suppliers, gifting, loyalty","Every family verified, advanced flows tested, approved licenses",NOT_STARTED
+1000,Complete vision,900,"Multi-market expansion, automation, equipment, BI, future simulation exploration",Market-by-market go-live; operational acceptance; measured SLOs,NOT_STARTED

@@ -1,0 +1,481 @@
+{
+  "Design": {
+    "initial": "DRAFT",
+    "transitions": [
+      {
+        "from": "DRAFT",
+        "to": "REVIEW",
+        "action": "submit",
+        "guard": "owner and valid revision"
+      },
+      {
+        "from": "REVIEW",
+        "to": "APPROVED",
+        "action": "approve",
+        "guard": "professional DFM and measurements"
+      },
+      {
+        "from": "REVIEW",
+        "to": "DRAFT",
+        "action": "return",
+        "guard": "reason"
+      },
+      {
+        "from": "APPROVED",
+        "to": "SUPERSEDED",
+        "action": "replace",
+        "guard": "new approved revision only"
+      }
+    ]
+  },
+  "Quote": {
+    "initial": "DRAFT",
+    "transitions": [
+      {
+        "from": "DRAFT",
+        "to": "ISSUED",
+        "action": "issue",
+        "guard": "pricing snapshot and authorized seller"
+      },
+      {
+        "from": "ISSUED",
+        "to": "ACCEPTED",
+        "action": "accept",
+        "guard": "owner and not expired and hash matches"
+      },
+      {
+        "from": "ISSUED",
+        "to": "EXPIRED",
+        "action": "expire",
+        "guard": "clock>=expiresAt"
+      },
+      {
+        "from": "ISSUED",
+        "to": "REJECTED",
+        "action": "reject",
+        "guard": "owner"
+      },
+      {
+        "from": "ISSUED",
+        "to": "SUPERSEDED",
+        "action": "replace",
+        "guard": "new revision issued"
+      }
+    ]
+  },
+  "Payment": {
+    "initial": "PENDING",
+    "transitions": [
+      {
+        "from": "PENDING",
+        "to": "PROCESSING",
+        "action": "submit",
+        "guard": "provider intent"
+      },
+      {
+        "from": "PENDING",
+        "to": "FAILED",
+        "action": "fail",
+        "guard": "provider confirmed"
+      },
+      {
+        "from": "PROCESSING",
+        "to": "CONFIRMED",
+        "action": "confirm",
+        "guard": "verified amount currency"
+      },
+      {
+        "from": "PROCESSING",
+        "to": "FAILED",
+        "action": "fail",
+        "guard": "provider verified"
+      },
+      {
+        "from": "CONFIRMED",
+        "to": "PARTIAL_REFUND",
+        "action": "refund",
+        "guard": "authorized"
+      },
+      {
+        "from": "CONFIRMED",
+        "to": "REFUNDED",
+        "action": "refund",
+        "guard": "authorized full"
+      },
+      {
+        "from": "PARTIAL_REFUND",
+        "to": "REFUNDED",
+        "action": "refund",
+        "guard": "remaining amount"
+      },
+      {
+        "from": "CONFIRMED",
+        "to": "DISPUTED",
+        "action": "dispute",
+        "guard": "verified provider"
+      }
+    ]
+  },
+  "Reservation": {
+    "initial": "HELD",
+    "transitions": [
+      {
+        "from": "HELD",
+        "to": "ALLOCATED",
+        "action": "allocate",
+        "guard": "valid order and sufficient stock"
+      },
+      {
+        "from": "HELD",
+        "to": "RELEASED",
+        "action": "expire_or_cancel",
+        "guard": "under lot lock"
+      },
+      {
+        "from": "ALLOCATED",
+        "to": "CONSUMED",
+        "action": "consume",
+        "guard": "work order and evidence"
+      },
+      {
+        "from": "ALLOCATED",
+        "to": "RELEASED",
+        "action": "release",
+        "guard": "authorized unused quantity"
+      }
+    ]
+  },
+  "WorkOrder": {
+    "initial": "PLANNED",
+    "transitions": [
+      {
+        "from": "PLANNED",
+        "to": "RELEASED",
+        "action": "release",
+        "guard": "DFM + human approval + confirmed advance + assigned stock"
+      },
+      {
+        "from": "RELEASED",
+        "to": "IN_PROGRESS",
+        "action": "start",
+        "guard": "assigned operator"
+      },
+      {
+        "from": "IN_PROGRESS",
+        "to": "BLOCKED",
+        "action": "block",
+        "guard": "reason"
+      },
+      {
+        "from": "BLOCKED",
+        "to": "IN_PROGRESS",
+        "action": "resume",
+        "guard": "dependency resolved"
+      },
+      {
+        "from": "IN_PROGRESS",
+        "to": "QA",
+        "action": "submit",
+        "guard": "required tasks done"
+      },
+      {
+        "from": "QA",
+        "to": "IN_PROGRESS",
+        "action": "rework",
+        "guard": "nonconformity"
+      },
+      {
+        "from": "QA",
+        "to": "DONE",
+        "action": "approve",
+        "guard": "inspector"
+      },
+      {
+        "from": "PLANNED",
+        "to": "CANCELLED",
+        "action": "cancel",
+        "guard": "authorized"
+      }
+    ]
+  },
+  "Shipment": {
+    "initial": "PREPARED",
+    "transitions": [
+      {
+        "from": "PREPARED",
+        "to": "DISPATCHED",
+        "action": "ship",
+        "guard": "eligible insured and balance satisfied"
+      },
+      {
+        "from": "DISPATCHED",
+        "to": "DELIVERED",
+        "action": "deliver",
+        "guard": "proof"
+      },
+      {
+        "from": "DISPATCHED",
+        "to": "INCIDENT",
+        "action": "incident",
+        "guard": "tracking evidence"
+      },
+      {
+        "from": "INCIDENT",
+        "to": "DELIVERED",
+        "action": "resolve",
+        "guard": "proof"
+      },
+      {
+        "from": "INCIDENT",
+        "to": "RETURNED",
+        "action": "return",
+        "guard": "record receipt"
+      }
+    ]
+  },
+  "Certificate": {
+    "initial": "DRAFT",
+    "transitions": [
+      {
+        "from": "DRAFT",
+        "to": "ISSUED",
+        "action": "issue",
+        "guard": "QA approved and evidence"
+      },
+      {
+        "from": "ISSUED",
+        "to": "REVOKED",
+        "action": "revoke",
+        "guard": "authorized reason"
+      },
+      {
+        "from": "ISSUED",
+        "to": "SUPERSEDED",
+        "action": "replace",
+        "guard": "new certificate"
+      }
+    ]
+  },
+  "Job": {
+    "initial": "QUEUED",
+    "transitions": [
+      {
+        "from": "QUEUED",
+        "to": "RUNNING",
+        "action": "claim",
+        "guard": "worker lease"
+      },
+      {
+        "from": "RUNNING",
+        "to": "SUCCEEDED",
+        "action": "complete",
+        "guard": "matching input hash"
+      },
+      {
+        "from": "RUNNING",
+        "to": "FAILED",
+        "action": "fail",
+        "guard": "reason"
+      },
+      {
+        "from": "RUNNING",
+        "to": "QUEUED",
+        "action": "retry",
+        "guard": "bounded attempts"
+      },
+      {
+        "from": "QUEUED",
+        "to": "CANCELLED",
+        "action": "cancel",
+        "guard": "owner"
+      },
+      {
+        "from": "RUNNING",
+        "to": "CANCELLED",
+        "action": "cancel",
+        "guard": "ignore late result"
+      }
+    ]
+  },
+  "Custody": {
+    "initial": "REQUESTED",
+    "transitions": [
+      {
+        "from": "REQUESTED",
+        "to": "IN_TRANSIT",
+        "action": "handoff",
+        "guard": "sender and approval if required"
+      },
+      {
+        "from": "IN_TRANSIT",
+        "to": "RECEIVED",
+        "action": "receive",
+        "guard": "recipient and measured evidence"
+      },
+      {
+        "from": "IN_TRANSIT",
+        "to": "DISCREPANCY",
+        "action": "flag",
+        "guard": "weight or condition mismatch"
+      },
+      {
+        "from": "DISCREPANCY",
+        "to": "RECEIVED",
+        "action": "resolve",
+        "guard": "authorized adjustment"
+      }
+    ]
+  },
+  "Service": {
+    "initial": "REQUESTED",
+    "transitions": [
+      {
+        "from": "REQUESTED",
+        "to": "RECEIVED",
+        "action": "intake",
+        "guard": "chain of custody"
+      },
+      {
+        "from": "RECEIVED",
+        "to": "INSPECTED",
+        "action": "inspect",
+        "guard": "measure and evidence"
+      },
+      {
+        "from": "INSPECTED",
+        "to": "QUOTED",
+        "action": "quote",
+        "guard": "approved assessment"
+      },
+      {
+        "from": "QUOTED",
+        "to": "AUTHORIZED",
+        "action": "accept",
+        "guard": "client"
+      },
+      {
+        "from": "AUTHORIZED",
+        "to": "IN_PROGRESS",
+        "action": "start",
+        "guard": "conditions met"
+      },
+      {
+        "from": "IN_PROGRESS",
+        "to": "COMPLETED",
+        "action": "complete",
+        "guard": "quality"
+      },
+      {
+        "from": "COMPLETED",
+        "to": "RETURNED",
+        "action": "return",
+        "guard": "receipt"
+      }
+    ]
+  },
+  "Order": {
+    "initial": "PENDING_PAYMENT",
+    "transitions": [
+      {
+        "from": "PENDING_PAYMENT",
+        "to": "CONFIRMED",
+        "action": "confirm",
+        "guard": "payment plan threshold"
+      },
+      {
+        "from": "CONFIRMED",
+        "to": "FULFILLING",
+        "action": "fulfill",
+        "guard": "stock or approved production"
+      },
+      {
+        "from": "FULFILLING",
+        "to": "READY",
+        "action": "ready",
+        "guard": "quality or picked"
+      },
+      {
+        "from": "READY",
+        "to": "DELIVERED",
+        "action": "deliver",
+        "guard": "proof"
+      },
+      {
+        "from": "PENDING_PAYMENT",
+        "to": "CANCELLED",
+        "action": "cancel",
+        "guard": "policy"
+      },
+      {
+        "from": "CONFIRMED",
+        "to": "CANCELLED",
+        "action": "cancel",
+        "guard": "policy and compensation"
+      }
+    ]
+  },
+  "Warranty": {
+    "initial": "ACTIVE",
+    "transitions": [
+      {
+        "from": "ACTIVE",
+        "to": "CLAIMED",
+        "action": "claim",
+        "guard": "owner and evidence"
+      },
+      {
+        "from": "CLAIMED",
+        "to": "IN_REVIEW",
+        "action": "review",
+        "guard": "assigned"
+      },
+      {
+        "from": "IN_REVIEW",
+        "to": "RESOLVED",
+        "action": "resolve",
+        "guard": "documented outcome"
+      },
+      {
+        "from": "ACTIVE",
+        "to": "EXPIRED",
+        "action": "expire",
+        "guard": "terms"
+      }
+    ]
+  },
+  "PurchaseOrder": {
+    "initial": "DRAFT",
+    "transitions": [
+      {
+        "from": "DRAFT",
+        "to": "ISSUED",
+        "action": "issue",
+        "guard": "buyer approval"
+      },
+      {
+        "from": "ISSUED",
+        "to": "PARTIAL",
+        "action": "receive",
+        "guard": "valid quantity"
+      },
+      {
+        "from": "PARTIAL",
+        "to": "RECEIVED",
+        "action": "receive",
+        "guard": "remaining"
+      },
+      {
+        "from": "ISSUED",
+        "to": "RECEIVED",
+        "action": "receive",
+        "guard": "full"
+      },
+      {
+        "from": "ISSUED",
+        "to": "CANCELLED",
+        "action": "cancel",
+        "guard": "authorized"
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+**/.env.local
+**/.env
+**/__pycache__/
+*.keystore
+*.jks
+*.tfstate*
+.terraform/
+node_modules/

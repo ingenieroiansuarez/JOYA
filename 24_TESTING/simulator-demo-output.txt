@@ -1,0 +1,5 @@
+SIMULATION ONLY
+{'simulated': True, 'baseRevision': '9f72afe7ff9b8f6e507bf8662ed62ea63e07532ea87d0793669ef6dc5ad690fa', 'concepts': [{'name': 'Classic', 'description': 'Aro y gema central'}, {'name': 'Halo', 'description': 'Montura halo'}, {'name': 'Minimal', 'description': 'Aro sencillo'}], 'inputHash': 'af32c0a462887456167e01946bb48b0f2e75b2b1bfd16720c75052888caf8ad8'}
+{'revision': '9f72afe7ff9b8f6e507bf8662ed62ea63e07532ea87d0793669ef6dc5ad690fa', 'total': '1770.46', 'currency': 'USD', 'expires': '2026-11-28T05:48:47.998623+00:00', 'state': 'ISSUED', 'hash': 'bcfdafcb63ca27e213c1b8a9ae3d7e6d73219b9858b75151dde6fd35d19f3c2d'}
+{'id': 'order-demo', 'quoteHash': 'bcfdafcb63ca27e213c1b8a9ae3d7e6d73219b9858b75151dde6fd35d19f3c2d', 'revision': '9f72afe7ff9b8f6e507bf8662ed62ea63e07532ea87d0793669ef6dc5ad690fa', 'total': '1770.46', 'currency': 'USD'}
+{'id': 'CERT-DEMO-01', 'simulated': True, 'revision': '9f72afe7ff9b8f6e507bf8662ed62ea63e07532ea87d0793669ef6dc5ad690fa'}

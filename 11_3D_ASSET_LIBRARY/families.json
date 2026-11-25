@@ -1,0 +1,6402 @@
+[
+  {
+    "id": "ring.classic",
+    "name": "Clásico",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "300",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.02",
+    "name": "Comfort fit",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "300",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.03",
+    "name": "Plano",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.04",
+    "name": "Media caña",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.05",
+    "name": "Cóncavo",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.06",
+    "name": "Convexo",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.07",
+    "name": "Split shank",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.08",
+    "name": "Trenzado",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.09",
+    "name": "Sello oval",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.10",
+    "name": "Sello rectangular",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.11",
+    "name": "Sello redondo",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.12",
+    "name": "Catedral",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.13",
+    "name": "Bypass",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.14",
+    "name": "Eternity",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.15",
+    "name": "Media eternidad",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.16",
+    "name": "Chevron",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.17",
+    "name": "Ondulado",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.18",
+    "name": "Doble aro",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.19",
+    "name": "Abierto",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ring.20",
+    "name": "Asimétrico",
+    "category": "ring",
+    "version": "0.1.0",
+    "parameters": {
+      "innerDiameter": {
+        "min": 14.0,
+        "max": 24.0,
+        "default": 18.0,
+        "unit": "mm"
+      },
+      "bandWidth": {
+        "min": 1.5,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "radialThickness": {
+        "min": 0.8,
+        "max": 4.0,
+        "default": 1.8,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "revolve/sweep profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.01",
+    "name": "Garras 4",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "300",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.02",
+    "name": "Garras 6",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "300",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.03",
+    "name": "Garras 3",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.04",
+    "name": "Garras dobles",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.05",
+    "name": "Bisel completo",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.06",
+    "name": "Bisel parcial",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.07",
+    "name": "Halo redondo",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.08",
+    "name": "Halo oval",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.09",
+    "name": "Halo cuadrado",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.10",
+    "name": "Pavé micro",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.11",
+    "name": "Pavé canal",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.12",
+    "name": "Canal recto",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.13",
+    "name": "Tensión conceptual",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.14",
+    "name": "Barra",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.15",
+    "name": "Cluster",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.16",
+    "name": "Cesta",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.17",
+    "name": "Catedral",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.18",
+    "name": "Ilusión",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.19",
+    "name": "Gypsy",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "setting.20",
+    "name": "Montura trellis",
+    "category": "setting",
+    "version": "0.1.0",
+    "parameters": {
+      "seatWidth": {
+        "min": 2.0,
+        "max": 15.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "seatLength": {
+        "min": 2.0,
+        "max": 18.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "wall": {
+        "min": 0.6,
+        "max": 3.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "gem",
+    "construction": "seat clearance and prong sweep",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.01",
+    "name": "Brillante redondo",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "300",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.02",
+    "name": "Oval",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "300",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.03",
+    "name": "Pera",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.04",
+    "name": "Marquise",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.05",
+    "name": "Princesa",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.06",
+    "name": "Esmeralda",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.07",
+    "name": "Asscher",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.08",
+    "name": "Cushion",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.09",
+    "name": "Radiante",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.10",
+    "name": "Corazón",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.11",
+    "name": "Baguette",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.12",
+    "name": "Trillion",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.13",
+    "name": "Cabujón redondo",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.14",
+    "name": "Cabujón oval",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "gem.15",
+    "name": "Rose cut",
+    "category": "gem",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 1.0,
+        "max": 20.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 1.0,
+        "max": 25.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "depth": {
+        "min": 0.5,
+        "max": 15.0,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "setting",
+    "construction": "faceted mesh / crown pavilion",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.01",
+    "name": "Cubana",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.02",
+    "name": "Gourmet",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.03",
+    "name": "Figaro",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.04",
+    "name": "Rolo",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.05",
+    "name": "Forzada",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.06",
+    "name": "Box",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.07",
+    "name": "Veneciana",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.08",
+    "name": "Franco",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.09",
+    "name": "Byzantine",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.10",
+    "name": "Cuerda",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.11",
+    "name": "Snake",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.12",
+    "name": "Espiga",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.13",
+    "name": "Marine",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.14",
+    "name": "Paperclip",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "chain.15",
+    "name": "Singapore",
+    "category": "chain",
+    "version": "0.1.0",
+    "parameters": {
+      "linkWidth": {
+        "min": 1.0,
+        "max": 12.0,
+        "default": 4.0,
+        "unit": "mm"
+      },
+      "wireDiameter": {
+        "min": 0.5,
+        "max": 4.0,
+        "default": 1.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 100.0,
+        "max": 1000.0,
+        "default": 450.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep link and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.01",
+    "name": "Disco",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "300",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.02",
+    "name": "Óvalo",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "300",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.03",
+    "name": "Rectángulo",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.04",
+    "name": "Corazón",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.05",
+    "name": "Cruz",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.06",
+    "name": "Infinito",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.07",
+    "name": "Medalla",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.08",
+    "name": "Escudo",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.09",
+    "name": "Inicial",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.10",
+    "name": "Nombre",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.11",
+    "name": "Barra",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.12",
+    "name": "Luna",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.13",
+    "name": "Sol",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.14",
+    "name": "Estrella",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.15",
+    "name": "Gota",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.16",
+    "name": "Marco",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.17",
+    "name": "Relicario",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.18",
+    "name": "Placa militar",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.19",
+    "name": "Triángulo",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "pendant.20",
+    "name": "Flor",
+    "category": "pendant",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 5.0,
+        "max": 60.0,
+        "default": 20.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 5.0,
+        "max": 70.0,
+        "default": 25.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "bail",
+    "construction": "extrude/revolve vector profile",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.01",
+    "name": "Stud",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.02",
+    "name": "Halo stud",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.03",
+    "name": "Solitaire stud",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.04",
+    "name": "Hoop redondo",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.05",
+    "name": "Hoop oval",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.06",
+    "name": "Huggie",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.07",
+    "name": "Chandelier",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.08",
+    "name": "Gota",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.09",
+    "name": "Cluster",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.10",
+    "name": "Ear cuff",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.11",
+    "name": "Barra",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.12",
+    "name": "Threader",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.13",
+    "name": "Crawler",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.14",
+    "name": "Disco",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "earring.15",
+    "name": "Geométrico",
+    "category": "earring",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 45.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 75.0,
+        "default": 15.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 5.0,
+        "default": 1.5,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "mirror pair / connector",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "bracelet.01",
+    "name": "Bangle redondo",
+    "category": "bracelet",
+    "version": "0.1.0",
+    "parameters": {
+      "innerCircumference": {
+        "min": 120.0,
+        "max": 240.0,
+        "default": 170.0,
+        "unit": "mm"
+      },
+      "width": {
+        "min": 1.5,
+        "max": 30.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "bracelet.02",
+    "name": "Bangle oval",
+    "category": "bracelet",
+    "version": "0.1.0",
+    "parameters": {
+      "innerCircumference": {
+        "min": 120.0,
+        "max": 240.0,
+        "default": 170.0,
+        "unit": "mm"
+      },
+      "width": {
+        "min": 1.5,
+        "max": 30.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "bracelet.03",
+    "name": "Cuff",
+    "category": "bracelet",
+    "version": "0.1.0",
+    "parameters": {
+      "innerCircumference": {
+        "min": 120.0,
+        "max": 240.0,
+        "default": 170.0,
+        "unit": "mm"
+      },
+      "width": {
+        "min": 1.5,
+        "max": 30.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "bracelet.04",
+    "name": "Tennis",
+    "category": "bracelet",
+    "version": "0.1.0",
+    "parameters": {
+      "innerCircumference": {
+        "min": 120.0,
+        "max": 240.0,
+        "default": 170.0,
+        "unit": "mm"
+      },
+      "width": {
+        "min": 1.5,
+        "max": 30.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "bracelet.05",
+    "name": "Eslabones",
+    "category": "bracelet",
+    "version": "0.1.0",
+    "parameters": {
+      "innerCircumference": {
+        "min": 120.0,
+        "max": 240.0,
+        "default": 170.0,
+        "unit": "mm"
+      },
+      "width": {
+        "min": 1.5,
+        "max": 30.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "bracelet.06",
+    "name": "Cordón",
+    "category": "bracelet",
+    "version": "0.1.0",
+    "parameters": {
+      "innerCircumference": {
+        "min": 120.0,
+        "max": 240.0,
+        "default": 170.0,
+        "unit": "mm"
+      },
+      "width": {
+        "min": 1.5,
+        "max": 30.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "bracelet.07",
+    "name": "ID plate",
+    "category": "bracelet",
+    "version": "0.1.0",
+    "parameters": {
+      "innerCircumference": {
+        "min": 120.0,
+        "max": 240.0,
+        "default": 170.0,
+        "unit": "mm"
+      },
+      "width": {
+        "min": 1.5,
+        "max": 30.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "bracelet.08",
+    "name": "Charm",
+    "category": "bracelet",
+    "version": "0.1.0",
+    "parameters": {
+      "innerCircumference": {
+        "min": 120.0,
+        "max": 240.0,
+        "default": 170.0,
+        "unit": "mm"
+      },
+      "width": {
+        "min": 1.5,
+        "max": 30.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "bracelet.09",
+    "name": "Trenzada",
+    "category": "bracelet",
+    "version": "0.1.0",
+    "parameters": {
+      "innerCircumference": {
+        "min": 120.0,
+        "max": 240.0,
+        "default": 170.0,
+        "unit": "mm"
+      },
+      "width": {
+        "min": 1.5,
+        "max": 30.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "bracelet.10",
+    "name": "Beaded",
+    "category": "bracelet",
+    "version": "0.1.0",
+    "parameters": {
+      "innerCircumference": {
+        "min": 120.0,
+        "max": 240.0,
+        "default": 170.0,
+        "unit": "mm"
+      },
+      "width": {
+        "min": 1.5,
+        "max": 30.0,
+        "default": 6.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.8,
+        "max": 6.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "clasp",
+    "construction": "sweep and pattern",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.01",
+    "name": "Lobster",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.02",
+    "name": "Spring ring",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.03",
+    "name": "Toggle",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.04",
+    "name": "Box clasp",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.05",
+    "name": "Magnetic conceptual",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.06",
+    "name": "Hook",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.07",
+    "name": "S hook",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.08",
+    "name": "Foldover",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.09",
+    "name": "Barrel",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.10",
+    "name": "Slide",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.11",
+    "name": "Butterfly back",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.12",
+    "name": "Screw back",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.13",
+    "name": "Lever back",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.14",
+    "name": "Bail simple",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "clasp.15",
+    "name": "Bail articulado",
+    "category": "clasp",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 20.0,
+        "default": 5.0,
+        "unit": "mm"
+      },
+      "length": {
+        "min": 3.0,
+        "max": 30.0,
+        "default": 8.0,
+        "unit": "mm"
+      },
+      "thickness": {
+        "min": 0.6,
+        "max": 4.0,
+        "default": 1.2,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "connector",
+    "construction": "assembly and motion clearance",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.01",
+    "name": "Dragón",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.02",
+    "name": "León",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.03",
+    "name": "Fénix",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.04",
+    "name": "Águila",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.05",
+    "name": "Lobo",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.06",
+    "name": "Tigre",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.07",
+    "name": "Serpiente",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.08",
+    "name": "Caballo",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.09",
+    "name": "Mariposa",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.10",
+    "name": "Rosa",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.11",
+    "name": "Loto",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.12",
+    "name": "Árbol de vida",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.13",
+    "name": "Corona",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.14",
+    "name": "Calavera",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.15",
+    "name": "Alas",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.16",
+    "name": "Pluma",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.17",
+    "name": "Escudo heráldico",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.18",
+    "name": "Monograma",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.19",
+    "name": "Ojo",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.20",
+    "name": "Estrella",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.21",
+    "name": "Luna",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.22",
+    "name": "Sol",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.23",
+    "name": "Ancla",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.24",
+    "name": "Brújula",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.25",
+    "name": "Montaña",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.26",
+    "name": "Ola",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.27",
+    "name": "Huella abstracta",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.28",
+    "name": "Flor geométrica",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.29",
+    "name": "Mandala",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  },
+  {
+    "id": "ornament.30",
+    "name": "Nudo celta",
+    "category": "ornament",
+    "version": "0.1.0",
+    "parameters": {
+      "width": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "height": {
+        "min": 2.0,
+        "max": 60.0,
+        "default": 12.0,
+        "unit": "mm"
+      },
+      "reliefDepth": {
+        "min": 0.3,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    "anchorType": "surface",
+    "construction": "vector relief or licensed sculpt mesh",
+    "targetMilestone": "900",
+    "status": "SPEC_ONLY",
+    "license": "PENDING_ORIGINAL_OR_LICENSED",
+    "validation": [
+      "finite range",
+      "default and boundary fixtures",
+      "positive volume if solid",
+      "anchor compatibility",
+      "DFM by process",
+      "unit roundtrip"
+    ],
+    "notes": "Rangos de exploración, no mínimos de fabricación; refinar parámetros específicos y anclajes en PoC."
+  }
+]

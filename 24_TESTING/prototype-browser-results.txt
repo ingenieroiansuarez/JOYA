@@ -1,0 +1,1 @@
+PASS: Chromium headless 390x844; render, metal edit, save, request quote, issue, acceptance, simulated payment, release, QA, simulated certificate; zero JS page errors. HTML loaded via set_content because file URL blocked by test environment; localStorage persistence not covered.

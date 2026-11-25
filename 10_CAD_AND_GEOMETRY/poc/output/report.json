@@ -1,0 +1,44 @@
+{
+  "cadquery": "2.8.0",
+  "trimesh": "4.11.1",
+  "results": [
+    {
+      "name": "ring_classic",
+      "volumeExpectedMm3": 447.8654486957611,
+      "volumeCadMm3": 447.86544869576096,
+      "volumeStepMm3": 447.8654486957711,
+      "volumeStlMm3": 447.67985951165883,
+      "stlWatertight": true,
+      "units": {
+        "step": "mm",
+        "stl": "mm by convention",
+        "glb": "m"
+      },
+      "hashes": {
+        "ring_classic.step": "5a1f6db844ac5f9ee404fc732e1c9dc4b76d98d821c64bc7af7b100633acd61b",
+        "ring_classic.stl": "dc77217b3e5a242b9d3f25ee795263a9be22dc411bb5f2e083a8ef65583dcaef",
+        "ring_classic.glb": "9f30ad7e85186b703c00b351d98b678e03cd1b67a00e710143c25d7317e79d02"
+      },
+      "status": "POC_ONLY_NOT_APPROVED_FOR_MANUFACTURING"
+    },
+    {
+      "name": "pendant_disc",
+      "volumeExpectedMm3": 628.3185307179587,
+      "volumeCadMm3": 628.3185307179585,
+      "volumeStepMm3": 628.3185307179585,
+      "volumeStlMm3": 628.0581575545312,
+      "stlWatertight": true,
+      "units": {
+        "step": "mm",
+        "stl": "mm by convention",
+        "glb": "m"
+      },
+      "hashes": {
+        "pendant_disc.step": "8326bf51c31a5dc19501331104cf40d06396e4497e4805b9426f8cf4d780a14e",
+        "pendant_disc.stl": "9038b8a288c136c84a398612eb00d4ea7d411dbe807df830d2756db6b25021c2",
+        "pendant_disc.glb": "5827a3dfbae9b065826a9cf8fc038697815ddc47e758602284d9625b083b5753"
+      },
+      "status": "POC_ONLY_NOT_APPROVED_FOR_MANUFACTURING"
+    }
+  ]
+}

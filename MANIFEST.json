@@ -1,0 +1,464 @@
+{
+  "project": "AUREA_ENGINEERING_HANDOFF_V1",
+  "version": "1.0.0",
+  "date": "2026-11-25",
+  "counts": {
+    "requirements": 184,
+    "screens": 410,
+    "families": 160,
+    "api_operations": 50,
+    "state_machines": 13,
+    "ai_tools": 17,
+    "simulator_tests_passed": 23,
+    "cad_poc_models": 2
+  },
+  "verification": {
+    "json_schema_fixture": "PASS",
+    "api_refs_and_screen_ids": "PASS",
+    "javascript_syntax": "PASS",
+    "browser_smoke": "PASS (set_content; localStorage persistence not tested)",
+    "simulator": "23 passed",
+    "cad": "2 valid solids, STEP roundtrip, STL watertight; not physical validation",
+    "full_openapi_lint": "NOT_RUN",
+    "sql_database_migration": "NOT_RUN",
+    "android_apk": "NOT_BUILT",
+    "providers": "NOT_INTEGRATED"
+  },
+  "files": [
+    {
+      "path": ".github/workflows/handoff-check.yml",
+      "bytes": 385,
+      "sha256": "a50485f51febc5530095402f5a8e817626d24c5685d81044ad828b21bd578a9f"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 92,
+      "sha256": "8916d928a89f4764458fc583be7098595f4ef4d5d0902a3f58121719fddaf54c"
+    },
+    {
+      "path": "01_PRODUCT/PRODUCT.md",
+      "bytes": 2252,
+      "sha256": "171aedc5a1cc33eb9ae11a096f77b454ef12bc390c6627696b48748a384ab5d5"
+    },
+    {
+      "path": "02_REQUIREMENTS/README.md",
+      "bytes": 19119,
+      "sha256": "110ee855c9740c543f69895b41a4cf5a1af81dd604905349a3b8ab9189280ae0"
+    },
+    {
+      "path": "02_REQUIREMENTS/decisiones.json",
+      "bytes": 78774,
+      "sha256": "fdc14060e2ab0f0ee475df57a141150d26b782437cd4c770d55a080e99a6cec2"
+    },
+    {
+      "path": "02_REQUIREMENTS/traceability.csv",
+      "bytes": 45133,
+      "sha256": "1e99c8efdbbaf0adfc7d2b2bafab7de20741abb038dc141b346f0429d0c643bd"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0001.md",
+      "bytes": 412,
+      "sha256": "a3c0d3212113b2c2327f0af9e4615647d2d3ccb748fd512b8952079cd61e1352"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0002.md",
+      "bytes": 412,
+      "sha256": "5da579a5bfe795ea8d6a41a93d2477b5466e99a4c3fc6541789ddbd877afb6cc"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0003.md",
+      "bytes": 422,
+      "sha256": "4ab6ede6bb985d04a1042187bfcc1b1649f56833d024e272724fcb60b5ced39e"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0004.md",
+      "bytes": 433,
+      "sha256": "51820c701cdc9e0fce5bb3601966f6b97b1edf4ad556d9afb11eaf158e2468d8"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0005.md",
+      "bytes": 398,
+      "sha256": "9eb87bd966ff1197e7c99292f395121893c0dd1181125f0747cc8d8e2571adb0"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0006.md",
+      "bytes": 383,
+      "sha256": "f32825378dbf1e14c3d63d570ece2b3ac14c187a5753318fb3805fd96bb827cd"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0007.md",
+      "bytes": 390,
+      "sha256": "c77157dbb281bd9ac2f085eda09e0119a7c1f7d2fbedea9244d55f3f4ee6ae72"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0008.md",
+      "bytes": 388,
+      "sha256": "873b43530d1585b5ece470f649e6860042cd4e4b03d954191fa4a9444ac83c65"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0009.md",
+      "bytes": 402,
+      "sha256": "ff2995ae39806766a4c87e5d3e6647298aabfa620b71a8a9554ae92a63d5fd84"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0010.md",
+      "bytes": 414,
+      "sha256": "94382b370885fd6ecb2e4dde4502f1394bbbaa200d889450e12482750852ba22"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0011.md",
+      "bytes": 410,
+      "sha256": "db26bbfc47f58ec2f641aacc2f8b2ff25614e56fe7fecc9d19ae8cbab83412c8"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0012.md",
+      "bytes": 371,
+      "sha256": "9c01c05e37fb82aa6e60f6b592791a06e8b8341fef387e260136fccaf76f5c46"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0013.md",
+      "bytes": 415,
+      "sha256": "c8e7fa52cf12659be0adb076bad830ce014a6eea97423794e0a316b431418ac3"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0014.md",
+      "bytes": 395,
+      "sha256": "2668fde1caa4f84c3c5d1d8de8a14a35171eac015c92c029485008269761cf86"
+    },
+    {
+      "path": "03_ARCHITECTURE/ADR/0015.md",
+      "bytes": 401,
+      "sha256": "68e030f611f20f14fbe8460b0987b535997e8e052622f74987ff53626428903e"
+    },
+    {
+      "path": "03_ARCHITECTURE/ARCHITECTURE.md",
+      "bytes": 3528,
+      "sha256": "87f4310acbec371f86f37837c2110ed06d9d45965c7068f2693e8ee5eab5e23d"
+    },
+    {
+      "path": "04_TECH_STACK/STACK.md",
+      "bytes": 1929,
+      "sha256": "0da1126b2ea6fc14989ac12c0b18fa2963bb6153472986baa167ce867cc3eee1"
+    },
+    {
+      "path": "05_DATABASE/DATA_MODEL.md",
+      "bytes": 4439,
+      "sha256": "d70007e7807e7c2991aa99981f4e33266a82739a603cb6435a0354078403ce92"
+    },
+    {
+      "path": "05_DATABASE/core_reference.sql",
+      "bytes": 4817,
+      "sha256": "0399ad6bc411f9c29709b918f482e2bfb3b2faa9c94cfc2cffb74139da4a73c2"
+    },
+    {
+      "path": "06_API_CONTRACTS/README.md",
+      "bytes": 5859,
+      "sha256": "e9cb3e10cf888592a621195d7d4c736c275ddc57069bd73618977b931273d973"
+    },
+    {
+      "path": "06_API_CONTRACTS/openapi.yaml",
+      "bytes": 121070,
+      "sha256": "6054ff897f028493432d91fd7a5c7f47bd3536dc0224d3af6c07d2abd2f9b9d3"
+    },
+    {
+      "path": "07_DOMAIN_MODELS/INVARIANTS.md",
+      "bytes": 1235,
+      "sha256": "79db20cd7c09c3eac62cbd0575b524643c4ba68850db36f8717ac1089ae65bee"
+    },
+    {
+      "path": "07_DOMAIN_MODELS/event.schema.json",
+      "bytes": 909,
+      "sha256": "d0a9675d1e45811044ba35101d250a97c6c24a40d4664761c6811326b4495a9a"
+    },
+    {
+      "path": "08_STATE_MACHINES/README.md",
+      "bytes": 3746,
+      "sha256": "8beca50f1d606d01afbb07da99be3d05ea87ef7fe79d07435816cab0f7428ea9"
+    },
+    {
+      "path": "08_STATE_MACHINES/machines.json",
+      "bytes": 10367,
+      "sha256": "c77900651e3fa8a15fdd90f1626018b7382f47b37d501165639c4cdc0779fb08"
+    },
+    {
+      "path": "09_JEWELRY_ENGINE/ENGINE.md",
+      "bytes": 3088,
+      "sha256": "d15e64da921e079eb6eb137e21d474950826d0e3c2d66927f812897544380e22"
+    },
+    {
+      "path": "09_JEWELRY_ENGINE/design.schema.json",
+      "bytes": 3598,
+      "sha256": "95f454f674102e1c5b78fff4f42d2816fb817e3acebfb6862d0ba7dcb38888a3"
+    },
+    {
+      "path": "09_JEWELRY_ENGINE/fixtures/ring.json",
+      "bytes": 779,
+      "sha256": "29a22eca8581eab1aa5df24f226d7bf6eac564cfd096f67dcaeb431007f4a7fc"
+    },
+    {
+      "path": "10_CAD_AND_GEOMETRY/DFM.md",
+      "bytes": 2219,
+      "sha256": "c44c2b054987a99dbfa0e286153bbcc894cc3b622cc97c4e2d917cc7c05bff17"
+    },
+    {
+      "path": "10_CAD_AND_GEOMETRY/poc/README.md",
+      "bytes": 830,
+      "sha256": "779488eee6009c4b93c433d87b9c77ef49ea632e052110a6a698231d61fc9a92"
+    },
+    {
+      "path": "10_CAD_AND_GEOMETRY/poc/output/pendant_disc.glb",
+      "bytes": 10084,
+      "sha256": "5827a3dfbae9b065826a9cf8fc038697815ddc47e758602284d9625b083b5753"
+    },
+    {
+      "path": "10_CAD_AND_GEOMETRY/poc/output/pendant_disc.step",
+      "bytes": 5750,
+      "sha256": "8326bf51c31a5dc19501331104cf40d06396e4497e4805b9426f8cf4d780a14e"
+    },
+    {
+      "path": "10_CAD_AND_GEOMETRY/poc/output/pendant_disc.stl",
+      "bytes": 25084,
+      "sha256": "9038b8a288c136c84a398612eb00d4ea7d411dbe807df830d2756db6b25021c2"
+    },
+    {
+      "path": "10_CAD_AND_GEOMETRY/poc/output/report.json",
+      "bytes": 1503,
+      "sha256": "2103deee8acb4ab15faabc00653318ac9910fdcff39e139eccede23560890dc6"
+    },
+    {
+      "path": "10_CAD_AND_GEOMETRY/poc/output/ring_classic.glb",
+      "bytes": 19208,
+      "sha256": "9f30ad7e85186b703c00b351d98b678e03cd1b67a00e710143c25d7317e79d02"
+    },
+    {
+      "path": "10_CAD_AND_GEOMETRY/poc/output/ring_classic.step",
+      "bytes": 9571,
+      "sha256": "5a1f6db844ac5f9ee404fc732e1c9dc4b76d98d821c64bc7af7b100633acd61b"
+    },
+    {
+      "path": "10_CAD_AND_GEOMETRY/poc/output/ring_classic.stl",
+      "bytes": 50484,
+      "sha256": "dc77217b3e5a242b9d3f25ee795263a9be22dc411bb5f2e083a8ef65583dcaef"
+    },
+    {
+      "path": "10_CAD_AND_GEOMETRY/poc/ring_poc.py",
+      "bytes": 1915,
+      "sha256": "1b06cec9c3d905f15a45bd2e1a6e91fdf5d8c4c05062b2d1ffddda6ceddf9f2c"
+    },
+    {
+      "path": "11_3D_ASSET_LIBRARY/PIPELINE.md",
+      "bytes": 1226,
+      "sha256": "e581d76fe1426d3ba37f828605702ab31d043b4a692e69212f39cefe1df8b215"
+    },
+    {
+      "path": "11_3D_ASSET_LIBRARY/families.csv",
+      "bytes": 51798,
+      "sha256": "c785f876ab7fe0358f1e0c11ec68043e97c3e6b87b9d3cf46ea0c31bc1584e43"
+    },
+    {
+      "path": "11_3D_ASSET_LIBRARY/families.json",
+      "bytes": 156981,
+      "sha256": "8abfbcc2a5db4dd705586e497a505eddc25c385b3c7ecb4ba03b61bcf92c88ed"
+    },
+    {
+      "path": "12_AI_ORCHESTRATION/AI_ARCHITECTURE.md",
+      "bytes": 3491,
+      "sha256": "e49da1bc3aca5c87577d20d1304afdeb2cdfa67ed1e34fecaad3cea287dcd561"
+    },
+    {
+      "path": "13_AI_PROMPTS_AND_TOOLS/SYSTEM_PROMPTS.md",
+      "bytes": 2040,
+      "sha256": "f24288b9a93c838199c5a2c326157c64845dbb9aa70f69cd63ad8528e32b2289"
+    },
+    {
+      "path": "13_AI_PROMPTS_AND_TOOLS/tools.json",
+      "bytes": 12245,
+      "sha256": "0102926243ef963a9e75b49f021c31dd5cf8fa1fffcd579f05fb15d2e97e9b4c"
+    },
+    {
+      "path": "14_AUGMENTED_REALITY/AR_SMART_FIT.md",
+      "bytes": 1912,
+      "sha256": "2970ba6dacbf10aba46387522f2b44944aba1ad7b6bbcb9bb8437e59d2419c3e"
+    },
+    {
+      "path": "15_COMMERCE_AND_PAYMENTS/COMMERCE.md",
+      "bytes": 3049,
+      "sha256": "9f7df8b8e847839f974c5179a29e1aa52ac6fce8fe93c2a26281c2a36bd9c8a8"
+    },
+    {
+      "path": "16_CRM_AND_ERP/ERP.md",
+      "bytes": 3018,
+      "sha256": "afd9ba4223e2dbab55b6a701afdf37815acd310d6c56c255aca5aeab8547ded8"
+    },
+    {
+      "path": "17_MANUFACTURING/WORKSHOP.md",
+      "bytes": 2112,
+      "sha256": "4b8252e75e01c0101da076e7b4dee8b27cecb975f2574f745f9764462890de2a"
+    },
+    {
+      "path": "18_DESIGN_SYSTEM/DESIGN.md",
+      "bytes": 2608,
+      "sha256": "6032edc4d0f3e90c1ffeb47fd93e84710802bfcf95c063b5af8fdb783418facb"
+    },
+    {
+      "path": "18_DESIGN_SYSTEM/tokens.json",
+      "bytes": 1074,
+      "sha256": "51e49b54300470a547d5b0f52666ab2f940ec7ec136be6493d718d8dd6c207c6"
+    },
+    {
+      "path": "19_SCREEN_INVENTORY/README.md",
+      "bytes": 692,
+      "sha256": "2acf62878af99ee3a83f4f65568f65e87c2b97bf2be6461ed93f6a420ca743b2"
+    },
+    {
+      "path": "19_SCREEN_INVENTORY/screens.csv",
+      "bytes": 149111,
+      "sha256": "a4406af8708d4bdd03cf89ba9ae57361ed2e3036109526c224c18348560189eb"
+    },
+    {
+      "path": "19_SCREEN_INVENTORY/screens.json",
+      "bytes": 243714,
+      "sha256": "1a7023fe15d0c1e441b4fb825c79592517d6b247b60c1caeb4ff6188188f48c7"
+    },
+    {
+      "path": "20_UX_FLOWS/FLOWS.md",
+      "bytes": 3050,
+      "sha256": "cca0c4e5b89fc94005a3993946456af27c15be324b666601eb00433cff597fc8"
+    },
+    {
+      "path": "20_UX_FLOWS/prototype/index.html",
+      "bytes": 16434,
+      "sha256": "1723bcc5ffa00e4d54a65ca4bcbf2c3a5064e15585179d94edb1e437a8a6d3bd"
+    },
+    {
+      "path": "21_SECURITY/SECURITY.md",
+      "bytes": 2315,
+      "sha256": "ddf876241e027b809b2a7de16ecfa9097fa45b17e724f5585ada5589419ac40f"
+    },
+    {
+      "path": "21_SECURITY/roles.reference.json",
+      "bytes": 2000,
+      "sha256": "172ed6c046562bf8587b1e861d9f91569da4a5450dda60c543df1494183a84bd"
+    },
+    {
+      "path": "22_OFFLINE_AND_SYNC/SYNC.md",
+      "bytes": 1931,
+      "sha256": "9d748d1405b26de0f24e55a3a005e1817825ebc3ad88844f248430abb99015a7"
+    },
+    {
+      "path": "23_SIMULATORS/README.md",
+      "bytes": 690,
+      "sha256": "27a95b782a51c54d035ffcd8b452508e33b22b8f8e73e2aabd885d01a3353870"
+    },
+    {
+      "path": "23_SIMULATORS/simulator.py",
+      "bytes": 6478,
+      "sha256": "de8e4adb8334f7de679d30ef971b213916360a795b8ba919824accfc03cc9bd3"
+    },
+    {
+      "path": "23_SIMULATORS/test_simulator.py",
+      "bytes": 3441,
+      "sha256": "14af684ecc938b1673930ed280d1d22022c7fd35b2a1e9ba08dbe47c7c8e760f"
+    },
+    {
+      "path": "24_TESTING/README.md",
+      "bytes": 1033,
+      "sha256": "3744d548764664de9e9b246a3c8190fa57d3333198a5b64e43b5aa527f24d690"
+    },
+    {
+      "path": "24_TESTING/cad-poc-output.txt",
+      "bytes": 1363,
+      "sha256": "03c06fdd0364e58bedd36c9bf604dfe0a6b394281309717febf25890c29dd462"
+    },
+    {
+      "path": "24_TESTING/prototype-browser-results.txt",
+      "bytes": 281,
+      "sha256": "f3d8892a67da84864146589a42ff0569bd1f472d07ba45fd29d7fd1bad1b9cdb"
+    },
+    {
+      "path": "24_TESTING/simulator-demo-output.txt",
+      "bytes": 979,
+      "sha256": "6ab00e48076b5ebf7de7893bdae3cd02a41ce0a8346a3789fb5245c280ce86d7"
+    },
+    {
+      "path": "24_TESTING/simulator-test-results.txt",
+      "bytes": 1751,
+      "sha256": "74880b681075cc9dfa286d711afaed470d48c1e3d0594f9ab91b341fe7214094"
+    },
+    {
+      "path": "24_TESTING/test_matrix.csv",
+      "bytes": 2592,
+      "sha256": "7327c7eb3e7d4498992e4bc26d7f33b9eec1190182493092a204be32c7600dd6"
+    },
+    {
+      "path": "25_INFRASTRUCTURE/.env.example",
+      "bytes": 203,
+      "sha256": "86f70a7dad3443cef652432fe422b7a8e1be32d405533a8c96611ef519016381"
+    },
+    {
+      "path": "25_INFRASTRUCTURE/INFRA.md",
+      "bytes": 2546,
+      "sha256": "0ef6d94b932f26b93ae874fad6f89fd5295087a85e6a53135649dc36b62ee534"
+    },
+    {
+      "path": "25_INFRASTRUCTURE/compose.reference.yml",
+      "bytes": 687,
+      "sha256": "219275cac8724adfe1913a6e6270f0f238dfbb19b26e4b724dea7a0a3a3d5bef"
+    },
+    {
+      "path": "26_CI_CD/README.md",
+      "bytes": 859,
+      "sha256": "cadb9bf00e62a8e36d29a8e1f1f4550cbd797b7f04a68144f746b41491cd061b"
+    },
+    {
+      "path": "27_IMPLEMENTATION_ROADMAP/ROADMAP.md",
+      "bytes": 3785,
+      "sha256": "b1e1d454072c30331c16c9771624531dd5a30844baf91e6203dba6188e3f79b7"
+    },
+    {
+      "path": "27_IMPLEMENTATION_ROADMAP/milestones.csv",
+      "bytes": 2302,
+      "sha256": "9604c6a208d2c8d4591db99e22055ea93b29436871026830f293e25e690d9765"
+    },
+    {
+      "path": "28_ANDROID_APK/BUILD.md",
+      "bytes": 1458,
+      "sha256": "a381a5291b46cb8cc317e926fedfb2bc2a250ad30462a7bce1d765af9744d5af"
+    },
+    {
+      "path": "28_ANDROID_APK/eas.reference.json",
+      "bytes": 500,
+      "sha256": "ad45c00228a0a8ca69dc0bbad2ad81e70f60f3e8c801d2ed9aacc3daa52eb7dc"
+    },
+    {
+      "path": "29_DEMO_SCENARIO/DEMO.md",
+      "bytes": 1203,
+      "sha256": "44bd108d96f23e51ac1298fad0a534375545ddc456c588f9e7099e3f5a325e72"
+    },
+    {
+      "path": "30_CLAUDE_EXECUTION_PROMPTS/00_FIRST_PROMPT.md",
+      "bytes": 1825,
+      "sha256": "21bd89dd4c01c15f499c510d15017540b8d2a0e06cdd7d6aac0051d4ff1dcf8e"
+    },
+    {
+      "path": "30_CLAUDE_EXECUTION_PROMPTS/NEXT_PHASES.md",
+      "bytes": 1081,
+      "sha256": "17a34e845ce65580cabb4ecacc38af0241b0591de3dee8eec6cacec67f3553c9"
+    },
+    {
+      "path": "CLAUDE.md",
+      "bytes": 2305,
+      "sha256": "9eb6aae2205d5c22b6da2c0a55b056af640e0efd3b2d68d8d9f42ee2672d661b"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1548,
+      "sha256": "c646227998259bdd9db1a0037ef6ac122f53eb15e79724592d0954ec4a6b44ed"
+    },
+    {
+      "path": "START_HERE.md",
+      "bytes": 1508,
+      "sha256": "bebe160f6cbe59b06141f4dfea769e23f3e2edbe7bbe043c508ae2d5be587a5e"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+-- PostgreSQL reference DDL, demo vertical slice; review before applying.
+CREATE SCHEMA IF NOT EXISTS aurea;
+SET search_path TO aurea,public;
+CREATE TABLE customer(id uuid PRIMARY KEY, subject text UNIQUE NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE location(id uuid PRIMARY KEY, name text NOT NULL, kind text NOT NULL CHECK(kind IN ('STORE','WORKSHOP','VAULT','WAREHOUSE')));
+CREATE TABLE project(id uuid PRIMARY KEY, owner_id uuid NOT NULL REFERENCES customer, title text NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE revision(id uuid PRIMARY KEY, project_id uuid NOT NULL REFERENCES project, parent_id uuid, number int NOT NULL CHECK(number>0), document jsonb NOT NULL, digest char(64) NOT NULL, UNIQUE(project_id,number), UNIQUE(project_id,id), FOREIGN KEY(project_id,parent_id) REFERENCES revision(project_id,id));
+CREATE TABLE branch(project_id uuid NOT NULL REFERENCES project, name text NOT NULL, head_id uuid NOT NULL, PRIMARY KEY(project_id,name), FOREIGN KEY(project_id,head_id) REFERENCES revision(project_id,id));
+CREATE TABLE dfm_report(id uuid PRIMARY KEY, revision_id uuid NOT NULL REFERENCES revision, rules_version text NOT NULL, state text NOT NULL CHECK(state IN ('PASS','WARN','FAIL')), report jsonb NOT NULL, created_at timestamptz DEFAULT now());
+CREATE TABLE quote(id uuid PRIMARY KEY, revision_id uuid NOT NULL REFERENCES revision, currency char(3) NOT NULL, amount numeric(20,6) NOT NULL CHECK(amount>=0), snapshot jsonb NOT NULL, expires_at timestamptz NOT NULL, state text NOT NULL CHECK(state IN ('DRAFT','ISSUED','ACCEPTED','EXPIRED','REJECTED','SUPERSEDED')), accepted_at timestamptz, CHECK(state <> 'ACCEPTED' OR accepted_at IS NOT NULL));
+CREATE TABLE sales_order(id uuid PRIMARY KEY, quote_id uuid UNIQUE NOT NULL REFERENCES quote, created_at timestamptz DEFAULT now());
+CREATE TABLE payment(id uuid PRIMARY KEY, order_id uuid NOT NULL REFERENCES sales_order, provider text NOT NULL, provider_id text NOT NULL, currency char(3) NOT NULL, amount numeric(20,6) NOT NULL CHECK(amount>0), state text NOT NULL CHECK(state IN ('PENDING','CONFIRMED','FAILED','REFUNDED')), UNIQUE(provider,provider_id));
+CREATE TABLE payment_event(provider text NOT NULL, event_id text NOT NULL, payment_id uuid REFERENCES payment, received_at timestamptz DEFAULT now(), PRIMARY KEY(provider,event_id));
+CREATE TABLE stock_lot(id uuid PRIMARY KEY, location_id uuid NOT NULL REFERENCES location, item_key text NOT NULL, unit text NOT NULL CHECK(unit IN ('g','ct','ea')), on_hand numeric(20,6) NOT NULL CHECK(on_hand>=0), reserved numeric(20,6) NOT NULL DEFAULT 0 CHECK(reserved>=0 AND reserved<=on_hand));
+CREATE TABLE reservation(id uuid PRIMARY KEY, lot_id uuid NOT NULL REFERENCES stock_lot, order_id uuid NOT NULL REFERENCES sales_order, quantity numeric(20,6) NOT NULL CHECK(quantity>0), expires_at timestamptz NOT NULL, state text NOT NULL CHECK(state IN ('HELD','ALLOCATED','RELEASED','CONSUMED')));
+CREATE TABLE stock_movement(id uuid PRIMARY KEY, lot_id uuid NOT NULL REFERENCES stock_lot, quantity_delta numeric(20,6) NOT NULL CHECK(quantity_delta<>0), actor text NOT NULL, reason text NOT NULL, recorded_at timestamptz DEFAULT now());
+CREATE TABLE work_order(id uuid PRIMARY KEY, order_id uuid NOT NULL REFERENCES sales_order, revision_id uuid NOT NULL REFERENCES revision, state text NOT NULL CHECK(state IN ('PLANNED','RELEASED','IN_PROGRESS','BLOCKED','QA','DONE','CANCELLED')), approved_by text, CHECK(state NOT IN ('RELEASED','IN_PROGRESS','QA','DONE') OR approved_by IS NOT NULL));
+CREATE TABLE work_task(id uuid PRIMARY KEY, work_order_id uuid NOT NULL REFERENCES work_order, name text NOT NULL, state text NOT NULL, assigned_to text, planned_start timestamptz, planned_end timestamptz, CHECK(planned_end>=planned_start));
+CREATE TABLE audit_event(id uuid PRIMARY KEY, actor text NOT NULL, action text NOT NULL, resource_id uuid NOT NULL, correlation_id uuid NOT NULL, recorded_at timestamptz NOT NULL DEFAULT now(), details jsonb NOT NULL DEFAULT '{}');
+CREATE TABLE outbox(id uuid PRIMARY KEY, aggregate_id uuid NOT NULL, type text NOT NULL, version int NOT NULL, payload jsonb NOT NULL, created_at timestamptz DEFAULT now(), published_at timestamptz);
+CREATE INDEX outbox_pending ON outbox(created_at) WHERE published_at IS NULL;
+CREATE TABLE inbox(consumer text NOT NULL,event_id uuid NOT NULL,processed_at timestamptz DEFAULT now(),PRIMARY KEY(consumer,event_id));
+CREATE TABLE idempotency(actor text NOT NULL, scope text NOT NULL, key text NOT NULL, request_digest char(64) NOT NULL, response jsonb, created_at timestamptz DEFAULT now(),PRIMARY KEY(actor,scope,key));
+-- Application-level transaction rules and grants are mandatory. Protect append-only tables and immutable revisions with restricted DB roles/triggers in production.

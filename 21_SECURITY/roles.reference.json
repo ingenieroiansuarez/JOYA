@@ -1,0 +1,99 @@
+{
+  "default": "DENY",
+  "note": "Illustrative grants; additional policies and permissions from screen/action specifications must be defined. Ownership/location/project/assignment constraints apply; no wildcard.",
+  "roles": {
+    "guest": [
+      "catalog.read",
+      "public.verify"
+    ],
+    "customer": [
+      "catalog.read",
+      "project.create",
+      "project.read",
+      "project.edit",
+      "project.share",
+      "project.comment",
+      "ai.generate",
+      "pricing.estimate",
+      "quote.request",
+      "quote.read",
+      "quote.accept",
+      "order.read",
+      "order.create",
+      "payment.create",
+      "payment.read",
+      "sync.read",
+      "sync.write"
+    ],
+    "advisor": [
+      "crm.read",
+      "crm.write",
+      "quote.read",
+      "quote.issue",
+      "project.read",
+      "order.read"
+    ],
+    "designer": [
+      "project.read",
+      "project.edit",
+      "project.validate",
+      "job.read",
+      "job.cancel"
+    ],
+    "manager": [
+      "workshop.read",
+      "workshop.plan",
+      "workshop.release",
+      "project.read"
+    ],
+    "worker": [
+      "workshop.read",
+      "workshop.execute",
+      "document.write"
+    ],
+    "stockkeeper": [
+      "inventory.read",
+      "inventory.reserve",
+      "inventory.release",
+      "inventory.move",
+      "custody.transfer"
+    ],
+    "inspector": [
+      "quality.inspect",
+      "quality.certify",
+      "quality.revoke"
+    ],
+    "finance": [
+      "finance.read",
+      "payment.read",
+      "payment.refund"
+    ],
+    "buyer": [
+      "procurement.write"
+    ],
+    "cashier": [
+      "order.create",
+      "payment.create",
+      "order.read"
+    ],
+    "supplier": [
+      "supplier.assigned"
+    ],
+    "marketing": [
+      "marketing.write",
+      "ai.generate"
+    ],
+    "admin": [
+      "identity.admin",
+      "organization.admin",
+      "catalog.write"
+    ],
+    "owner": [
+      "finance.read",
+      "organization.admin"
+    ],
+    "auditor": [
+      "audit.read"
+    ]
+  }
+}
