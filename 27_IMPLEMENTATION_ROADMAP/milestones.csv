@@ -1,7 +1,7 @@
 ﻿id,name,depends_on,deliverables,exit_gate,status
 000,Feasibility,none,CAD ring/pendant BREP and mesh roundtrip; Android Filament vs WebView; AR SDK comparison; mesh AI; license inventory,Evidence on real devices or explicit blocker; volume/tolerance benchmarks; ADRs with selection,GO_CONDITIONAL
 100,Foundation,000,"Monorepo, Node/Expo/Next/Python pinned; compose; schema migrations; identity; tokens; CI; baseline contracts","Clean bootstrap, test and login; isolated env; no committed secrets",GATE_MET
-200,Boutique,100,"Guest navigation, catalog, product detail, profile, favorite, demo seed",APK dev browses catalog; accessible empty/error states,IN_PROGRESS
+200,Boutique,100,"Guest navigation, catalog, product detail, profile, favorite, demo seed",APK dev browses catalog; accessible empty/error states,GATE_MET
 300,Jewelry Engine,"100,200",Core ring and pendant families; preview and CAD regeneration; revisions; offline sync; export,Parameter update real geometry; rejected invalid input; restart offline; STEP/STL roundtrip,NOT_STARTED
 400,AURA,300,"Gateway, tool allowlist, deterministic adapter, real optional providers, concepts/mesh jobs",Prompt → proposal → authorized revision; failure/quota tests,NOT_STARTED
 500,Commercial slice,"300,400","Pricing, quote, acceptance, order, simulated deposit, inventory and panel","E2E from Android to web, snapshot, duplicate payment and stock tests",NOT_STARTED
