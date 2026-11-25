@@ -1,0 +1,194 @@
+{
+    "tool": "aurea-render-bench-android/0.1.5",
+    "path": "native-filament",
+    "filament": "1.79.0",
+    "measuredAt": "2026-11-25T08:51:33.616094Z",
+    "asset": {
+        "file": "showcase.glb (ring.classic 18/4/1.8 mm + gema, tools/render-bench/scene)",
+        "bytes": 40452,
+        "sha256": "ea02f0df02532af7ce35fffa1643879c8113cb25e5f7640477821ccb60738f15",
+        "triangles": 1088,
+        "ringTriangles": 1008,
+        "gemTriangles": 80,
+        "parseMs": 1.2,
+        "instancedLoadMs": 274.8,
+        "instancedCount": 2500
+    },
+    "firstFrameMs": 584,
+    "device": {
+        "manufacturer": "samsung",
+        "model": "SM-F766B",
+        "device": "b7s",
+        "hardware": "s5e9955",
+        "socManufacturer": "Samsung",
+        "socModel": "s5e9955",
+        "android": "17",
+        "sdkInt": 37,
+        "filamentBackend": "OPENGL",
+        "refreshRateHz": 60,
+        "supportedRefreshRatesHz": [
+            10,
+            24,
+            30,
+            48,
+            60
+        ],
+        "surfacePx": [
+            984,
+            738
+        ],
+        "msaaSamples": 4,
+        "cores": 10,
+        "totalMemGB": 10.9
+    },
+    "memory": {
+        "totalPssMB": 347,
+        "nativeHeapMB": 120.7
+    },
+    "battery": {
+        "start": {
+            "level": 0.91,
+            "charging": true,
+            "temperatureC": 36.9
+        },
+        "end": {
+            "level": 0.92,
+            "charging": true,
+            "temperatureC": 36.7
+        },
+        "seconds": 71
+    },
+    "thermal": {
+        "start": {
+            "status": 1,
+            "headroom": 0.81
+        },
+        "end": {
+            "status": 1,
+            "headroom": 0.79
+        }
+    },
+    "sceneSeconds": 15,
+    "warmupSeconds": 2,
+    "displayCadenceMs": 16.65,
+    "cameraRecoveries": 0,
+    "results": [
+        {
+            "scene": "base",
+            "rings": 1,
+            "frames": 781,
+            "fpsMean": 60.1,
+            "p50ms": 16.65,
+            "p95ms": 16.73,
+            "p99ms": 16.81,
+            "over33msPct": 0,
+            "skippedFrames": 0,
+            "cpuSubmitP50ms": 0.5,
+            "cpuSubmitP95ms": 0.97,
+            "renderables": 1,
+            "trianglesPerFrame": 1008
+        },
+        {
+            "scene": "vitrina",
+            "rings": 1,
+            "frames": 781,
+            "fpsMean": 60.1,
+            "p50ms": 16.64,
+            "p95ms": 16.75,
+            "p99ms": 16.86,
+            "over33msPct": 0,
+            "skippedFrames": 0,
+            "cpuSubmitP50ms": 0.64,
+            "cpuSubmitP95ms": 1.29,
+            "renderables": 2,
+            "trianglesPerFrame": 1088
+        },
+        {
+            "scene": "estres",
+            "rings": 25,
+            "frames": 781,
+            "fpsMean": 60.1,
+            "p50ms": 16.64,
+            "p95ms": 16.73,
+            "p99ms": 16.85,
+            "over33msPct": 0,
+            "skippedFrames": 0,
+            "cpuSubmitP50ms": 1.97,
+            "cpuSubmitP95ms": 6.07,
+            "renderables": 50,
+            "trianglesPerFrame": 27200
+        }
+    ],
+    "ramp": {
+        "secondsPerStep": 6,
+        "criterion": "p95 <= 1.1 x display cadence",
+        "maxSustainedRings": 400,
+        "steps": [
+            {
+                "scene": "limite",
+                "rings": 100,
+                "frames": 301,
+                "fpsMean": 60.1,
+                "p50ms": 16.64,
+                "p95ms": 16.73,
+                "p99ms": 16.78,
+                "over33msPct": 0,
+                "skippedFrames": 0,
+                "cpuSubmitP50ms": 2.43,
+                "cpuSubmitP95ms": 5.5,
+                "renderables": 200,
+                "trianglesPerFrame": 108800
+            },
+            {
+                "scene": "limite",
+                "rings": 225,
+                "frames": 301,
+                "fpsMean": 60.1,
+                "p50ms": 16.64,
+                "p95ms": 16.73,
+                "p99ms": 16.86,
+                "over33msPct": 0,
+                "skippedFrames": 0,
+                "cpuSubmitP50ms": 2.62,
+                "cpuSubmitP95ms": 5.6,
+                "renderables": 450,
+                "trianglesPerFrame": 244800
+            },
+            {
+                "scene": "limite",
+                "rings": 400,
+                "frames": 301,
+                "fpsMean": 60.1,
+                "p50ms": 16.64,
+                "p95ms": 16.74,
+                "p99ms": 16.82,
+                "over33msPct": 0,
+                "skippedFrames": 0,
+                "cpuSubmitP50ms": 2.85,
+                "cpuSubmitP95ms": 5.95,
+                "renderables": 800,
+                "trianglesPerFrame": 435200
+            },
+            {
+                "scene": "limite",
+                "rings": 900,
+                "frames": 283,
+                "fpsMean": 56.5,
+                "p50ms": 16.65,
+                "p95ms": 33.25,
+                "p99ms": 33.32,
+                "over33msPct": 0,
+                "skippedFrames": 18,
+                "cpuSubmitP50ms": 2.8,
+                "cpuSubmitP95ms": 6.84,
+                "renderables": 1800,
+                "trianglesPerFrame": 979200
+            }
+        ]
+    },
+    "notes": [
+        "Intervalos entre frames renderizados (beginFrame=true) con timestamps de vsync de Choreographer.",
+        "renderables y trianglesPerFrame se calculan desde el GLB; Filament no expone draw calls en Java.",
+        "Entorno IBL procedural (sin HDRI), prefiltrado con IBLPrefilterContext; exposici\u00f3n 1.0."
+    ]
+}

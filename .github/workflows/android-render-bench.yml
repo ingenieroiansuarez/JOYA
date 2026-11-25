@@ -1,0 +1,70 @@
+name: Android render bench APK (hito 000, P0-04)
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish the debug APK as a GitHub pre-release (test builds only)"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - "apps/render-bench-android/**"
+      - "tools/render-bench/scene/**"
+      - ".github/workflows/android-render-bench.yml"
+  pull_request:
+    paths:
+      - "apps/render-bench-android/**"
+      - "tools/render-bench/scene/**"
+      - ".github/workflows/android-render-bench.yml"
+permissions:
+  contents: read
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bundled GLB must be the scene builder's output
+        run: cmp tools/render-bench/scene/showcase.glb apps/render-bench-android/app/src/main/assets/showcase.glb
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.6.0"
+      - name: Build debug APK (debug-signed, not for distribution)
+        run: gradle -p apps/render-bench-android --no-daemon assembleDebug
+      - name: Checksum
+        run: |
+          cd apps/render-bench-android/app/build/outputs/apk/debug
+          mv app-debug.apk aurea-render-bench-android-debug.apk
+          sha256sum aurea-render-bench-android-debug.apk | tee aurea-render-bench-android-debug.apk.sha256
+          ls -l
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aurea-render-bench-android-debug
+          path: apps/render-bench-android/app/build/outputs/apk/debug/aurea-render-bench-android-debug.apk*
+          retention-days: 30
+
+  # Manual only: lets a tester download the .apk directly on the phone (Actions artifacts arrive zipped
+  # and need a GitHub login). Debug-signed test build, marked as a pre-release.
+  publish:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    needs: apk
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: aurea-render-bench-android-debug
+      - name: Publish pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: render-bench-android-${{ github.run_number }}
+        run: |
+          gh release create "$TAG" aurea-render-bench-android-debug.apk aurea-render-bench-android-debug.apk.sha256 \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "Render bench Android (prueba, debug) #${{ github.run_number }}" \
+            --notes "APK de prueba P0-04 (Filament nativo). Firmada con clave debug de CI: solo para pruebas, no es la app de AUREA. Commit $GITHUB_SHA."

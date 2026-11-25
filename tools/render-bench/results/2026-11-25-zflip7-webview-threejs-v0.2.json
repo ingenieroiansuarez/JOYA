@@ -1,0 +1,52 @@
+{
+  "tool": "aurea-render-bench/0.2.0",
+  "path": "webview-threejs",
+  "three": "160",
+  "measuredAt": "2026-11-25T09:02:18.672Z",
+  "asset": {
+    "file": "ring-base.glb (ring.classic 18/4/1.8 mm)",
+    "bytes": 19196,
+    "sha256": "7c016f4f6a76f8f8556c6a61bd62384105631a4266e3a7dc97584dc91a60ce7c",
+    "sha256Verified": true,
+    "triangles": 1008,
+    "parseMs": 6.6
+  },
+  "firstFrameMs": 301,
+  "device": {
+    "userAgent": "Mozilla/5.0 (Linux; Android 10; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/157.0.0.0 Mobile Safari/537.36 Claude/1.261120.19",
+    "gpu": "ANGLE ((Samsung Xclipse 950) on Vulkan 1.3.304)",
+    "webgl2": true,
+    "devicePixelRatio": 3,
+    "renderPixelRatio": 3,
+    "canvasPx": [984, 738],
+    "cores": 10,
+    "deviceMemoryGB": 8
+  },
+  "jsHeapMB": 61,
+  "battery": {
+    "start": {"level": 0.95, "charging": false},
+    "end": {"level": 0.94, "charging": false},
+    "seconds": 83
+  },
+  "sceneSeconds": 15,
+  "warmupSeconds": 2,
+  "displayCadenceMs": 16.7,
+  "results": [
+    {"scene": "base", "rings": 1, "frames": 781, "fpsMean": 60.1, "p50ms": 16.6, "p95ms": 16.7, "p99ms": 16.8, "over33msPct": 0, "drawCalls": 1, "trianglesPerFrame": 1008},
+    {"scene": "vitrina", "rings": 1, "frames": 781, "fpsMean": 60.1, "p50ms": 16.6, "p95ms": 16.7, "p99ms": 16.9, "over33msPct": 0, "drawCalls": 3, "trianglesPerFrame": 2096},
+    {"scene": "estres", "rings": 25, "frames": 781, "fpsMean": 60.1, "p50ms": 16.6, "p95ms": 16.7, "p99ms": 16.8, "over33msPct": 0, "drawCalls": 75, "trianglesPerFrame": 52400}
+  ],
+  "ramp": {
+    "secondsPerStep": 6,
+    "criterion": "p95 <= 1.1 x display cadence",
+    "maxSustainedRings": 2500,
+    "steps": [
+      {"scene": "limite", "rings": 100, "frames": 301, "fpsMean": 60.1, "p50ms": 16.6, "p95ms": 16.7, "p99ms": 16.8, "over33msPct": 0, "drawCalls": 300, "trianglesPerFrame": 209600},
+      {"scene": "limite", "rings": 225, "frames": 301, "fpsMean": 60.1, "p50ms": 16.6, "p95ms": 16.8, "p99ms": 16.8, "over33msPct": 0, "drawCalls": 675, "trianglesPerFrame": 471600},
+      {"scene": "limite", "rings": 400, "frames": 300, "fpsMean": 59.9, "p50ms": 16.7, "p95ms": 16.7, "p99ms": 16.8, "over33msPct": 0, "drawCalls": 1200, "trianglesPerFrame": 838400},
+      {"scene": "limite", "rings": 900, "frames": 300, "fpsMean": 59.9, "p50ms": 16.7, "p95ms": 16.8, "p99ms": 17, "over33msPct": 0, "drawCalls": 2700, "trianglesPerFrame": 1886400},
+      {"scene": "limite", "rings": 1600, "frames": 301, "fpsMean": 60.1, "p50ms": 16.6, "p95ms": 16.8, "p99ms": 16.8, "over33msPct": 0, "drawCalls": 4800, "trianglesPerFrame": 3353600},
+      {"scene": "limite", "rings": 2500, "frames": 292, "fpsMean": 58.3, "p50ms": 16.6, "p95ms": 17.2, "p99ms": 33.3, "over33msPct": 0, "drawCalls": 7500, "trianglesPerFrame": 5240000}
+    ]
+  }
+}
