@@ -1,7 +1,8 @@
 import tokens from "@aurea/tokens";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useReducer } from "react";
-import { BackHandler, Pressable, StatusBar as RNStatusBar, StyleSheet, Text, View } from "react-native";
+import { BackHandler, Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { maybeCompleteAuthSession } from "expo-web-browser";
 import { configFromBuild, ConfigError, type AppConfig } from "./config";
 import { deviceLocale, translator } from "./i18n";
@@ -23,19 +24,29 @@ export default function App() {
       return e instanceof ConfigError ? e : new ConfigError("invalid configuration");
     }
   }, []);
-  if (config instanceof ConfigError) {
-    const t = translator(deviceLocale());
-    return (
-      <View style={[styles.screen, styles.center, { paddingTop: RNStatusBar.currentHeight ?? 0 }]}>
-        <StatusBar style="light" />
-        <Text accessibilityRole="alert" style={[styles.body, { color: c.danger }]}>{t("configError")}</Text>
-      </View>
-    );
-  }
   return (
-    <SessionProvider config={config}>
-      <Shell />
-    </SessionProvider>
+    // Android draws edge to edge: every screen keeps clear of the status bar and the system navigation
+    // (3-button or gesture bar) through the insets, never fixed paddings.
+    <SafeAreaProvider>
+      {config instanceof ConfigError ? (
+        <ConfigErrorScreen />
+      ) : (
+        <SessionProvider config={config}>
+          <Shell />
+        </SessionProvider>
+      )}
+    </SafeAreaProvider>
+  );
+}
+
+function ConfigErrorScreen() {
+  const t = translator(deviceLocale());
+  const insets = useSafeAreaInsets();
+  return (
+    <View style={[styles.screen, styles.center, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+      <StatusBar style="light" />
+      <Text accessibilityRole="alert" style={[styles.body, { color: c.danger }]}>{t("configError")}</Text>
+    </View>
   );
 }
 
@@ -45,6 +56,7 @@ function Shell() {
   const { t, config } = useSession();
   const [nav, dispatch] = useReducer(navReducer, initialNav);
   const route = currentRoute(nav);
+  const insets = useSafeAreaInsets();
 
   // Android back: pop inside the app while there is somewhere to go; otherwise let the system close it.
   useEffect(() => {
@@ -60,7 +72,7 @@ function Shell() {
   const back = () => dispatch({ type: "back" });
 
   return (
-    <View style={[styles.screen, { paddingTop: RNStatusBar.currentHeight ?? 0 }]}>
+    <View style={[styles.screen, { paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }]}>
       <StatusBar style="light" />
       {config.env !== "production" && <Text style={styles.banner}>{t("envBanner", { env: config.env })}</Text>}
       <View style={{ flex: 1 }}>
@@ -69,7 +81,7 @@ function Shell() {
         {route.name === "profile" && <ProfileScreen />}
         {route.name === "product" && <ProductScreen key={route.id} id={route.id} onBack={back} />}
       </View>
-      <View accessibilityRole="tablist" style={bar.root}>
+      <View accessibilityRole="tablist" style={[bar.root, { paddingBottom: insets.bottom + s[1] }]}>
         {TABS.map((tab: Tab) => {
           const selected = nav.tab === tab;
           return (
