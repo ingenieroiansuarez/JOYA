@@ -168,6 +168,9 @@ describe("web skeleton (production build)", () => {
     assert.match(html, /Reglas de precio de demostración/);
     assert.match(html, /Emitir por COP 5\.036\.913/);
     assert.match(html, /<label for="exp-11111111[^"]*">Válida hasta<\/label>/);
+    assert.match(html, /name="validDays" value="6"/, "validity taken from the draft's own expiry");
+    const date = html.match(/<input[^>]*name="expiresOn"[^>]*>/)[0];
+    assert.equal(date.match(/value="([^"]+)"/)[1], date.match(/max="([^"]+)"/)[1], "the default is the last allowed day, not one past it");
     assert.match(html, /Aceptada/, "recent quotes list");
     assert.doesNotMatch(html, new RegExp(ACCESS));
     assert.ok(fake.calls.filter((c) => c.path.startsWith("/v1/quotes")).every((c) => c.auth === `Bearer ${ACCESS}`));

@@ -79,6 +79,12 @@ export class QuotesController {
           WHERE r.id = $1 AND cu.subject = $2`, [revisionId, p.subject]);
       if (!rows[0]) throw new NotFoundException();
       const project = await ownedProject(c, p.subject, rows[0].project_id);
+      // A revision already sold (accepted, order not cancelled) is not priced again: asking returns
+      // that quote, which links to its order.
+      const sold = (await c.query<{ id: string }>(
+        `SELECT q.id FROM aurea.quote q JOIN aurea.sales_order o ON o.quote_id = q.id
+          WHERE q.revision_id = $1 AND q.state = 'ACCEPTED' AND o.state <> 'CANCELLED' ORDER BY q.accepted_at DESC LIMIT 1`, [revisionId])).rows[0];
+      if (sold) return toQuote(await visibleQuote(c, p, sold.id), locale, false);
       // One open quote per revision: asking again returns it. An issued offer past its expiry is
       // closed here (EXPIRED) so the customer gets a fresh draft instead of a dead one.
       const open = (await c.query<{ id: string; lapsed: boolean }>(

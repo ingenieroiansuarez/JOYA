@@ -1,6 +1,7 @@
 "use server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { expiryFor } from "../../lib/expiry";
 import { pickLocale } from "../../lib/i18n";
 import { api, requireSession } from "../../lib/server/api";
 
@@ -32,7 +33,7 @@ export async function issueQuote(form: FormData): Promise<void> {
       expectedDigest: field(form, "digest"),
       total: { amount: field(form, "amount"), currency: field(form, "currency") },
       termsVersion: field(form, "termsVersion"),
-      expiresAt: `${date}T23:59:59-05:00`, // end of that day in Bogotá
+      expiresAt: expiryFor(date, Number(field(form, "validDays"))),
     },
   });
   if (!r.ok) back(path, { error: r.error.code, detail: r.error.message ?? "" });

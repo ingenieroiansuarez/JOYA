@@ -17,6 +17,8 @@ interface Quote {
   internal?: { costLines: Line[]; cost: Money; margin: string; grossProfit: Money };
 }
 
+/** How many days an offer may last, as the API set it on the draft (created → default expiry). */
+const validityDays = (q: Quote) => Math.max(1, Math.round((Date.parse(q.expiresAt) - Date.parse(q.createdAt)) / 86_400_000));
 const plusDays = (days: number) => new Date(Date.now() + days * 86_400_000).toLocaleDateString("sv-SE", { timeZone: "America/Bogota" });
 
 export default async function Quotes({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
@@ -79,9 +81,10 @@ export default async function Quotes({ searchParams }: { searchParams: Promise<R
               <input type="hidden" name="amount" value={q.total.amount} />
               <input type="hidden" name="currency" value={q.total.currency} />
               <input type="hidden" name="termsVersion" value={q.pricing.termsVersion} />
+              <input type="hidden" name="validDays" value={validityDays(q)} />
               <input type="hidden" name="idempotencyKey" value={randomBytes(18).toString("base64url")} />
               <label htmlFor={`exp-${q.id}`}>{t("quotes.validUntil")}</label>
-              <input id={`exp-${q.id}`} name="expiresOn" type="date" required defaultValue={plusDays(7)} min={plusDays(1)} />
+              <input id={`exp-${q.id}`} name="expiresOn" type="date" required defaultValue={plusDays(validityDays(q))} min={plusDays(1)} max={plusDays(validityDays(q))} />
               <button type="submit">{t("quotes.issue", { total: formatMoney(q.total, locale) })}</button>
             </form>
           )}

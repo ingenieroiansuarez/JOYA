@@ -151,7 +151,8 @@ export function Row({ k, v, strong }: { k: string; v: string; strong?: boolean }
 }
 
 export const qs = StyleSheet.create({
-  content: { padding: s[4], gap: s[3] },
+  // Room under the last button so it scrolls clear of the tab bar and the system navigation.
+  content: { padding: s[4], gap: s[3], paddingBottom: s[4] * 4 },
   card: { backgroundColor: c.surface, borderRadius: 12, padding: s[3], gap: s[2] },
   row: { flexDirection: "row", justifyContent: "space-between", gap: s[3] },
   h: { color: c.text, fontSize: type[3], fontWeight: "600" },

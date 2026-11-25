@@ -346,6 +346,19 @@ describe("commercial slice (hito 500)", { skip }, () => {
     assert.equal((await requestQuote(p)).body.id, again.body.id, "the new draft is the open one now");
   });
 
+  test("asking again for a revision already sold returns that quote and its order; after a cancel it prices again", async () => {
+    const { p, q } = await issuedQuote(ALICE, "silver-925", { bandWidth: 5 });
+    const order = (await accept(q)).body;
+    const again = await requestQuote(p);
+    assert.equal(again.status, 200, JSON.stringify(again.body));
+    assert.deepEqual([again.body.id, again.body.state, again.body.orderId], [q.id, "ACCEPTED", order.id]);
+    assert.equal((await pool.query("SELECT count(*)::int AS n FROM aurea.quote WHERE revision_id = $1", [p.revisionId])).rows[0].n, 1);
+    assert.equal((await call("POST", `/v1/orders/${order.id}/cancel`, { body: { reason: "prueba" } })).status, 200);
+    const fresh = await requestQuote(p);
+    assert.notEqual(fresh.body.id, q.id);
+    assert.equal(fresh.body.state, "DRAFT");
+  });
+
   test("issuing: validated, segregated, needs geometry, supersedes the previous offer", async () => {
     const p = (await call("POST", "/v1/projects", { body: { title: "Sin geometría", templateId: "ring.classic", materialId: "gold-18k-yellow" } })).body;
     const noGeo = await call("POST", "/v1/quotes", { body: { revisionId: p.headRevisionId, currency: "COP" } });
