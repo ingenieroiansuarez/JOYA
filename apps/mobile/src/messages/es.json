@@ -1,0 +1,12 @@
+{
+  "envBanner": "Entorno {env}: datos de demostración, no reales",
+  "configError": "La app no está configurada. Revisa EXPO_PUBLIC_* antes de compilar.",
+  "welcome": "Bienvenido a AUREA",
+  "signIn": "Iniciar sesión",
+  "signingIn": "Abriendo el inicio de sesión…",
+  "signOut": "Cerrar sesión",
+  "signInFailed": "No se pudo iniciar sesión.",
+  "retry": "Reintentar",
+  "signedInAs": "Sesión iniciada",
+  "roles": "Roles: {roles}"
+}

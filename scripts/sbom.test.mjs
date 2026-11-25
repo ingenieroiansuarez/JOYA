@@ -38,13 +38,18 @@ test("lock integrity is read for scoped and plain packages", () => {
 });
 
 test("dev-only packages are marked excluded, shipped ones required", () => {
-  const prod = prodSet([{ dependencies: { a: { version: "1.0.0", dependencies: { b: { version: "2.0.0" } } }, ws: { version: "link:../ws" } } }]);
-  assert.deepEqual([...prod].sort(), ["a@1.0.0", "b@2.0.0"]);
+  const prod = prodSet({
+    importers: {
+      app: { dependencies: { a: { version: "1.0.0(peer@1.0.0)" }, ws: { version: "link:../ws" } }, devDependencies: { t: { version: "3.0.0" } } },
+    },
+    snapshots: { "a@1.0.0(peer@1.0.0)": { dependencies: { "@s/b": "2.0.0" } }, "@s/b@2.0.0": {}, "t@3.0.0": {} },
+  });
+  assert.deepEqual([...prod].sort(), ["@s/b@2.0.0", "a@1.0.0"]);
   const bom = buildBom({
-    licenses: { MIT: [{ name: "a", versions: ["1.0.0"] }, { name: "t", versions: ["3.0.0"] }] },
+    licenses: { MIT: [{ name: "a", versions: ["1.0.0"] }, { name: "@s/b", versions: ["2.0.0"] }, { name: "t", versions: ["3.0.0"] }] },
     prod, integrity: new Map(), python: [], images: [], version: "0.0.0",
   });
-  assert.deepEqual(bom.components.map((c) => [c.name, c.scope]), [["a", "required"], ["t", "excluded"]]);
+  assert.deepEqual(bom.components.map((c) => [c.name, c.scope]), [["@s/b", "required"], ["a", "required"], ["t", "excluded"]]);
 });
 
 test("Python requirements must be pinned exactly", () => {

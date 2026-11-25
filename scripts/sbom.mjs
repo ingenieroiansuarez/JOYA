@@ -1,12 +1,13 @@
 // CycloneDX 1.6 SBOM for what this repository builds and runs, written to sbom/aurea.cdx.json.
 //   node scripts/sbom.mjs          # write
 //   node scripts/sbom.mjs --check  # exit 1 if the committed SBOM no longer matches the locks
-// Sources, all pinned: pnpm-lock.yaml (npm, with integrity hashes), `pnpm licenses list`
-// (declared licenses), `pnpm list --prod` (what ships vs dev-only), services/*/requirements.lock
+// Sources, all pinned: pnpm-lock.yaml (npm, with integrity hashes; its importers and
+// snapshots tell what ships vs dev-only), `pnpm licenses list` (declared licenses), services/*/requirements.lock
 // (Python) and compose.yaml (container images by digest). Deterministic: no timestamp or random
 // serial, components sorted, so the file changes only when a dependency does.
 // Not covered yet: apps/render-bench-android (Gradle, a benchmark, not shipped).
 import { execFileSync } from "node:child_process";
+import { parse as parseYaml } from "yaml";
 import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
@@ -26,20 +27,27 @@ export function lockIntegrity(lockText) {
   return out;
 }
 
-/** Every name@version reachable through production dependencies of the workspace packages. */
-export function prodSet(pnpmListProd) {
+/**
+ * Every name@version reachable through the production dependencies of the workspace packages,
+ * walked through the lockfile's `snapshots` (pnpm list --depth Infinity overflows on the Expo tree).
+ */
+export function prodSet(lock) {
+  const base = (v) => v.replace(/\(.*$/, "");
   const seen = new Set();
-  const walk = (deps = {}) => {
-    for (const [name, d] of Object.entries(deps)) {
-      if (d.version?.startsWith("link:")) continue;
-      const key = `${name}@${d.version}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      walk(d.dependencies);
-    }
-  };
-  for (const ws of pnpmListProd) walk(ws.dependencies);
-  return seen;
+  const stack = [];
+  for (const imp of Object.values(lock.importers ?? {})) {
+    for (const [name, d] of Object.entries(imp.dependencies ?? {})) stack.push([name, d.version]);
+  }
+  while (stack.length) {
+    const [name, version] = stack.pop();
+    if (version.startsWith("link:")) continue;
+    const snap = `${name}@${version}`;
+    if (seen.has(snap)) continue;
+    seen.add(snap);
+    const node = lock.snapshots?.[snap] ?? {};
+    for (const [n, v] of Object.entries({ ...node.dependencies, ...node.optionalDependencies })) stack.push([n, v]);
+  }
+  return new Set([...seen].map((k) => { const at = k.indexOf("@", 1); return `${k.slice(0, at)}@${base(k.slice(at + 1))}`; }));
 }
 
 export function parseRequirements(text) {
@@ -117,6 +125,7 @@ export function buildBom({ licenses, prod, integrity, python, images, version })
 }
 
 function collect() {
+  const lockText = readFileSync(`${ROOT}pnpm-lock.yaml`, "utf8");
   const run = (args) => JSON.parse(execFileSync("pnpm", args, { cwd: ROOT, encoding: "utf8", maxBuffer: 64 << 20 }));
   const python = readdirSync(`${ROOT}services`)
     .filter((s) => existsSync(`${ROOT}services/${s}/requirements.lock`))
@@ -124,8 +133,8 @@ function collect() {
     .map((s) => ({ service: s, reqs: parseRequirements(readFileSync(`${ROOT}services/${s}/requirements.lock`, "utf8")) }));
   return {
     licenses: run(["licenses", "list", "--json"]),
-    prod: prodSet(run(["list", "-r", "--json", "--depth", "Infinity", "--prod"])),
-    integrity: lockIntegrity(readFileSync(`${ROOT}pnpm-lock.yaml`, "utf8")),
+    prod: prodSet(parseYaml(lockText, { maxAliasCount: -1 })),
+    integrity: lockIntegrity(lockText),
     python,
     images: composeImages(readFileSync(`${ROOT}compose.yaml`, "utf8")),
     version: JSON.parse(readFileSync(`${ROOT}apps/api/package.json`, "utf8")).version,
