@@ -216,5 +216,9 @@
   "orderReview": "Tu pago está en revisión. Un asesor te contactará.",
   "orderAlreadyPaid": "El anticipo ya está pagado.",
   "orderPayFailed": "El pago no se pudo completar. Puedes intentarlo de nuevo.",
-  "orderConfirmedNote": "Recibimos tu anticipo. Tu pieza pasa al taller."
+  "orderConfirmedNote": "Recibimos tu anticipo. Tu pieza pasa al taller.",
+  "illustration3d": "Ilustración 3D de {name}, no es una fotografía",
+  "illustration3dNote": "La imagen es una ilustración 3D generada a partir de la descripción de la pieza; la joya real puede variar.",
+  "brandOverline": "AUREA · Alta joyería",
+  "familyArtNote": "Las imágenes muestran cada familia en el metal elegido con sus medidas iniciales; tu diseño se ve en 3D en el editor."
 }

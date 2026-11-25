@@ -15,7 +15,7 @@ export function CatalogScreen({ onOpen }: { onOpen: (id: string) => void }) {
 
   return (
     <View style={styles.screen}>
-      <Header title={t("catalogTitle")} subtitle={t("catalogSubtitle")} />
+      <Header overline={t("brandOverline")} title={t("catalogTitle")} subtitle={t("catalogSubtitle")} />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={chips.row} style={chips.bar}
         accessibilityRole="tablist">
         {[null, ...CATEGORIES].map((cat) => {
@@ -71,10 +71,10 @@ const chips = StyleSheet.create({
   bar: { flexGrow: 0, flexShrink: 0 },
   row: { paddingHorizontal: s[3], gap: s[1], paddingBottom: s[2] },
   chip: {
-    minHeight: tokens.touchTargetDp, paddingHorizontal: s[3], borderRadius: tokens.touchTargetDp / 2, borderWidth: 1,
-    borderColor: c.inputBorder, justifyContent: "center",
+    minHeight: tokens.touchTargetDp, paddingHorizontal: s[3], borderRadius: tokens.touchTargetDp / 2, borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(197,160,89,0.45)", justifyContent: "center",
   },
   selected: { backgroundColor: c.accent, borderColor: c.accent },
-  text: { color: c.text, fontSize: type[1] },
-  selectedText: { color: c.onAccent, fontWeight: "600" },
+  text: { color: c.text, fontSize: type[0], letterSpacing: 1.2, textTransform: "uppercase" },
+  selectedText: { color: c.onAccent, fontWeight: "700" },
 });

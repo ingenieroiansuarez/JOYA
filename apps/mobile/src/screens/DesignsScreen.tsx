@@ -5,7 +5,8 @@ import { useDesign } from "../design/DesignContext";
 import { familyName } from "../design/describe";
 import type { LocalProject, OutboxEntry } from "../design/store";
 import { useSession } from "../session";
-import { Button, c, errorKey, Header, Loading, Notice, s, styles, type } from "../ui";
+import { FamilyArt } from "../design/art";
+import { Button, c, errorKey, fonts, Header, Loading, Notice, s, styles, type } from "../ui";
 
 type Row = LocalProject & { pending: number; problems: number };
 type State = { phase: "loading" } | { phase: "ready"; rows: Row[]; refreshed: boolean; error: ApiError | null };
@@ -86,10 +87,15 @@ export function DesignsScreen({ onOpen, onNew }: { onOpen: (id: string) => void;
             return (
               <Pressable accessibilityRole="button" accessibilityLabel={[item.project.title, ...lines].join(", ")}
                 onPress={() => onOpen(item.project.id)} style={({ pressed }) => [list.row, pressed && { opacity: 0.7 }]}>
-                <Text style={list.title}>{item.project.title}</Text>
-                <Text style={styles.muted}>{lines.slice(0, 2).join(" · ")}</Text>
-                {item.pending > 0 && <Text style={[styles.muted, { color: c.info }]}>{lines[2]}</Text>}
-                {item.problems > 0 && <Text style={[styles.muted, { color: c.warning }]}>{t("needsDecision")}</Text>}
+                <FamilyArt familyId={item.project.familyId} materialId={item.head.document.components[0]?.materialId ?? ""} label="" style={list.thumb} />
+                <View style={list.body}>
+                  <Text style={list.kind}>{lines[0]}</Text>
+                  <Text style={list.title} numberOfLines={2}>{item.project.title}</Text>
+                  <Text style={styles.muted}>{lines[1]}</Text>
+                  {item.pending > 0 && <Text style={[styles.muted, { color: c.info }]}>{lines[2]}</Text>}
+                  {item.problems > 0 && <Text style={[styles.muted, { color: c.warning }]}>{t("needsDecision")}</Text>}
+                </View>
+                <Text style={list.chevron}>›</Text>
               </Pressable>
             );
           }}
@@ -102,6 +108,13 @@ export function DesignsScreen({ onOpen, onNew }: { onOpen: (id: string) => void;
 
 const list = StyleSheet.create({
   content: { padding: s[4], gap: s[3] },
-  row: { backgroundColor: c.surface, borderRadius: 12, padding: s[3], gap: s[0], minHeight: 64 },
-  title: { color: c.text, fontSize: type[3], fontWeight: "600" },
+  row: {
+    backgroundColor: c.surface, borderRadius: 12, padding: s[2], gap: s[3], minHeight: 64, flexDirection: "row", alignItems: "center",
+    borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(197,160,89,0.22)",
+  },
+  thumb: { width: 88, borderRadius: 8 },
+  body: { flex: 1, gap: 2 },
+  kind: { color: c.textMuted, fontSize: type[0], letterSpacing: 1.2, textTransform: "uppercase" },
+  title: { color: c.text, fontSize: type[3], fontFamily: fonts.display },
+  chevron: { color: c.accent, fontSize: type[4], paddingHorizontal: s[1] },
 });

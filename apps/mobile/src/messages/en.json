@@ -216,5 +216,9 @@
   "orderReview": "Your payment is under review. An advisor will contact you.",
   "orderAlreadyPaid": "The deposit is already paid.",
   "orderPayFailed": "The payment could not be completed. You can try again.",
-  "orderConfirmedNote": "We received your deposit. Your piece goes to the workshop."
+  "orderConfirmedNote": "We received your deposit. Your piece goes to the workshop.",
+  "illustration3d": "3D illustration of {name}, not a photograph",
+  "illustration3dNote": "The image is a 3D illustration made from the piece description; the real jewel may vary.",
+  "brandOverline": "AUREA · Fine jewelry",
+  "familyArtNote": "Images show each family in the chosen alloy at its starting size; your design appears in 3D in the editor."
 }

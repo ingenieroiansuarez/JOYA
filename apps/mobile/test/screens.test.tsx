@@ -20,6 +20,7 @@ import { SessionProvider } from "../src/session";
 import { CatalogScreen } from "../src/screens/CatalogScreen";
 import { ProductScreen } from "../src/screens/ProductScreen";
 import { FavoritesScreen } from "../src/screens/FavoritesScreen";
+import { hasCatalogArt } from "../src/ui";
 
 const config = { env: "ci" as const, issuer: "http://127.0.0.1:8080/realms/aurea-local", apiUrl: "http://127.0.0.1:3000" };
 const summary = (id: string, name: string, extra = {}) => ({
@@ -108,6 +109,20 @@ describe("product detail", () => {
     await fireEvent.press(screen.getByRole("button", { name: en.saveFavorite }));
     expect((await screen.findByRole("alert")).props.children).toBe(en.signInToSave);
     expect(screen.getByRole("button", { name: en.signIn })).toBeTruthy();
+  });
+
+  it("a catalog piece with a studio render shows it as a labelled 3D illustration", async () => {
+    const api = new FakeApi();
+    api.detail = { ...product, sku: "AUR-RNG-001" };
+    await wrap(api, <ProductScreen id="p1" onBack={() => undefined} />);
+    expect(await screen.findByRole("image", { name: "3D illustration of Classic Ring, not a photograph" })).toBeTruthy();
+    expect(screen.getByText(en.illustration3dNote)).toBeTruthy();
+  });
+
+  it("every published demo SKU has a studio render", () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const seed = require("../../../packages/db/seed/demo-catalog.json") as { products: { sku: string; published: boolean }[] };
+    for (const p of seed.products.filter((x) => x.published)) expect(hasCatalogArt(p.sku)).toBe(true);
   });
 
   it("a product that is gone offers the way back", async () => {

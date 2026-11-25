@@ -17,17 +17,55 @@ try {
   throw new Error("webgl");
 }
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
+// Studio look shared with the catalog renders (tools/jewel-renders): neutral tone mapping keeps the
+// alloy's hue, a soft radial backdrop, a key and a warm rim light, and a contact shadow.
+renderer.toneMapping = THREE.NeutralToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 const scene = new THREE.Scene();
-scene.background = new THREE.Color("#0c0c0d");
+scene.background = backdrop();
 const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture;
+const key = new THREE.DirectionalLight("#ffffff", 1.4);
+const rim = new THREE.DirectionalLight("#ffe7c2", 0.8);
+scene.add(key, rim);
+const shadow = contactShadow();
+scene.add(shadow);
+
+function backdrop() {
+  const c = document.createElement("canvas");
+  c.width = c.height = 512;
+  const x = c.getContext("2d");
+  const g = x.createRadialGradient(256, 215, 25, 256, 256, 384);
+  g.addColorStop(0, "#2c2a2e");
+  g.addColorStop(0.55, "#1b1a1d");
+  g.addColorStop(1, "#111113");
+  x.fillStyle = g;
+  x.fillRect(0, 0, 512, 512);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+function contactShadow() {
+  const c = document.createElement("canvas");
+  c.width = c.height = 128;
+  const x = c.getContext("2d");
+  const g = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+  g.addColorStop(0, "rgba(0,0,0,0.55)");
+  g.addColorStop(1, "rgba(0,0,0,0)");
+  x.fillStyle = g;
+  x.fillRect(0, 0, 128, 128);
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1),
+    new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false, toneMapped: false }));
+  plane.rotation.x = -Math.PI / 2;
+  plane.visible = false;
+  return plane;
+}
 const camera = new THREE.PerspectiveCamera(35, 1, 0.0001, 10);
 const pivot = new THREE.Group();
 scene.add(pivot);
 let current = null;
-let yaw = 0.6, pitch = 0.35, distance = 0.05, dragging = null, idle = 0;
+let yaw = 0.5, pitch = 0.3, distance = 0.05, dragging = null, idle = 0;
 
 function resize() {
   const w = window.innerWidth, h = window.innerHeight;
@@ -53,6 +91,8 @@ function frame() {
   if (!dragging && !reduced && current && ++idle > 90) yaw += 0.004; // slow turn after 1.5 s without touch
   camera.position.set(distance * Math.cos(pitch) * Math.sin(yaw), distance * Math.sin(pitch), distance * Math.cos(pitch) * Math.cos(yaw));
   camera.lookAt(0, 0, 0);
+  key.position.set(distance, distance * 1.2, distance * 0.6);
+  rim.position.set(-distance, distance * 0.4, -distance);
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
@@ -79,7 +119,9 @@ function parse(buffer, color) {
       pivot.remove(current);
       current.traverse((o) => { o.geometry?.dispose(); o.material?.dispose?.(); });
     }
-    const metal = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(color), metalness: 1, roughness: 0.22, clearcoat: 0.3 });
+    const metal = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(color), metalness: 1, roughness: 0.16, clearcoat: 0.15, clearcoatRoughness: 0.1, envMapIntensity: 1.35,
+    });
     let triangles = 0;
     gltf.scene.traverse((o) => {
       if (!o.isMesh) return;
@@ -87,10 +129,18 @@ function parse(buffer, color) {
       const g = o.geometry;
       triangles += (g.index ? g.index.count : g.attributes.position.count) / 3;
     });
-    const box = new THREE.Box3().setFromObject(gltf.scene);
-    const center = box.getCenter(new THREE.Vector3());
+    const box = new THREE.Box3().setFromObject(gltf.scene); // CAD axes: sizes are reported as modelled
+    // CAD is Z-up (glTF makes it Y-up), so rings and pendants arrive lying flat: stand them up facing
+    // the camera, like a jewel in a showcase. Only the presentation turns; the mesh is untouched.
+    gltf.scene.rotation.x = Math.PI / 2;
+    gltf.scene.updateMatrixWorld(true);
+    const shown = new THREE.Box3().setFromObject(gltf.scene);
+    const center = shown.getCenter(new THREE.Vector3());
     gltf.scene.position.sub(center);
-    const radius = box.getBoundingSphere(new THREE.Sphere()).radius || 0.01;
+    const radius = shown.getBoundingSphere(new THREE.Sphere()).radius || 0.01;
+    shadow.scale.set(radius * 2.2, radius * 0.7, 1);
+    shadow.position.y = -(shown.max.y - shown.min.y) / 2 - radius * 0.04;
+    shadow.visible = true;
     distance = radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.15;
     camera.near = distance / 100;
     camera.far = distance * 10;
