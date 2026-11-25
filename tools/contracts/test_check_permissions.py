@@ -22,6 +22,11 @@ class PermissionsTest(unittest.TestCase):
             del roles["scopes"][r]["cart.edit"]
         self.assertTrue(any("createCart" in e for e in self.run_check(roles=roles)))
 
+    def test_role_enum_follows_roles(self):
+        api = copy.deepcopy(self.api)
+        api["components"]["schemas"]["Role"]["enum"].append("superuser")
+        self.assertTrue(any("OpenAPI Role enum" in e for e in self.run_check(api=api)))
+
     def test_grant_without_scope(self):
         roles = copy.deepcopy(self.roles)
         del roles["scopes"]["finance"]["payment.refund"]

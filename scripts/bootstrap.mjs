@@ -1,13 +1,15 @@
-// Creates .env for local development with random passwords. Never overwrites an existing .env
-// and never prints secrets. Refuses to run when AUREA_ENV says this is not a local machine.
+// Creates .env for local development with random passwords. Never overwrites a value already in
+// .env (it only appends keys a newer bootstrap introduced) and never prints secrets. Refuses to
+// run when AUREA_ENV says this is not a local machine.
 import { randomBytes } from "node:crypto";
-import { existsSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const ENV = `${ROOT}.env`;
+export const OIDC_REALM = "aurea-local";
 
-export function localEnv({ pgPort = 5432, valkeyPort = 6379, random = () => randomBytes(24).toString("hex") } = {}) {
+export function localEnv({ pgPort = 5432, valkeyPort = 6379, kcPort = 8080, random = () => randomBytes(24).toString("hex") } = {}) {
   const pg = random();
   const vk = random();
   return [
@@ -19,8 +21,22 @@ export function localEnv({ pgPort = 5432, valkeyPort = 6379, random = () => rand
     `VALKEY_PASSWORD=${vk}`,
     `DATABASE_URL=postgresql://aurea_local:${pg}@127.0.0.1:${pgPort}/aurea_local`,
     `VALKEY_URL=redis://:${vk}@127.0.0.1:${valkeyPort}`,
+    `KC_PORT=${kcPort}`,
+    `KC_BOOTSTRAP_ADMIN_PASSWORD=${random()}`,
+    `KC_CI_CLIENT_SECRET=${random()}`,
+    `KC_DEV_USER_PASSWORD=${random()}`,
+    `OIDC_ISSUER=http://127.0.0.1:${kcPort}/realms/${OIDC_REALM}`,
+    "OIDC_AUDIENCE=aurea-api",
     "",
   ].join("\n");
+}
+
+const keyOf = (line) => (line && !line.startsWith("#") ? line.split("=", 1)[0] : null);
+
+/** Lines of `fresh` whose keys are absent from `current`. Existing values are never touched. */
+export function missingLines(current, fresh) {
+  const have = new Set(current.split("\n").map(keyOf).filter(Boolean));
+  return fresh.split("\n").filter((l) => keyOf(l) && !have.has(keyOf(l)));
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
@@ -29,13 +45,22 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     console.error(`AUREA_ENV=${env}: bootstrap only creates local credentials`);
     process.exit(1);
   }
-  if (existsSync(ENV)) {
-    console.log(".env already exists; left unchanged");
-  } else {
-    writeFileSync(ENV, localEnv({
-      pgPort: Number(process.env.POSTGRES_PORT || 5432),
-      valkeyPort: Number(process.env.VALKEY_PORT || 6379),
-    }), { mode: 0o600 });
+  const fresh = localEnv({
+    pgPort: Number(process.env.POSTGRES_PORT || 5432),
+    valkeyPort: Number(process.env.VALKEY_PORT || 6379),
+    kcPort: Number(process.env.KC_PORT || 8080),
+  });
+  if (!existsSync(ENV)) {
+    writeFileSync(ENV, fresh, { mode: 0o600 });
     console.log(".env created with random local passwords (not printed)");
+  } else {
+    const current = readFileSync(ENV, "utf8");
+    const add = missingLines(current, fresh);
+    if (add.length) {
+      appendFileSync(ENV, `${current.endsWith("\n") ? "" : "\n"}${add.join("\n")}\n`);
+      console.log(`.env existed; added ${add.map(keyOf).join(", ")} (values not printed)`);
+    } else {
+      console.log(".env already complete; left unchanged");
+    }
   }
 }
