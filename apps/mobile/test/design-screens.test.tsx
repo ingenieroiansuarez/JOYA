@@ -106,6 +106,19 @@ describe("design editor", () => {
     r.db.close();
   });
 
+  it("with nothing pending, the list itself notices the connection is back and drops the banner", async () => {
+    const server = new FakeDesignServer();
+    const file = join(dir, `${uuid()}.db`);
+    await stored(server, file);
+    server.online = false;
+    const r = await app(server, file, <DesignsScreen onOpen={() => undefined} onNew={() => undefined} retryMs={150} />);
+    expect(await screen.findByText(en.offlineBanner)).toBeTruthy();
+    server.online = true; // airplane mode off; no outbox, no other screen asking
+    await waitFor(() => expect(screen.queryByText(en.offlineBanner)).toBeNull(), { timeout: 3000 });
+    await r.unmount();
+    r.db.close();
+  });
+
   it("the offline banner goes away once the connection is back, without changing tab", async () => {
     const server = new FakeDesignServer();
     const file = join(dir, `${uuid()}.db`);

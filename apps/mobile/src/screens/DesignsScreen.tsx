@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { AppState, FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { ApiError } from "../api";
 import { useDesign } from "../design/DesignContext";
 import { familyName } from "../design/describe";
@@ -13,7 +13,10 @@ type State = { phase: "loading" } | { phase: "ready"; rows: Row[]; refreshed: bo
 
 const MAX_PAGES = 5;
 
-export function DesignsScreen({ onOpen, onNew }: { onOpen: (id: string) => void; onNew: () => void }) {
+/** How often the list asks again while it has no connection (nothing else may reach the API to notice). */
+export const OFFLINE_RETRY_MS = 10_000;
+
+export function DesignsScreen({ onOpen, onNew, retryMs = OFFLINE_RETRY_MS }: { onOpen: (id: string) => void; onNew: () => void; retryMs?: number }) {
   const { t, locale, status, signIn, localOwner } = useSession();
   const { store, sync, client, connectivity, version, saw, ready } = useDesign();
   const [state, setState] = useState<State>({ phase: "loading" });
@@ -59,6 +62,15 @@ export function DesignsScreen({ onOpen, onNew }: { onOpen: (id: string) => void;
   // stop saying "offline" without waiting for a change of tab.
   const lostConnection = state.phase === "ready" && state.error?.kind === "offline";
   useEffect(() => { if (connectivity === "online" && lostConnection) void load(); }, [connectivity, lostConnection, load]);
+  // While offline with nothing waiting to be sent, no other request would find out the connection is
+  // back: ask again now and then, and when the app returns to the foreground.
+  const offlineNow = connectivity === "offline" || lostConnection;
+  useEffect(() => {
+    if (!offlineNow) return;
+    const timer = setInterval(() => { void load(); }, retryMs);
+    const sub = AppState.addEventListener("change", (st) => { if (st === "active") void load(); });
+    return () => { clearInterval(timer); sub.remove(); };
+  }, [offlineNow, load, retryMs]);
   useEffect(() => { if (state.phase === "ready") void readLocal().then((rows) => setState((s0) => (s0.phase === "ready" ? { ...s0, rows } : s0))); },
     [version]);
 
