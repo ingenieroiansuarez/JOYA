@@ -1,6 +1,6 @@
 # STATUS — AUREA
 
-Hito activo: **400 AURA** (300 — Jewelry Engine aceptado). Actualizado: 2026-11-25.
+Hito activo: **500 Commercial slice** (400 — AURA aceptado). Actualizado: 2026-11-25.
 Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5YS
 
 ## Hitos
@@ -10,7 +10,7 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | 100 Foundation | ACEPTADO (ian, 2026-11-25, PR #25) | Gate "arranque limpio, pruebas y login; entorno aislado; sin secretos": CI verde en main, login PKCE real en el Z Flip 7 (debug y release), `.env` fuera de git y `No secrets tracked` en CI. Contratos 1.1–1.7 con verificación en CI; arranque local (pnpm, Compose, migraciones); API con OIDC y permisos por rol; Keycloak local con login PKCE probado. Tokens de diseño con contraste AA verificado. Esqueletos web (Next) y móvil (Expo, login PKCE). Login PKCE real probado en el Z Flip 7 (2026-11-25) |
 | 200 Boutique | ACEPTADO (ian, 2026-11-25, PR #30) | Gate "APK dev navega el catálogo; estados vacío/error accesibles": APK debug en el Z Flip 7 navega catálogo, detalle y favoritos contra la API; error "Sin conexión" con Reintentar visto con la API apagada (2026-11-25). Contratos 1.8.0, migración 0001, seed demo, API (PR #26), app (PR #27–#29). Pendiente: recorrido con TalkBack |
 | 300 Jewelry Engine | ACEPTADO (ian, 2026-11-25, PR #35) | Gate "parámetro con geometría real; entrada inválida rechazada; reinicio sin conexión; roundtrip STEP/STL": probado en el Z Flip 7 contra API y worker reales (2026-11-25, 12:34–12:50). PR #31–#34 y la de cierre |
-| 400 AURA | GATE CUMPLIDO (falta aceptación de ian) | Gate "Prompt → proposal → authorized revision; failure/quota tests": API, panel y golden set (PR #36); pruebas automáticas y prueba en el Z Flip 7 (2026-11-25) pasan. Proveedor LLM real y trabajos de concepto/malla quedan pendientes de autorización |
+| 400 AURA | ACEPTADO (ian, 2026-11-25, PR #37) | Gate "Prompt → proposal → authorized revision; failure/quota tests": probado en el Z Flip 7 (2026-11-25, 14:15–14:17) con el adaptador simulado `aura-sim`; API, panel y golden set (PR #36). Sin modelo de IA real por decisión de ian (sin presupuesto); concepto/malla con IA no se hacen |
 | 500–1000 | NOT_STARTED | |
 
 ## Backlog 000
@@ -123,6 +123,7 @@ TEST_DATABASE_URL=… pnpm test      # api: ai 13, golden 31; mobile 59; db 10
 python tools/contracts/check_contracts.py   # 14 machines (AiProposal nueva)
 psql … -f 05_DATABASE/tests/ai_checks.sql   # ai checks OK
 ```
+- Decisión de ian (2026-11-25): no incorporar modelos de IA ni servicios pagos; AURA queda con el simulador por reglas.
 - Pendiente: barrido de reservas huérfanas (si la API cae entre reservar y guardar, la unidad cuenta hasta el día siguiente); proveedor LLM real y trabajos de concepto/malla (`/ai/jobs`), ambos sujetos a autorización; recorrido con TalkBack.
 
 ## Hito 300 — Jewelry Engine
