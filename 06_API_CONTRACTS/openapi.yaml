@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: AUREA API V1 — contract baseline
-  version: 1.1.0
+  version: 1.2.0
   description: Contratos iniciales; extender por vertical slice. No API implementada.
 servers:
 - url: http://localhost:3000/v1
@@ -546,8 +546,8 @@ paths:
               type: object
               properties:
                 baseRevisionId: *id002
-                operation: &id005
-                  type: object
+                operation:
+                  $ref: '#/components/schemas/DesignOperation'
               required:
               - baseRevisionId
               - operation
@@ -1090,6 +1090,78 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Job'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto de versión o idempotencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invariante de negocio incumplida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /jobs/{id}/artifacts/{artifactId}:
+    get:
+      operationId: getJobArtifact
+      summary: URL firmada para descargar un artefacto del trabajo (ACL del proyecto)
+      tags:
+      - jobs
+      x-permission: job.read
+      x-first-milestone: '300'
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema: *id002
+      - in: path
+        name: artifactId
+        required: true
+        schema: *id002
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtifactDownload'
         '400':
           description: Error
           content:
@@ -3913,7 +3985,8 @@ paths:
                       projectId: *id002
                       baseRevisionId: *id002
                       type: *id001
-                      payload: *id005
+                      payload: &id005
+                        type: object
                     required:
                     - id
                     - projectId
@@ -4250,6 +4323,170 @@ components:
       - ISSUED
       - REVOKED
       - SUPERSEDED
+    DesignOperation:
+      description: Generado de 13_AI_PROMPTS_AND_TOOLS/tools.json (herramientas PREVIEW). No editar a mano.
+      oneOf:
+      - $ref: '#/components/schemas/OpCreateRing'
+      - $ref: '#/components/schemas/OpCreateSetting'
+      - $ref: '#/components/schemas/OpPlaceGemstone'
+      - $ref: '#/components/schemas/OpModifyParameter'
+      - $ref: '#/components/schemas/OpChangeMaterial'
+      - $ref: '#/components/schemas/OpBooleanUnion'
+      - $ref: '#/components/schemas/OpEngraveSurface'
+      - $ref: '#/components/schemas/OpPatternOnCurve'
+      discriminator:
+        propertyName: type
+        mapping:
+          create_ring: '#/components/schemas/OpCreateRing'
+          create_setting: '#/components/schemas/OpCreateSetting'
+          place_gemstone: '#/components/schemas/OpPlaceGemstone'
+          modify_parameter: '#/components/schemas/OpModifyParameter'
+          change_material: '#/components/schemas/OpChangeMaterial'
+          boolean_union: '#/components/schemas/OpBooleanUnion'
+          engrave_surface: '#/components/schemas/OpEngraveSurface'
+          pattern_on_curve: '#/components/schemas/OpPatternOnCurve'
+    OpCreateRing:
+      type: object
+      properties:
+        type:
+          const: create_ring
+        innerDiameter:
+          type: number
+          minimum: 14
+          maximum: 24
+        bandWidth:
+          type: number
+          minimum: 1.5
+          maximum: 12
+        radialThickness:
+          type: number
+          minimum: 0.8
+          maximum: 4
+        materialId:
+          type: string
+      required:
+      - type
+      - innerDiameter
+      - bandWidth
+      - radialThickness
+      - materialId
+      additionalProperties: false
+    OpCreateSetting:
+      type: object
+      properties:
+        type:
+          const: create_setting
+        familyId:
+          type: string
+        anchorId:
+          type: string
+        stoneId:
+          type: string
+      required:
+      - type
+      - familyId
+      - anchorId
+      - stoneId
+      additionalProperties: false
+    OpPlaceGemstone:
+      type: object
+      properties:
+        type:
+          const: place_gemstone
+        componentId:
+          type: string
+        stoneId:
+          type: string
+        anchorId:
+          type: string
+      required:
+      - type
+      - componentId
+      - stoneId
+      - anchorId
+      additionalProperties: false
+    OpModifyParameter:
+      type: object
+      properties:
+        type:
+          const: modify_parameter
+        componentId:
+          type: string
+        name:
+          type: string
+        value:
+          type: number
+      required:
+      - type
+      - componentId
+      - name
+      - value
+      additionalProperties: false
+    OpChangeMaterial:
+      type: object
+      properties:
+        type:
+          const: change_material
+        componentId:
+          type: string
+        materialId:
+          type: string
+      required:
+      - type
+      - componentId
+      - materialId
+      additionalProperties: false
+    OpBooleanUnion:
+      type: object
+      properties:
+        type:
+          const: boolean_union
+        componentIds:
+          type: array
+          items:
+            type: string
+      required:
+      - type
+      - componentIds
+      additionalProperties: false
+    OpEngraveSurface:
+      type: object
+      properties:
+        type:
+          const: engrave_surface
+        componentId:
+          type: string
+        text:
+          type: string
+          maxLength: 80
+        depthMm:
+          type: number
+          exclusiveMinimum: 0
+      required:
+      - type
+      - componentId
+      - text
+      - depthMm
+      additionalProperties: false
+    OpPatternOnCurve:
+      type: object
+      properties:
+        type:
+          const: pattern_on_curve
+        componentId:
+          type: string
+        curveId:
+          type: string
+        count:
+          type: integer
+          minimum: 1
+          maximum: 100
+      required:
+      - type
+      - componentId
+      - curveId
+      - count
+      additionalProperties: false
     Money:
       type: object
       properties:
@@ -4285,13 +4522,90 @@ components:
       type: object
       properties:
         id: *id002
+        kind:
+          $ref: '#/components/schemas/JobKind'
         state:
           $ref: '#/components/schemas/JobState'
         revisionId: *id002
+        simulated:
+          type: boolean
+          description: true si lo produjo un adaptador simulado (demo); la UI muestra el banner.
+        errorCode:
+          type:
+          - string
+          - 'null'
+          description: Código estable cuando state es FAILED; sin PII ni trazas internas.
+        artifacts:
+          type: array
+          description: Vacío hasta SUCCEEDED. Cada archivo se descarga con getJobArtifact tras ACL.
+          items:
+            $ref: '#/components/schemas/JobArtifact'
       required:
       - id
+      - kind
       - state
       - revisionId
+      - simulated
+      - errorCode
+      - artifacts
+      additionalProperties: false
+    JobKind:
+      type: string
+      enum:
+      - PREVIEW
+      - GEOMETRY
+      - VALIDATION
+      - AI
+    JobArtifact:
+      type: object
+      properties:
+        id: *id002
+        kind:
+          type: string
+          enum:
+          - STEP
+          - STL
+          - GLB_PREVIEW
+          - DFM_REPORT
+          - MANIFEST
+          - OPERATION_DIFF
+          - MESH_REPORT
+        units:
+          type: string
+          enum:
+          - mm
+          - m
+          - none
+        sha256:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        bytes:
+          type: integer
+          minimum: 0
+      required:
+      - id
+      - kind
+      - units
+      - sha256
+      - bytes
+      additionalProperties: false
+    ArtifactDownload:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: URL firmada de corta duración; no reutilizar ni registrar.
+        expiresAt:
+          type: string
+          format: date-time
+        sha256:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+      required:
+      - url
+      - expiresAt
+      - sha256
       additionalProperties: false
     Project:
       type: object

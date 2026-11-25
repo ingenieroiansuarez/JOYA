@@ -1,5 +1,14 @@
 # Contratos — changelog
 
+## 1.2.0 — 2026-11-25 (hito 100, trabajos y operaciones)
+- `proposeOperation.operation` deja de ser un objeto libre: es `DesignOperation`, un `oneOf` con discriminador `type` generado de las herramientas `PREVIEW` de `13_AI_PROMPTS_AND_TOOLS/tools.json` (`OpCreateRing`, `OpModifyParameter`, ...). Una herramienta `READ`/`CONFIRM` o un tipo desconocido no es una operación válida. La validación semántica (pertenencia, rangos de familia, presupuesto) sigue en el servidor.
+- `create_ring` se verifica contra los rangos de `ring.classic` en `families.json`.
+- `Job` añade `kind` (`PREVIEW`, `GEOMETRY`, `VALIDATION`, `AI`), `simulated`, `errorCode` y `artifacts` (`JobArtifact`: id, tipo, unidades, SHA-256, bytes). Los artefactos nunca traen URL.
+- Nuevo `GET /v1/jobs/{id}/artifacts/{artifactId}` (`getJobArtifact`, `job.read`): devuelve una URL firmada de corta duración con su `expiresAt` y SHA-256.
+- El documento se valida como OpenAPI 3.1 en CI (`openapi-spec-validator` 0.9.0, dependencias fijadas en `tools/contracts/requirements.lock`).
+- Compatibilidad: cambio incompatible para clientes que enviaban operaciones libres o leían `Job` sin los campos nuevos; no hay clientes ni API implementados todavía.
+- Sigue libre (pendiente): `payload` de las operaciones de sincronización offline y `details` de `Error`.
+
 ## 1.1.0 — 2026-11-25 (hito 100, estados)
 Fuente de verdad de estados: `08_STATE_MACHINES/machines.json`. `08_STATE_MACHINES/bindings.json` dice dónde vive cada máquina; `tools/contracts/check_contracts.py` falla en CI si SQL u OpenAPI se desvían.
 
@@ -18,4 +27,4 @@ SQL de referencia (`core_reference.sql`):
 
 Migración: el SQL es de referencia y no hay base desplegada, así que no hay datos que migrar. La primera migración real del backend (hito 100) parte de esta versión. Roll-forward: columnas nuevas con default; los valores añadidos a CHECK amplían el dominio sin invalidar filas existentes.
 
-Pendiente de la revisión del handoff (no incluido aquí): `Job` sin artefactos, transiciones de diseño/pago/pedido sin endpoint, `proposeOperation.operation` sin tipar, `quote` sin digest, sobre de eventos duplicado, permisos sin rol.
+Pendiente de la revisión del handoff (no incluido aquí): transiciones de diseño/pago/pedido sin endpoint, `quote` sin digest, sobre de eventos duplicado, permisos sin rol.
