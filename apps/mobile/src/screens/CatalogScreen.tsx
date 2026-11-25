@@ -67,7 +67,8 @@ export function CatalogScreen({ onOpen }: { onOpen: (id: string) => void }) {
 }
 
 const chips = StyleSheet.create({
-  bar: { flexGrow: 0 },
+  // ScrollView defaults to flexShrink 1: in landscape (Flip 7 unfolded, ~411 dp tall) the list squashed the chips.
+  bar: { flexGrow: 0, flexShrink: 0 },
   row: { paddingHorizontal: s[3], gap: s[1], paddingBottom: s[2] },
   chip: {
     minHeight: tokens.touchTargetDp, paddingHorizontal: s[3], borderRadius: tokens.touchTargetDp / 2, borderWidth: 1,

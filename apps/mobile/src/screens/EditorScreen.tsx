@@ -37,6 +37,8 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
   const [issue, setIssue] = useState<{ name: string; issue: Issue } | null>(null);
   const [preview, setPreview] = useState<Preview>({ phase: "none" });
   const [glb, setGlb] = useState<string | null>(null);
+  // Why there is no mesh yet: being built, no connection, or the build failed. Never "offline" while building.
+  const [mesh, setMesh] = useState<"building" | "offline" | "failed">("building");
   const [syncing, setSyncing] = useState<"idle" | "busy" | "offline">("idle");
   const alive = useRef({ aborted: false });
   useEffect(() => () => { alive.current.aborted = true; }, []);
@@ -74,12 +76,16 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
       if (cancelled) return;
       if (cached) { setGlb(cached); return; }
       setGlb(null);
+      setMesh("building");
       try {
         const job = await waitForJob(client, (await client.buildRevision(headId, newId())).id, { signal: alive.current });
-        if (job.state === "SUCCEEDED" && !cancelled) setGlb(await loadGlb(client, job, { store, cacheKey: headDigest }));
+        if (cancelled) return;
+        if (job.state === "SUCCEEDED") setGlb(await loadGlb(client, job, { store, cacheKey: headDigest }));
+        else setMesh("failed");
         saw(undefined);
       } catch (e) {
-        saw(e); // offline: the viewer says the 3D view needs a connection
+        saw(e);
+        if (!cancelled) setMesh(e instanceof ApiError && e.kind === "offline" ? "offline" : "failed");
       }
     })();
     return () => { cancelled = true; };
@@ -180,7 +186,7 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
       {offline && <Text accessibilityRole="alert" style={styles.banner}>{t("offlineBanner")}</Text>}
       <ScrollView contentContainerStyle={ed.content} keyboardShouldPersistTaps="handled">
         <Viewer glb={glb} color={alloyColor(comp.materialId)} label={t("viewerLabel", { name: title })}
-          emptyText={t("viewerEmpty")} errorText={t("viewerError")} loadingText={t("viewerLoading")} />
+          emptyText={t(mesh === "building" ? "viewerBuilding" : mesh === "offline" ? "viewerEmpty" : "viewerBuildFailed")} errorText={t("viewerError")} loadingText={t("viewerLoading")} />
         <Text style={styles.muted}>{t("previewNote")}</Text>
 
         {local.problems.length > 0 && (

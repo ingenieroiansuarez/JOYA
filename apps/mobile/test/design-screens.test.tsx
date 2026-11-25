@@ -5,7 +5,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 import en from "../src/messages/en.json";
 import { DesignApi, FakeDesignServer, GLB_BYTES, PREVIEW_BYTES, PREVIEW_SHA, sqlite, uuid } from "./designFakes";
 
@@ -36,7 +36,7 @@ import { SqliteDesignStore } from "../src/design/store";
 import { SessionProvider } from "../src/session";
 import { DesignsScreen } from "../src/screens/DesignsScreen";
 import { EditorScreen } from "../src/screens/EditorScreen";
-import { posted } from "./webviewMock";
+import { fromPage, posted } from "./webviewMock";
 
 const config = { env: "ci" as const, issuer: "http://127.0.0.1:8080/realms/aurea-local", apiUrl: "http://127.0.0.1:3000" };
 const OWNER = "3c1e9f50-0000-4000-8000-00000000a11c";
@@ -111,6 +111,9 @@ describe("design editor", () => {
     server.online = false;
     const first = await app(server, file, <EditorScreen id={p.id} onBack={() => undefined} />);
     await screen.findByText("Revision 1", { exact: false });
+    // No mesh cached and no connection: says so (and not "building").
+    await act(async () => { fromPage({ type: "ready" }); });
+    expect(await screen.findByText(en.viewerEmpty)).toBeTruthy();
 
     await fireEvent.changeText(input("Inner diameter"), "40");
     await fireEvent(input("Inner diameter"), "endEditing");

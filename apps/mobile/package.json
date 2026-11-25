@@ -9,7 +9,8 @@
     "typecheck": "node scripts/viewer-html.mjs && tsc --noEmit",
     "test": "node scripts/viewer-html.mjs && tsc --noEmit && jest --ci && pnpm run bundle",
     "bundle": "EXPO_NO_TELEMETRY=1 EXPO_PUBLIC_AUREA_ENV=ci EXPO_PUBLIC_OIDC_ISSUER=http://127.0.0.1:8080/realms/aurea-local EXPO_PUBLIC_API_URL=http://127.0.0.1:3000 expo export --platform android --output-dir dist",
-    "viewer": "node scripts/viewer-html.mjs"
+    "viewer": "node scripts/viewer-html.mjs",
+    "postinstall": "node scripts/viewer-html.mjs"
   },
   "dependencies": {
     "@aurea/design": "workspace:*",
