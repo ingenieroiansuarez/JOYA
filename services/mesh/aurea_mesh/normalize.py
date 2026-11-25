@@ -137,6 +137,8 @@ def normalize(data: bytes, scale: ScaleSpec, *, source: dict) -> tuple[dict, byt
     # glTF Y-up -> internal Z-up (+90 deg about X).
     mesh.apply_transform(trimesh.transformations.rotation_matrix(np.pi / 2, [1, 0, 0]))
     mesh, repair_log = _repair(mesh)
+    if len(mesh.faces) == 0:
+        raise MeshImportError("no triangles left after repair", code="MESH_EMPTY")
 
     extents = mesh.extents
     idx = int(np.argmax(extents)) if scale.axis == "max" else AXES[scale.axis]

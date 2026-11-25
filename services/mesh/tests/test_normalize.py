@@ -129,3 +129,12 @@ def test_non_finite_vertices_rejected():
     data = trimesh.exchange.gltf.export_glb(trimesh.Scene(bad))
     with pytest.raises(MeshImportError):
         normalize(data, OK_SCALE, source=SRC)
+
+
+def test_mesh_that_repairs_to_nothing_is_rejected():
+    v = [[0, 0, 0], [1, 0, 0], [2, 0, 0]]  # collinear: zero area
+    flat = trimesh.Trimesh(vertices=v, faces=[[0, 1, 2]], process=False)
+    data = trimesh.exchange.gltf.export_glb(trimesh.Scene(flat))
+    with pytest.raises(MeshImportError) as e:
+        normalize(data, OK_SCALE, source=SRC)
+    assert e.value.code == "MESH_EMPTY"
