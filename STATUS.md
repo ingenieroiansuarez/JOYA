@@ -1,6 +1,6 @@
 # STATUS — AUREA
 
-Hito activo: **500 Commercial slice** (400 — AURA aceptado). Actualizado: 2026-11-25.
+Hito activo: **500 Commercial slice**, gate cumplido y pendiente de la aceptación de ian (400 — AURA aceptado). Actualizado: 2026-11-25.
 Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5YS
 
 ## Hitos
@@ -11,7 +11,8 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | 200 Boutique | ACEPTADO (ian, 2026-11-25, PR #30) | Gate "APK dev navega el catálogo; estados vacío/error accesibles": APK debug en el Z Flip 7 navega catálogo, detalle y favoritos contra la API; error "Sin conexión" con Reintentar visto con la API apagada (2026-11-25). Contratos 1.8.0, migración 0001, seed demo, API (PR #26), app (PR #27–#29). Pendiente: recorrido con TalkBack |
 | 300 Jewelry Engine | ACEPTADO (ian, 2026-11-25, PR #35) | Gate "parámetro con geometría real; entrada inválida rechazada; reinicio sin conexión; roundtrip STEP/STL": probado en el Z Flip 7 contra API y worker reales (2026-11-25, 12:34–12:50). PR #31–#34 y la de cierre |
 | 400 AURA | ACEPTADO (ian, 2026-11-25, PR #37) | Gate "Prompt → proposal → authorized revision; failure/quota tests": probado en el Z Flip 7 (2026-11-25, 14:15–14:17) con el adaptador simulado `aura-sim`; API, panel y golden set (PR #36). Sin modelo de IA real por decisión de ian (sin presupuesto); concepto/malla con IA no se hacen |
-| 500–1000 | NOT_STARTED | |
+| 500 Commercial slice | GATE_MET, pendiente de aceptación de ian | Gate "E2E de Android a web, snapshot, pago duplicado y stock": flujo completo en el Z Flip 7 + panel web (2026-11-25, 15:22–15:25); snapshot, pago duplicado y stock con pruebas automáticas. API, panel y app (PR #39), arreglos de la prueba (PR #40). Precios, impuesto y pagos simulados |
+| 600–1000 | NOT_STARTED | |
 
 ## Backlog 000
 | ID | Tarea | Estado | Evidencia |
@@ -100,6 +101,29 @@ TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # db 3, api 45 (5 contra Keycloak)
   - Probado: 9 formas de token malo (sin cabecera, no JWT, vencido, emisor y audiencia ajenos, otra clave, `alg: none`, HS256 con la clave pública, payload alterado) → 401; contra Keycloak real, client credentials → `/v1/me` como auditor, login PKCE de `dev.cliente` → customer, el código no se canjea sin `code_verifier` ni con uno falso, la petición sin `code_challenge` se rechaza y el ID token no sirve contra la API.
   - Pendiente: MFA para personal y step-up (exige pantallas de login de staff, hito 200+), alcance por recurso y ubicación (lo aplica cada módulo cuando exista), revocación/introspección, y desplegar el IdP de producción (Keycloak autogestionado, ADR-0008, decidido el 2026-11-25).
 - Probado localmente: compose arriba, migración aplicada, `state_checks.sql` sobre la base migrada OK, Valkey rechaza clientes sin contraseña (`NOAUTH`).
+
+## Hito 500 — Commercial slice
+Gate: "E2E from Android to web, snapshot, duplicate payment and stock tests".
+- API (contratos 1.11.0, migración 0004, PR #39): precio en el servidor desde la geometría real de una revisión fija (decimales exactos), cotización DRAFT → emitida por un asesor (congelada) → aceptada con el digest exacto; aceptar crea el pedido y aparta el metal en una transacción; anticipo por el proveedor **simulado** con eventos firmados (HMAC) por el mismo camino del webhook; inventario con libro append-only. Reglas de precio `DEMO_SYNTHETIC` (`15_COMMERCE_AND_PAYMENTS/pricing.demo.json`): no son precios reales y producción no arranca con ellas.
+- Panel web del equipo (PR #39): login BFF con PKCE, cotizaciones (precio al cliente y costo interno, Emitir), pedidos e inventario; se actualiza cada 5 s.
+- App (PR #39): "Pedir cotización" en el editor, pantalla de cotización (espera al asesor, Aceptar) y de pedido ("Pagar anticipo (simulado)").
+- Prueba en dispositivo (2026-11-25, Z Flip 7, build debug ya instalado con el JS nuevo por Metro y `adb reverse`; API en 3900, worker, Keycloak, PostgreSQL y panel web en el portátil de ian, código idéntico a main 4f3e0af). Horas de Bogotá (UTC−5); capturas en `C:\Users\IAN\joya\evidence\hito-500\` (no están en git):
+  1. Línea base: lote demo de oro amarillo 18k con 30 g, 0 apartados, 0 asignados.
+  2. 15:22:39 — `dev.cliente` crea un anillo Clásico en oro amarillo 18k (revisión 1) y toca "Pedir cotización": "Un asesor está revisando tu precio", total estimado $5.036.913, anticipo $1.511.100.
+  3. ~15:23 — en el panel, `dev.equipo` (asesor, bodega, finanzas) ve el borrador con costo interno 2.539.621 y margen 0,40. Emitir con la fecha por defecto falló con `VALIDATION_FAILED` (la fecha por defecto pasaba del límite de vigencia; arreglado en PR #40). Con fecha 2026-12-01 se emitió a las 15:23:42.
+  4. 15:23:50 — el teléfono cambió solo a "Tu precio está listo", válida hasta el 1 de diciembre de 2026. Aceptar a las 15:23:55: pedido "Esperando el anticipo", 7,637 g de oro apartados.
+  5. 15:24:15 — "Pagar anticipo de $ 1.511.100 COP (simulado)"; a las 15:24:21 "Pedido confirmado", pagado $1.511.100, saldo $3.525.813, 7,637 g "asignado a tu pieza".
+  6. 15:24:28 — en el panel: pedido confirmado, un solo pago (anticipo simulado confirmado); lote con 30 g, 7,637 g asignados y 22,363 g disponibles.
+  7. 15:24:35 — dos toques más en la zona del botón de pago: nada nuevo. En la base: 1 pago (DEPOSIT, CONFIRMED, 1511100, simulado) y 1 cotización ACCEPTED.
+- Encontrado en la prueba y arreglado en PR #40: el lanzador web fallaba en Windows (`ERR_UNSUPPORTED_ESM_URL_SCHEME`, verificado en el PC con el arreglo); la fecha de vigencia por defecto se rechazaba (no se volvió a probar en el teléfono, sí con prueba automática); desde la app no había vuelta al pedido y "Pedir cotización" habría creado otra cotización sobre una revisión ya vendida (ahora devuelve la aceptada); el último botón quedaba tapado por la barra de pestañas.
+- Snapshot, pago duplicado y stock: `apps/api/test/commerce.test.mjs` (16): precio congelado ante cambio de reglas y de diseño, re-precio del borrador (`PRICE_CHANGED`), misma clave / otra clave / 6 intentos concurrentes → 1 pago, evento repetido, firma mala, importe distinto en revisión, 3 aceptaciones concurrentes con metal para 2 → 2, reserva vencida y metal vendido entretanto.
+```bash
+TEST_DATABASE_URL=… pnpm --filter @aurea/api test   # 137 pass
+pnpm --filter @aurea/web test                       # 14 pass
+pnpm --filter @aurea/mobile test                    # 67 pass + bundle Android
+```
+- No verificado: el refresco automático de 5 s del panel (en la prueba se recargó la página); recorrido con TalkBack.
+- Pendiente: lista de pedidos en el perfil de la app; impuesto real y proveedor de pagos real (sujetos a autorización y presupuesto; por decisión de ian todo sigue simulado); conciliación manual de pagos en revisión (hito 700).
 
 ## Hito 400 — AURA
 Gate: "Prompt → proposal → authorized revision; failure/quota tests".
