@@ -55,6 +55,10 @@ export function DesignsScreen({ onOpen, onNew }: { onOpen: (id: string) => void;
   }, [store, sync, client, readLocal, saw]);
 
   useEffect(() => { void load(); }, [load]);
+  // Back online (a sync or another screen reached the API): fetch again, so the list and the banner
+  // stop saying "offline" without waiting for a change of tab.
+  const lostConnection = state.phase === "ready" && state.error?.kind === "offline";
+  useEffect(() => { if (connectivity === "online" && lostConnection) void load(); }, [connectivity, lostConnection, load]);
   useEffect(() => { if (state.phase === "ready") void readLocal().then((rows) => setState((s0) => (s0.phase === "ready" ? { ...s0, rows } : s0))); },
     [version]);
 
@@ -70,7 +74,7 @@ export function DesignsScreen({ onOpen, onNew }: { onOpen: (id: string) => void;
   }
   if (!ready || state.phase === "loading") return <View style={styles.screen}>{header}<Loading label={t("loadingDesigns")} /></View>;
 
-  const offline = connectivity === "offline" || state.error?.kind === "offline";
+  const offline = connectivity === "offline" || (connectivity !== "online" && state.error?.kind === "offline");
   const empty = state.rows.length === 0;
   return (
     <View style={styles.screen}>
