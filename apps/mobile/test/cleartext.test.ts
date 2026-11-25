@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { cleartextHosts, networkSecurityXml } = require("../plugins/with-dev-cleartext.js");
+const { applyToManifest, cleartextHosts, networkSecurityXml } = require("../plugins/with-dev-cleartext.js");
 
 const local = {
   EXPO_PUBLIC_AUREA_ENV: "local",
@@ -26,5 +26,12 @@ describe("release cleartext allowance", () => {
     const xml = networkSecurityXml(["127.0.0.1", "localhost"]);
     expect(xml).toContain('<base-config cleartextTrafficPermitted="false" />');
     expect(xml).toContain('<domain includeSubdomains="false">127.0.0.1</domain>');
+  });
+  it("removes a policy left by an earlier dev build from a production manifest", () => {
+    const manifest = { manifest: { application: [{ $: { "android:networkSecurityConfig": "@xml/network_security_config" } }] } };
+    applyToManifest(manifest, []);
+    expect(manifest.manifest.application[0].$).toEqual({});
+    applyToManifest(manifest, ["127.0.0.1"]);
+    expect(manifest.manifest.application[0].$["android:networkSecurityConfig"]).toBe("@xml/network_security_config");
   });
 });

@@ -34,26 +34,47 @@ ${domains}
 `;
 }
 
+const XML_REF = "@xml/network_security_config";
+
+/**
+ * Applies (local/ci) or removes (demo/production) the policy. Removal matters when an existing
+ * android/ folder from a dev build is regenerated without --clean: the old XML and manifest
+ * reference would otherwise survive into a production build.
+ */
 function withDevCleartext(config) {
   const hosts = cleartextHosts(process.env);
-  if (hosts.length === 0) return config;
   config = withDangerousMod(config, [
     "android",
     (c) => {
       const dir = path.join(c.modRequest.platformProjectRoot, "app/src/main/res/xml");
-      fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(path.join(dir, "network_security_config.xml"), networkSecurityXml(hosts));
+      const file = path.join(dir, "network_security_config.xml");
+      if (hosts.length) {
+        fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(file, networkSecurityXml(hosts));
+      } else {
+        fs.rmSync(file, { force: true });
+      }
       return c;
     },
   ]);
   return withAndroidManifest(config, (c) => {
-    const app = c.modResults.manifest.application[0];
-    app.$["android:networkSecurityConfig"] = "@xml/network_security_config";
-    delete app.$["android:usesCleartextTraffic"];
+    applyToManifest(c.modResults, hosts);
     return c;
   });
+}
+
+function applyToManifest(manifest, hosts) {
+  const app = manifest.manifest.application[0];
+  if (hosts.length) {
+    app.$["android:networkSecurityConfig"] = XML_REF;
+    delete app.$["android:usesCleartextTraffic"];
+  } else if (app.$["android:networkSecurityConfig"] === XML_REF) {
+    delete app.$["android:networkSecurityConfig"];
+  }
+  return manifest;
 }
 
 module.exports = withDevCleartext;
 module.exports.cleartextHosts = cleartextHosts;
 module.exports.networkSecurityXml = networkSecurityXml;
+module.exports.applyToManifest = applyToManifest;
