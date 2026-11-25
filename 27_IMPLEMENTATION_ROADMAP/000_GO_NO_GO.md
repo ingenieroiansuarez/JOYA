@@ -22,12 +22,12 @@ Gate del hito (`milestones.csv`): evidencia en dispositivos reales o bloqueo exp
 | 0005 PostgreSQL + objetos + Redis + SQLite | Dirección, sin PoC | Hito 100 |
 | 0006 REST/OpenAPI + WS | Dirección; **contratos con deriva** | Corregir inconsistencias listadas en `STATUS.md` antes de generar clientes |
 | 0007 Outbox + BullMQ | Dirección, sin PoC | Hito 100 |
-| 0008 OIDC/Keycloak + RBAC/ABAC | Dirección; **pendiente decisión** Keycloak vs IdP gestionado | Decisión de ian |
+| 0008 OIDC/Keycloak + RBAC/ABAC | **Aceptado**: Keycloak autogestionado (2026-11-25) | Login PKCE probado en Z Flip 7 |
 | 0009 AI Gateway declarativo | **Parcial** | El contrato del adaptador de malla sigue el patrón; `proposeOperation.operation` sigue sin tipar |
 | 0010 AWS referencia, Compose local | Dirección, sin PoC | Hito 100 |
 | 0011 Revisiones y conflictos explícitos | Dirección, sin PoC | Hito 300 |
 | 0012 Demo → MVP → Profesional | Vigente | |
-| 0013 ERP operativo, exportación contable | Dirección; depende de mercado piloto | Decisión de ian (país y moneda) |
+| 0013 ERP operativo, exportación contable | Dirección; mercado piloto Colombia, COP (2026-11-25) | Proveedor de pagos pendiente |
 | 0014 Licencias y SBOM como gate | **Incumplido parcialmente** | Falta SBOM y revisión legal; añadir SBOM en CI del hito 100 |
 | 0015 AR SDK intercambiable | **Sin evidencia** | Bloqueado con P0-05 |
 
@@ -44,7 +44,7 @@ Condiciones para el hito 100:
 
 ## 4. Decisiones abiertas para ian
 1. ~~Aceptar o no este go condicional~~: aceptado por ian el 2026-11-25.
-2. Mercado/país piloto y moneda.
-3. Keycloak autogestionado o IdP gestionado.
+2. ~~Mercado/país piloto y moneda~~: Colombia, COP (2026-11-25).
+3. ~~Keycloak autogestionado o IdP gestionado~~: Keycloak autogestionado (2026-11-25).
 4. Permiso y presupuesto para evaluar Meshy/Tripo.
 5. Dispositivos y participantes para P0-05 (AR), o aceptar AR fuera del alcance de demo/MVP.
