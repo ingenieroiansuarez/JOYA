@@ -1,0 +1,371 @@
+{
+  "synthetic": true,
+  "note": "Catálogo sintético de demostración (29_DEMO_SCENARIO). Precios, pesos y piedras ficticios; no son datos reales ni oferta comercial. Nunca se carga en producción.",
+  "products": [
+    {
+      "id": "27c746ed-46fe-5880-8037-57232196a02f",
+      "sku": "AUR-RNG-001",
+      "position": 10,
+      "category": "RING",
+      "metal": "GOLD_18K_YELLOW",
+      "metalWeightGrams": "4.200",
+      "stones": [],
+      "content": {
+        "es": {
+          "name": "Anillo Clásico",
+          "summary": "Banda media caña pulida a espejo.",
+          "description": "Pieza de demostración con datos sintéticos: peso, piedras y precio son ficticios y no constituyen una oferta.",
+          "collection": "Esencial"
+        },
+        "en": {
+          "name": "Classic Ring",
+          "summary": "Mirror-polished half-round band.",
+          "description": "Demo piece with synthetic data: weight, stones and price are fictitious and are not an offer.",
+          "collection": "Essential"
+        }
+      },
+      "price": {
+        "amount": "2850000.00",
+        "currency": "COP"
+      },
+      "available": true,
+      "customizable": true,
+      "published": true
+    },
+    {
+      "id": "6446e9c4-a0a4-5d75-b745-ca98f2272047",
+      "sku": "AUR-RNG-002",
+      "position": 20,
+      "category": "RING",
+      "metal": "GOLD_18K_WHITE",
+      "metalWeightGrams": "3.600",
+      "stones": [
+        {
+          "type": "DIAMOND",
+          "count": 1,
+          "totalCarats": "0.250",
+          "origin": "LAB_GROWN"
+        }
+      ],
+      "content": {
+        "es": {
+          "name": "Solitario Aurora",
+          "summary": "Solitario de cuatro garras sobre banda fina.",
+          "description": "Pieza de demostración con datos sintéticos: peso, piedras y precio son ficticios y no constituyen una oferta.",
+          "collection": "Aurora"
+        },
+        "en": {
+          "name": "Aurora Solitaire",
+          "summary": "Four-prong solitaire on a slim band.",
+          "description": "Demo piece with synthetic data: weight, stones and price are fictitious and are not an offer.",
+          "collection": "Aurora"
+        }
+      },
+      "price": {
+        "amount": "5400000.00",
+        "currency": "COP"
+      },
+      "available": true,
+      "customizable": true,
+      "published": true
+    },
+    {
+      "id": "7a8b9111-6358-5b6d-9f66-ad9761bfba4a",
+      "sku": "AUR-RNG-003",
+      "position": 30,
+      "category": "RING",
+      "metal": "GOLD_18K_ROSE",
+      "metalWeightGrams": "5.100",
+      "stones": [
+        {
+          "type": "EMERALD",
+          "count": 1,
+          "totalCarats": "0.800",
+          "origin": "LAB_GROWN"
+        }
+      ],
+      "content": {
+        "es": {
+          "name": "Anillo Esmeralda Bogotá",
+          "summary": "Esmeralda talla esmeralda con bisel envolvente.",
+          "description": "Pieza de demostración con datos sintéticos: peso, piedras y precio son ficticios y no constituyen una oferta.",
+          "collection": "Andina"
+        },
+        "en": {
+          "name": "Bogotá Emerald Ring",
+          "summary": "Emerald-cut emerald in a wraparound bezel.",
+          "description": "Demo piece with synthetic data: weight, stones and price are fictitious and are not an offer.",
+          "collection": "Andina"
+        }
+      },
+      "price": {
+        "amount": "7200000.00",
+        "currency": "COP"
+      },
+      "available": true,
+      "customizable": true,
+      "published": true
+    },
+    {
+      "id": "097d7466-724d-528b-8285-b464426ea73a",
+      "sku": "AUR-RNG-004",
+      "position": 40,
+      "category": "RING",
+      "metal": "PLATINUM_950",
+      "metalWeightGrams": "6.400",
+      "stones": [
+        {
+          "type": "DIAMOND",
+          "count": 7,
+          "totalCarats": "0.350",
+          "origin": "LAB_GROWN"
+        }
+      ],
+      "content": {
+        "es": {
+          "name": "Media Alianza Estela",
+          "summary": "Siete piedras en carril sobre platino.",
+          "description": "Pieza de demostración con datos sintéticos: peso, piedras y precio son ficticios y no constituyen una oferta.",
+          "collection": "Aurora"
+        },
+        "en": {
+          "name": "Estela Half Eternity",
+          "summary": "Seven channel-set stones in platinum.",
+          "description": "Demo piece with synthetic data: weight, stones and price are fictitious and are not an offer.",
+          "collection": "Aurora"
+        }
+      },
+      "price": {
+        "amount": "9600000.00",
+        "currency": "COP"
+      },
+      "available": false,
+      "customizable": false,
+      "published": true
+    },
+    {
+      "id": "28901ee7-2167-5fb2-bfd4-46ee93fe8b40",
+      "sku": "AUR-PND-001",
+      "position": 50,
+      "category": "PENDANT",
+      "metal": "GOLD_18K_YELLOW",
+      "metalWeightGrams": "2.300",
+      "stones": [],
+      "content": {
+        "es": {
+          "name": "Dije Medalla",
+          "summary": "Medalla lisa lista para grabar.",
+          "description": "Pieza de demostración con datos sintéticos: peso, piedras y precio son ficticios y no constituyen una oferta.",
+          "collection": "Esencial"
+        },
+        "en": {
+          "name": "Medallion Pendant",
+          "summary": "Plain medallion ready for engraving.",
+          "description": "Demo piece with synthetic data: weight, stones and price are fictitious and are not an offer.",
+          "collection": "Essential"
+        }
+      },
+      "price": {
+        "amount": "1650000.00",
+        "currency": "COP"
+      },
+      "available": true,
+      "customizable": true,
+      "published": true
+    },
+    {
+      "id": "1f23585c-9a0e-5c41-b681-c96f9c49f3b3",
+      "sku": "AUR-PND-002",
+      "position": 60,
+      "category": "PENDANT",
+      "metal": "SILVER_925",
+      "metalWeightGrams": "3.900",
+      "stones": [
+        {
+          "type": "RUBY",
+          "count": 1,
+          "totalCarats": "0.500",
+          "origin": "LAB_GROWN"
+        }
+      ],
+      "content": {
+        "es": {
+          "name": "Dije Gota Rubí",
+          "summary": "Rubí en gota con engaste de bisel.",
+          "description": "Pieza de demostración con datos sintéticos: peso, piedras y precio son ficticios y no constituyen una oferta.",
+          "collection": "Andina"
+        },
+        "en": {
+          "name": "Ruby Drop Pendant",
+          "summary": "Bezel-set pear ruby.",
+          "description": "Demo piece with synthetic data: weight, stones and price are fictitious and are not an offer.",
+          "collection": "Andina"
+        }
+      },
+      "price": {
+        "amount": "980000.00",
+        "currency": "COP"
+      },
+      "available": true,
+      "customizable": false,
+      "published": true
+    },
+    {
+      "id": "7393c361-87a4-5753-8952-c846249508ca",
+      "sku": "AUR-EAR-001",
+      "position": 70,
+      "category": "EARRINGS",
+      "metal": "GOLD_18K_YELLOW",
+      "metalWeightGrams": "2.800",
+      "stones": [],
+      "content": {
+        "es": {
+          "name": "Argollas Río",
+          "summary": "Argollas tubulares de 18 mm.",
+          "description": "Pieza de demostración con datos sintéticos: peso, piedras y precio son ficticios y no constituyen una oferta.",
+          "collection": "Esencial"
+        },
+        "en": {
+          "name": "Río Hoops",
+          "summary": "18 mm tubular hoops.",
+          "description": "Demo piece with synthetic data: weight, stones and price are fictitious and are not an offer.",
+          "collection": "Essential"
+        }
+      },
+      "price": {
+        "amount": "2100000.00",
+        "currency": "COP"
+      },
+      "available": true,
+      "customizable": false,
+      "published": true
+    },
+    {
+      "id": "78f379b7-5321-5d9d-b08f-112847b2d889",
+      "sku": "AUR-EAR-002",
+      "position": 80,
+      "category": "EARRINGS",
+      "metal": "GOLD_18K_WHITE",
+      "metalWeightGrams": "1.600",
+      "stones": [
+        {
+          "type": "SAPPHIRE",
+          "count": 2,
+          "totalCarats": "0.600",
+          "origin": "LAB_GROWN"
+        }
+      ],
+      "content": {
+        "es": {
+          "name": "Topos Zafiro",
+          "summary": "Par de zafiros redondos en cuatro garras.",
+          "description": "Pieza de demostración con datos sintéticos: peso, piedras y precio son ficticios y no constituyen una oferta.",
+          "collection": "Aurora"
+        },
+        "en": {
+          "name": "Sapphire Studs",
+          "summary": "Pair of round sapphires in four prongs.",
+          "description": "Demo piece with synthetic data: weight, stones and price are fictitious and are not an offer.",
+          "collection": "Aurora"
+        }
+      },
+      "price": {
+        "amount": "3300000.00",
+        "currency": "COP"
+      },
+      "available": true,
+      "customizable": false,
+      "published": true
+    },
+    {
+      "id": "4fe8c936-e35b-5617-bad4-fa5f2f24206a",
+      "sku": "AUR-BRC-001",
+      "position": 90,
+      "category": "BRACELET",
+      "metal": "SILVER_925",
+      "metalWeightGrams": "12.500",
+      "stones": [],
+      "content": {
+        "es": {
+          "name": "Esclava Cauca",
+          "summary": "Esclava abierta martillada a mano.",
+          "description": "Pieza de demostración con datos sintéticos: peso, piedras y precio son ficticios y no constituyen una oferta.",
+          "collection": "Andina"
+        },
+        "en": {
+          "name": "Cauca Cuff",
+          "summary": "Open hand-hammered cuff.",
+          "description": "Demo piece with synthetic data: weight, stones and price are fictitious and are not an offer.",
+          "collection": "Andina"
+        }
+      },
+      "price": {
+        "amount": "1250000.00",
+        "currency": "COP"
+      },
+      "available": true,
+      "customizable": false,
+      "published": true
+    },
+    {
+      "id": "c495c60f-e5c6-5073-94dc-21becaa6c15b",
+      "sku": "AUR-NCK-001",
+      "position": 100,
+      "category": "NECKLACE",
+      "metal": "GOLD_18K_ROSE",
+      "metalWeightGrams": "4.700",
+      "stones": [],
+      "content": {
+        "es": {
+          "name": "Cadena Veneciana",
+          "summary": "Cadena veneciana de 45 cm.",
+          "description": "Pieza de demostración con datos sintéticos: peso, piedras y precio son ficticios y no constituyen una oferta.",
+          "collection": "Esencial"
+        },
+        "en": {
+          "name": "Venetian Chain",
+          "summary": "45 cm Venetian box chain.",
+          "description": "Demo piece with synthetic data: weight, stones and price are fictitious and are not an offer.",
+          "collection": "Essential"
+        }
+      },
+      "price": {
+        "amount": "3900000.00",
+        "currency": "COP"
+      },
+      "available": true,
+      "customizable": false,
+      "published": true
+    },
+    {
+      "id": "da9579dd-d25c-5ea9-8ace-55a7a3d798fa",
+      "sku": "AUR-RNG-099",
+      "position": 110,
+      "category": "RING",
+      "metal": "GOLD_18K_YELLOW",
+      "metalWeightGrams": "4.000",
+      "stones": [],
+      "content": {
+        "es": {
+          "name": "Borrador sin publicar",
+          "summary": "No debe aparecer en el catálogo.",
+          "description": "Pieza de demostración con datos sintéticos: peso, piedras y precio son ficticios y no constituyen una oferta.",
+          "collection": "Esencial"
+        },
+        "en": {
+          "name": "Unpublished draft",
+          "summary": "Must not appear in the catalog.",
+          "description": "Demo piece with synthetic data: weight, stones and price are fictitious and are not an offer.",
+          "collection": "Essential"
+        }
+      },
+      "price": {
+        "amount": "1000000.00",
+        "currency": "COP"
+      },
+      "available": true,
+      "customizable": true,
+      "published": false
+    }
+  ]
+}

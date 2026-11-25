@@ -10,6 +10,8 @@
     ],
     "customer": [
       "catalog.read",
+      "favorite.read",
+      "favorite.edit",
       "project.create",
       "project.read",
       "project.edit",
@@ -149,6 +151,8 @@
     },
     "customer": {
       "catalog.read": "public",
+      "favorite.read": "own",
+      "favorite.edit": "own",
       "project.create": "self",
       "project.read": "own",
       "project.edit": "own",

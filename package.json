@@ -9,6 +9,7 @@
   "scripts": {
     "bootstrap": "node scripts/bootstrap.mjs",
     "db:migrate": "pnpm --filter @aurea/db migrate",
+    "db:seed:demo": "pnpm --filter @aurea/db seed:demo",
     "test": "node --test scripts/*.test.mjs && pnpm -r --if-present test",
     "license-check": "node scripts/check-licenses.mjs",
     "sbom": "node scripts/sbom.mjs",

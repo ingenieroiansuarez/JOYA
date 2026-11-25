@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { after, before, test } from "node:test";
 import pg from "pg";
+import { readFileSync } from "node:fs";
 import { runMigrations } from "../src/migrate.mjs";
 
 const ADMIN = process.env.TEST_DATABASE_URL;
@@ -65,7 +66,8 @@ test("migrating twice is a no-op", { skip }, async () => {
   await runMigrations(urlFor(DBS.migrated));
   const n = await withDb(DBS.migrated, async (c) =>
     (await c.query("SELECT count(*)::int AS n FROM aurea_migrations.__drizzle_migrations")).rows[0].n);
-  assert.equal(n, 1);
+  const journal = JSON.parse(readFileSync(new URL("../migrations/meta/_journal.json", import.meta.url), "utf8"));
+  assert.equal(n, journal.entries.length);
 });
 
 test("a missing DATABASE_URL fails closed", async () => {

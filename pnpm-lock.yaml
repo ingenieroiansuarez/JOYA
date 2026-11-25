@@ -45,6 +45,9 @@ importers:
         specifier: 7.8.2
         version: 7.8.2
     devDependencies:
+      '@aurea/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@types/node':
         specifier: 22.20.6
         version: 22.20.6
