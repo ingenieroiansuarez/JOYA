@@ -1,0 +1,91 @@
+{
+  "$comment": "Who triggers each action of each machine in machines.json. via: api (operationId in openapi.yaml, POST, response carries the machine state), provider-webhook (signed provider event; simulated adapter in demo), system (server rule inside another transaction), worker (job runner), pending (no trigger yet; milestone). tools/contracts/check_contracts.py fails CI when an action has no entry or an entry points nowhere.",
+  "Design": {
+    "submit": {"via": "api", "operationId": "submitDesign"},
+    "approve": {"via": "api", "operationId": "approveDesign"},
+    "return": {"via": "api", "operationId": "returnDesign"},
+    "replace": {"via": "system", "by": "approving a newer revision of the same project supersedes the previous APPROVED one"}
+  },
+  "Quote": {
+    "issue": {"via": "api", "operationId": "issueQuote"},
+    "accept": {"via": "api", "operationId": "acceptQuote", "returns": "Order", "why": "accepting creates the order in the same transaction; the response is the new order"},
+    "reject": {"via": "api", "operationId": "rejectQuote"},
+    "expire": {"via": "system", "by": "scheduled sweep at expiresAt; acceptQuote also refuses an expired quote"},
+    "replace": {"via": "system", "by": "issuing a new quote for the same revision supersedes the ISSUED one"}
+  },
+  "Payment": {
+    "submit": {"via": "provider-webhook", "by": "provider reports the payment in processing"},
+    "confirm": {"via": "provider-webhook", "by": "verified provider event or authorized reconciliation; never the client"},
+    "fail": {"via": "provider-webhook", "by": "provider reports failure or the intent expires"},
+    "dispute": {"via": "provider-webhook", "by": "provider opens a chargeback"},
+    "refund": {"via": "api", "operationId": "refundPayment"}
+  },
+  "Reservation": {
+    "allocate": {"via": "system", "by": "order confirmation allocates held stock"},
+    "expire_or_cancel": {"via": "api", "operationId": "releaseReservation", "alsoSystem": "expiry sweep at expiresAt; cancelOrder releases in the same transaction"},
+    "release": {"via": "api", "operationId": "releaseReservation", "alsoSystem": "cancelOrder releases in the same transaction"},
+    "consume": {"via": "pending", "milestone": "700", "by": "work order material consumption (inventory/custody)"}
+  },
+  "WorkOrder": {
+    "release": {"via": "api", "operationId": "releaseWorkOrder"},
+    "start": {"via": "pending", "milestone": "700"},
+    "block": {"via": "pending", "milestone": "700"},
+    "resume": {"via": "pending", "milestone": "700"},
+    "submit": {"via": "pending", "milestone": "700"},
+    "rework": {"via": "pending", "milestone": "700"},
+    "approve": {"via": "pending", "milestone": "700"},
+    "cancel": {"via": "pending", "milestone": "700"}
+  },
+  "Order": {
+    "confirm": {"via": "system", "by": "required advance payment CONFIRMED"},
+    "fulfill": {"via": "system", "by": "first work order released"},
+    "ready": {"via": "system", "by": "all work orders DONE and quality checks passed"},
+    "deliver": {"via": "pending", "milestone": "800", "by": "delivery or pickup handoff"},
+    "cancel": {"via": "api", "operationId": "cancelOrder"}
+  },
+  "Job": {
+    "claim": {"via": "worker"},
+    "complete": {"via": "worker"},
+    "fail": {"via": "worker"},
+    "retry": {"via": "worker", "by": "bounded retries on transient errors"},
+    "cancel": {"via": "api", "operationId": "cancelJob"}
+  },
+  "Certificate": {
+    "issue": {"via": "api", "operationId": "issueCertificate"},
+    "revoke": {"via": "api", "operationId": "revokeCertificate"},
+    "replace": {"via": "system", "by": "issuing a corrected certificate for the same item supersedes the previous one"}
+  },
+  "Shipment": {
+    "ship": {"via": "pending", "milestone": "logistics, to be defined"},
+    "deliver": {"via": "pending", "milestone": "logistics, to be defined"},
+    "incident": {"via": "pending", "milestone": "logistics, to be defined"},
+    "resolve": {"via": "pending", "milestone": "logistics, to be defined"},
+    "return": {"via": "pending", "milestone": "logistics, to be defined"}
+  },
+  "Custody": {
+    "receive": {"via": "pending", "milestone": "700"},
+    "handoff": {"via": "pending", "milestone": "700"},
+    "flag": {"via": "pending", "milestone": "700"},
+    "resolve": {"via": "pending", "milestone": "700"}
+  },
+  "Service": {
+    "intake": {"via": "pending", "milestone": "service, to be defined"},
+    "inspect": {"via": "pending", "milestone": "service, to be defined"},
+    "quote": {"via": "pending", "milestone": "service, to be defined"},
+    "accept": {"via": "pending", "milestone": "service, to be defined"},
+    "start": {"via": "pending", "milestone": "service, to be defined"},
+    "complete": {"via": "pending", "milestone": "service, to be defined"},
+    "return": {"via": "pending", "milestone": "service, to be defined"}
+  },
+  "Warranty": {
+    "claim": {"via": "pending", "milestone": "800"},
+    "review": {"via": "pending", "milestone": "800"},
+    "resolve": {"via": "pending", "milestone": "800"},
+    "expire": {"via": "pending", "milestone": "800"}
+  },
+  "PurchaseOrder": {
+    "issue": {"via": "pending", "milestone": "700"},
+    "receive": {"via": "pending", "milestone": "700"},
+    "cancel": {"via": "pending", "milestone": "700"}
+  }
+}

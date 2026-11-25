@@ -1,4 +1,5 @@
-"""Fail when SQL or OpenAPI state values drift from 08_STATE_MACHINES/machines.json.
+"""Fail when SQL or OpenAPI state values drift from 08_STATE_MACHINES/machines.json,
+or when a machine action has no trigger in 08_STATE_MACHINES/transitions.json.
 
     python tools/contracts/check_contracts.py            # check, exit 1 on drift
     python tools/contracts/check_contracts.py --emit     # print the OpenAPI state schemas
@@ -23,6 +24,8 @@ SQL = ROOT / "05_DATABASE/core_reference.sql"
 OPENAPI = ROOT / "06_API_CONTRACTS/openapi.yaml"
 TOOLS = ROOT / "13_AI_PROMPTS_AND_TOOLS/tools.json"
 FAMILIES = ROOT / "11_3D_ASSET_LIBRARY/families.json"
+TRANSITIONS = ROOT / "08_STATE_MACHINES/transitions.json"
+VIA = {"api", "provider-webhook", "system", "worker", "pending"}
 
 
 def machine_states(machine: dict) -> list[str]:
@@ -169,6 +172,95 @@ def check_create_ring_ranges(tools: list, families: list) -> list[str]:
     return errs
 
 
+def _operations(openapi: dict) -> dict[str, tuple[str, dict]]:
+    out = {}
+    for ops in openapi["paths"].values():
+        for method, op in ops.items():
+            if isinstance(op, dict) and "operationId" in op:
+                out[op["operationId"]] = (method, op)
+    return out
+
+
+def _response_state(op: dict, schemas: dict) -> str | None:
+    """Name of the state schema carried by the operation's first 2xx JSON response."""
+    for code in sorted(op.get("responses", {})):
+        if code.startswith("2"):
+            ref = (op["responses"][code].get("content", {}).get("application/json", {})
+                   .get("schema", {}).get("$ref", ""))
+            sch = schemas.get(ref.rsplit("/", 1)[-1], {})
+            return sch.get("properties", {}).get("state", {}).get("$ref", "").rsplit("/", 1)[-1] or None
+    return None
+
+
+def check_transitions(machines: dict, bindings: dict, transitions: dict, openapi: dict) -> list[str]:
+    """Every machine action has a trigger: an API operation, a provider event, a system rule,
+    a worker, or an explicit pending milestone. API operations must exist, be POST, require an
+    Idempotency-Key, and return the machine's own state (or the declared `returns` machine)."""
+    errs = []
+    schemas = openapi["components"]["schemas"]
+    ops = _operations(openapi)
+    for name, m in machines.items():
+        entries = transitions.get(name)
+        if entries is None:
+            errs.append(f"transitions.json: machine {name} missing")
+            continue
+        actions = {t["action"] for t in m["transitions"]}
+        for a in sorted(actions - entries.keys()):
+            errs.append(f"{name}.{a}: no trigger in transitions.json")
+        for a in sorted(entries.keys() - actions):
+            errs.append(f"{name}.{a}: not an action of the machine")
+        for a, e in entries.items():
+            via = e.get("via")
+            if via not in VIA:
+                errs.append(f"{name}.{a}: unknown via {via!r}")
+            elif via == "pending" and not e.get("milestone"):
+                errs.append(f"{name}.{a}: pending without milestone")
+            elif via == "api":
+                op_id = e.get("operationId")
+                if op_id not in ops:
+                    errs.append(f"{name}.{a}: operation {op_id} not in OpenAPI")
+                    continue
+                method, op = ops[op_id]
+                if method != "post":
+                    errs.append(f"{name}.{a}: {op_id} must be POST")
+                if not any(p.get("in") == "header" and p.get("name") == "Idempotency-Key" and p.get("required")
+                           for p in op.get("parameters", [])):
+                    errs.append(f"{name}.{a}: {op_id} lacks a required Idempotency-Key")
+                target = e.get("returns", name)
+                want = bindings.get(target, {}).get("openapi")
+                got = _response_state(op, schemas)
+                if want and got != want:
+                    errs.append(f"{name}.{a}: {op_id} returns state {got}, expected {want}")
+    for name in transitions:
+        if not name.startswith("$") and name not in machines:
+            errs.append(f"transitions.json: unknown machine {name}")
+    return errs
+
+
+DIGEST_BOUND = ("acceptQuote", "rejectQuote", "issueQuote", "submitDesign", "approveDesign", "returnDesign")
+
+
+def check_digest_bound(openapi: dict) -> list[str]:
+    """Decisions on a quote or a revision bind the exact version the user saw."""
+    errs = []
+    ops = _operations(openapi)
+    for op_id in DIGEST_BOUND:
+        if op_id not in ops:
+            errs.append(f"OpenAPI has no {op_id}")
+            continue
+        body = (ops[op_id][1].get("requestBody", {}).get("content", {})
+                .get("application/json", {}).get("schema", {}))
+        if "expectedDigest" not in body.get("required", []):
+            errs.append(f"{op_id}: requestBody must require expectedDigest")
+    if "digest" not in schemas_required(openapi, "Quote"):
+        errs.append("Quote: digest must be required")
+    return errs
+
+
+def schemas_required(openapi: dict, name: str) -> list[str]:
+    return openapi["components"]["schemas"].get(name, {}).get("required", [])
+
+
 def _op_schema_name(tool: str) -> str:
     return "Op" + "".join(p.capitalize() for p in tool.split("_"))
 
@@ -210,8 +302,13 @@ def main(argv: list[str] | None = None) -> int:
     api = yaml.safe_load(OPENAPI.read_text())
     families = json.loads(FAMILIES.read_text())
     families = families if isinstance(families, list) else families["families"]
-    errs = (check(machines, bindings, SQL.read_text(), api) + check_operations(tools, api)
-            + check_create_ring_ranges(tools, families))
+    transitions = json.loads(TRANSITIONS.read_text())
+    sql = SQL.read_text()
+    errs = (check(machines, bindings, sql, api) + check_operations(tools, api)
+            + check_create_ring_ranges(tools, families)
+            + check_transitions(machines, bindings, transitions, api) + check_digest_bound(api))
+    if not re.search(r"CREATE TABLE quote\([^;]*\bdigest char\(64\) NOT NULL", sql):
+        errs.append("SQL quote has no `digest char(64) NOT NULL`")
     for e in errs:
         print(f"DRIFT: {e}")
     if errs:

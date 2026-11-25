@@ -30,7 +30,8 @@
       "document.read",
       "loyalty.read",
       "identity.self",
-      "crm.contact"
+      "crm.contact",
+      "order.cancel"
     ],
     "advisor": [
       "crm.read",
@@ -50,7 +51,8 @@
       "job.read",
       "job.cancel",
       "library.write",
-      "notification.read"
+      "notification.read",
+      "design.approve"
     ],
     "manager": [
       "workshop.read",
@@ -95,7 +97,8 @@
       "order.create",
       "payment.create",
       "order.read",
-      "notification.read"
+      "notification.read",
+      "order.cancel"
     ],
     "supplier": [
       "supplier.assigned",
@@ -151,7 +154,8 @@
       "document.read": "own",
       "loyalty.read": "own",
       "identity.self": "self",
-      "crm.contact": "assigned"
+      "crm.contact": "assigned",
+      "order.cancel": "own"
     },
     "advisor": {
       "crm.read": "assigned",
@@ -171,7 +175,8 @@
       "job.read": "assigned",
       "job.cancel": "assigned",
       "library.write": "organization",
-      "notification.read": "own"
+      "notification.read": "own",
+      "design.approve": "assigned"
     },
     "manager": {
       "workshop.read": "location",
@@ -216,7 +221,8 @@
       "order.create": "location",
       "payment.create": "location",
       "order.read": "location",
-      "notification.read": "own"
+      "notification.read": "own",
+      "order.cancel": "location"
     },
     "supplier": {
       "supplier.assigned": "assigned",
@@ -260,5 +266,5 @@
       "rule": "a family version is published by someone other than its author"
     }
   ],
-  "segregationRuntime": "Per-action rules (initiator != approver for production release, refunds, cert revoke, admin grants; SECURITY.md) are enforced at runtime on each approval, not by role layout."
+  "segregationRuntime": "Per-action rules (initiator != approver for production release, refunds, cert revoke, admin grants; SECURITY.md) are enforced at runtime on each approval, not by role layout; design approval: the approver of a revision is not the user who submitted it (designers hold both project.edit and design.approve)."
 }

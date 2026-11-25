@@ -148,5 +148,81 @@ class OperationAndJobSchemaTest(unittest.TestCase):
         self.assertFalse(v.is_valid({**job, "kind": "SHELL"}))
 
 
+def body_validator(op_id):
+    api = yaml.safe_load(cc.OPENAPI.read_text())
+    _, op = cc._operations(api)[op_id]
+    schema = op["requestBody"]["content"]["application/json"]["schema"]
+    return Draft202012Validator({**schema, "components": api["components"]})
+
+
+class TransitionsTest(unittest.TestCase):
+    def setUp(self):
+        self.machines = json.loads(cc.MACHINES.read_text())
+        self.bindings = json.loads(cc.BINDINGS.read_text())
+        self.transitions = json.loads(cc.TRANSITIONS.read_text())
+        self.api = yaml.safe_load(cc.OPENAPI.read_text())
+
+    def run_check(self, transitions=None, api=None, machines=None):
+        return cc.check_transitions(machines or self.machines, self.bindings,
+                                    transitions or self.transitions, api or self.api)
+
+    def test_every_action_has_a_trigger(self):
+        self.assertEqual(self.run_check(), [])
+        self.assertEqual(cc.check_digest_bound(self.api), [])
+
+    def test_missing_action_is_detected(self):
+        t = copy.deepcopy(self.transitions)
+        del t["Order"]["cancel"]
+        self.assertIn("Order.cancel: no trigger in transitions.json", self.run_check(transitions=t))
+        m = copy.deepcopy(self.machines)
+        m["Order"]["transitions"].append({"from": "READY", "to": "CANCELLED", "action": "abandon"})
+        self.assertIn("Order.abandon: no trigger in transitions.json", self.run_check(machines=m))
+
+    def test_bad_entries_are_detected(self):
+        t = copy.deepcopy(self.transitions)
+        t["Design"]["approve"] = {"via": "api", "operationId": "approveEverything"}
+        t["Quote"]["expire"] = {"via": "cron"}
+        t["WorkOrder"]["start"] = {"via": "pending"}
+        t["Payment"]["confirm"] = {"via": "api", "operationId": "getPayment"}
+        errs = "\n".join(self.run_check(transitions=t))
+        for needle in ("approveEverything not in OpenAPI", "unknown via 'cron'",
+                       "WorkOrder.start: pending without milestone", "getPayment must be POST"):
+            self.assertIn(needle, errs)
+
+    def test_response_must_carry_machine_state(self):
+        t = copy.deepcopy(self.transitions)
+        del t["Quote"]["accept"]["returns"]
+        self.assertTrue(any("acceptQuote returns state OrderState" in e for e in self.run_check(transitions=t)))
+
+    def test_idempotency_key_required(self):
+        api = copy.deepcopy(self.api)
+        op = cc._operations(api)["cancelOrder"][1]
+        op["parameters"] = [p for p in op["parameters"] if p.get("name") != "Idempotency-Key"]
+        self.assertTrue(any("cancelOrder lacks" in e for e in self.run_check(api=api)))
+
+    def test_digest_binding_is_required(self):
+        api = copy.deepcopy(self.api)
+        body = cc._operations(api)["rejectQuote"][1]["requestBody"]["content"]["application/json"]["schema"]
+        body["required"].remove("expectedDigest")
+        self.assertEqual(cc.check_digest_bound(api), ["rejectQuote: requestBody must require expectedDigest"])
+
+    def test_approval_body(self):
+        v = body_validator("approveDesign")
+        ok = {"expectedDigest": SHA, "dfmReportId": "00000000-0000-0000-0000-000000000001",
+              "measurementsConfirmed": True}
+        v.validate(ok)
+        self.assertFalse(v.is_valid({**ok, "measurementsConfirmed": False}))
+        self.assertFalse(v.is_valid({k: x for k, x in ok.items() if k != "dfmReportId"}))
+        self.assertFalse(v.is_valid({**ok, "approvedBy": "someone"}))  # identity comes from the token
+
+    def test_reasons_are_mandatory(self):
+        for op_id, base in (("returnDesign", {"expectedDigest": SHA}), ("rejectQuote", {"expectedDigest": SHA}),
+                            ("cancelOrder", {})):
+            v = body_validator(op_id)
+            v.validate({**base, "reason": "cliente desiste"})
+            self.assertFalse(v.is_valid({**base, "reason": ""}), op_id)
+            self.assertFalse(v.is_valid(base), op_id)
+
+
 if __name__ == "__main__":
     unittest.main()

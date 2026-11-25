@@ -7,3 +7,5 @@ Critical actions: release production, inventory adjustment/transfer above thresh
 
 ## Matriz de permisos (hito 100)
 `roles.reference.json` es la referencia: `default: DENY`, sin comodines y cada concesión con un alcance explícito (`scopes`, vocabulario en `scopeVocabulary`). `tools/contracts/check_permissions.py` falla en CI si un permiso usado por la API, una herramienta o una pantalla no lo tiene ningún rol, si una pantalla pide un permiso que su rol no tiene, o si un rol junta autor y publicador de la biblioteca. El alcance es un requisito para el backend, que lo aplica por recurso y ubicación; la matriz no sustituye esa verificación.
+
+Aprobación de diseño (1.3.0): `design.approve` lo tiene el diseñador, que también edita; por eso la regla es por acción y no por rol: el servidor rechaza que apruebe o devuelva una revisión quien la envió, y la aprobación queda ligada al digest de la revisión y al reporte DFM.
