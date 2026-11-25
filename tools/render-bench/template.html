@@ -57,13 +57,13 @@ textarea { width: 100%; box-sizing: border-box; min-height: 180px; font: 12px va
   <header>
     <div class="eyebrow">Hito 000 · P0-04 · ruta WebView / Three.js</div>
     <h1>Banco de render AUREA</h1>
-    <p class="lede">Mide cómo se mueve en este teléfono el anillo <code>ring.classic</code> (18 mm × 4 mm × 1,8 mm) generado por el servicio de geometría, con oro PBR y una gema con transmisión. Tres escenas de 15 s cada una.</p>
+    <p class="lede">Mide cómo se mueve en este teléfono el anillo <code>ring.classic</code> (18 mm × 4 mm × 1,8 mm) generado por el servicio de geometría, con oro PBR y una gema con transmisión. Tres escenas de 15 s y una rampa que añade anillos hasta encontrar el límite del teléfono (unos 1–2 minutos en total).</p>
   </header>
 
   <div id="stage"><div id="hud">—</div></div>
 
   <div class="controls">
-    <button id="run" class="primary" type="button">Ejecutar las 3 escenas</button>
+    <button id="run" class="primary" type="button">Ejecutar la prueba</button>
     <button id="copy" type="button" disabled>Copiar resultados</button>
     <span id="status" class="status">Cargando Three.js…</span>
   </div>
@@ -75,6 +75,7 @@ textarea { width: 100%; box-sizing: border-box; min-height: 180px; font: 12px va
         <tr data-scene="base"><td>Base: anillo</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="pill pending">Pendiente</span></td></tr>
         <tr data-scene="vitrina"><td>Vitrina: anillo + gema</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="pill pending">Pendiente</span></td></tr>
         <tr data-scene="estres"><td>Estrés: 25 anillos + gemas</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="pill pending">Pendiente</span></td></tr>
+        <tr data-scene="limite"><td>Límite: rampa hasta 2500 anillos</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="pill pending">Pendiente</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -104,6 +105,7 @@ const RING_GLB_B64 = "__RING_GLB_B64__";
 const RING_GLB_SHA256 = "__RING_GLB_SHA256__";
 const RING_TOP_M = [0, 0, -0.0123]; // ring.top anchor (0, 10.8, 2) mm -> glTF (0, 0.002, -0.0108) m; geometry recentred to y=0, gem lifted 1.5 mm
 const SCENE_SECONDS = 15, WARMUP_SECONDS = 2;
+const RAMP_COUNTS = [100, 225, 400, 900, 1600, 2500];
 
 const $ = (id) => document.getElementById(id);
 const statusEl = $("status"), hud = $("hud");
@@ -151,9 +153,9 @@ const triangles = (ringGeo.index ? ringGeo.index.count : ringGeo.attributes.posi
 
 const root = new THREE.Group(); scene.add(root);
 function spinAll(t) { for (const c of root.children) { c.rotation.y = t / 2400; c.rotation.x = 0.35; } }
-function buildScene(kind) {
+function buildScene(kind, count) {
   root.clear();
-  const n = kind === "estres" ? 25 : 1;
+  const n = count ?? (kind === "estres" ? 25 : 1);
   const grid = Math.ceil(Math.sqrt(n)), step = 0.03;
   for (let i = 0; i < n; i++) {
     const g = new THREE.Group();
@@ -162,7 +164,7 @@ function buildScene(kind) {
     if (n > 1) g.position.set(((i % grid) - (grid - 1) / 2) * step, (Math.floor(i / grid) - (grid - 1) / 2) * step, 0);
     root.add(g);
   }
-  camera.position.set(0, 0.012, n > 1 ? 0.26 : 0.055); camera.lookAt(0, 0, 0);
+  camera.position.set(0, 0.012, n > 1 ? Math.max(0.26, grid * step * 1.9) : 0.055); camera.lookAt(0, 0, 0);
 }
 
 let firstFrameMs = null;
@@ -186,22 +188,22 @@ statusEl.textContent = `Listo. GLB ${(buf.byteLength / 1024).toFixed(1)} KB, ${t
 async function battery() { try { const b = await navigator.getBattery(); return { level: b.level, charging: b.charging }; } catch { return null; } }
 const pct = (arr, p) => { const s = [...arr].sort((a, b) => a - b); return s[Math.min(s.length - 1, Math.floor(p * s.length))]; };
 
-function runScene(kind) {
+function runScene(kind, { count, seconds = SCENE_SECONDS, warmup = WARMUP_SECONDS } = {}) {
   return new Promise(resolve => {
-    buildScene(kind);
+    buildScene(kind, count);
     const times = []; let last = null, start = null;
     function frame(t) {
       if (start === null) start = t;
       const el = (t - start) / 1000;
       spinAll(t);
       renderer.render(scene, camera);
-      if (last !== null && el > WARMUP_SECONDS) times.push(t - last);
+      if (last !== null && el > warmup) times.push(t - last);
       last = t;
-      hud.textContent = `${kind} · ${Math.max(0, SCENE_SECONDS - el).toFixed(0)} s · ${times.length ? (1000 / times[times.length - 1]).toFixed(0) : "—"} fps`;
-      if (el < SCENE_SECONDS) requestAnimationFrame(frame);
+      hud.textContent = `${kind} · ${count ? count + " anillos · " : ""}${Math.max(0, seconds - el).toFixed(0)} s · ${times.length ? (1000 / times[times.length - 1]).toFixed(0) : "—"} fps`;
+      if (el < seconds) requestAnimationFrame(frame);
       else {
         const total = times.reduce((a, b) => a + b, 0);
-        resolve({ scene: kind, frames: times.length, fpsMean: +(times.length / (total / 1000)).toFixed(1),
+        resolve({ scene: kind, rings: root.children.length, frames: times.length, fpsMean: +(times.length / (total / 1000)).toFixed(1),
           p50ms: +pct(times, 0.5).toFixed(2), p95ms: +pct(times, 0.95).toFixed(2), p99ms: +pct(times, 0.99).toFixed(2),
           over33msPct: +(100 * times.filter(x => x > 33.4).length / times.length).toFixed(1),
           drawCalls: renderer.info.render.calls, trianglesPerFrame: renderer.info.render.triangles });
@@ -225,14 +227,27 @@ $("run").addEventListener("click", async () => {
   const batStart = await battery(); const tStart = Date.now();
   const results = [];
   for (const k of ["base", "vitrina", "estres"]) { statusEl.textContent = `Midiendo ${k}… no toques la pantalla.`; const r = await runScene(k); results.push(r); paintRow(r); }
+  // Ramp: more rings (each with a gem) until frame p95 leaves the display cadence.
+  const ramp = []; const cadence = Math.min(...results.map(r => r.p50ms));
+  for (const count of RAMP_COUNTS) {
+    statusEl.textContent = `Buscando el límite: ${count} anillos…`;
+    const r = await runScene("limite", { count, seconds: 6, warmup: 1 });
+    ramp.push(r);
+    if (r.p95ms > cadence * 1.1) break;
+  }
+  const sustained = ramp.filter(r => r.p95ms <= cadence * 1.1).pop() ?? null;
+  const limitRow = { scene: "limite", fpsMean: sustained ? sustained.fpsMean : ramp[0].fpsMean, p50ms: (sustained ?? ramp[0]).p50ms, p95ms: (sustained ?? ramp[0]).p95ms, over33msPct: (sustained ?? ramp[0]).over33msPct };
+  paintRow(limitRow);
+  document.querySelector('tr[data-scene="limite"] td').textContent = sustained ? `Límite: ${sustained.rings} anillos + gemas a cadencia plena` : `Límite: < ${RAMP_COUNTS[0]} anillos`;
   const batEnd = await battery();
   try { await lock?.release(); } catch {}
-  report = { tool: "aurea-render-bench/0.1.0", path: "webview-threejs", three: THREE.REVISION, measuredAt: new Date().toISOString(),
+  report = { tool: "aurea-render-bench/0.2.0", path: "webview-threejs", three: THREE.REVISION, measuredAt: new Date().toISOString(),
     asset: { file: "ring-base.glb (ring.classic 18/4/1.8 mm)", bytes: buf.byteLength, sha256: RING_GLB_SHA256, sha256Verified: hashOk, triangles, parseMs: +parseMs.toFixed(1) },
     firstFrameMs: +firstFrameMs.toFixed(0), device,
     jsHeapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null,
     battery: batStart && batEnd ? { start: batStart, end: batEnd, seconds: Math.round((Date.now() - tStart) / 1000) } : null,
-    sceneSeconds: SCENE_SECONDS, warmupSeconds: WARMUP_SECONDS, results };
+    sceneSeconds: SCENE_SECONDS, warmupSeconds: WARMUP_SECONDS, displayCadenceMs: cadence, results,
+    ramp: { secondsPerStep: 6, criterion: "p95 <= 1.1 x display cadence", maxSustainedRings: sustained ? sustained.rings : 0, steps: ramp } };
   $("json").value = JSON.stringify(report, null, 2);
   document.querySelector("details").open = true;
   statusEl.textContent = "Terminado. Copia los resultados y pégalos en el chat.";
