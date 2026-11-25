@@ -48,16 +48,17 @@ class FakeApi extends Api {
 const wrap = async (api: FakeApi, ui: React.ReactElement) => render(<SessionProvider config={config} apiOverride={api}>{ui}</SessionProvider>);
 
 describe("catalog", () => {
-  it("shows a spoken loading state, then cards labelled with name, metal, price and availability", async () => {
+  it("announces loading while the boutique is on its way", async () => {
     const api = new FakeApi();
-    let release!: () => void;
-    const gate = new Promise<void>((r) => { release = r; });
-    const list = api.listProducts.bind(api);
-    api.listProducts = async () => { await gate; return list(); };
-    api.pages.push({ items: [summary("p1", "Classic Ring"), summary("p2", "Río Hoops", { available: false })], nextCursor: null });
+    api.listProducts = () => new Promise<ProductPage>(() => undefined); // never answers
     await wrap(api, <CatalogScreen onOpen={() => undefined} />);
     expect(screen.getByLabelText(en.loadingCatalog)).toBeTruthy();
-    release();
+  });
+
+  it("labels each card with name, metal, price and availability", async () => {
+    const api = new FakeApi();
+    api.pages.push({ items: [summary("p1", "Classic Ring"), summary("p2", "Río Hoops", { available: false })], nextCursor: null });
+    await wrap(api, <CatalogScreen onOpen={() => undefined} />);
     expect(await screen.findByRole("button", { name: "Classic Ring, 18K yellow gold, $ 2,850,000 COP, Available" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Río Hoops, 18K yellow gold, $ 2,850,000 COP, Sold out" })).toBeTruthy();
     expect(screen.getByRole("tab", { name: en.allCategories, selected: true })).toBeTruthy();
