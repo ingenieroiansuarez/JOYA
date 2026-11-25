@@ -86,6 +86,10 @@ const T: Record<string, Record<Locale, (...a: string[]) => string>> = {
     es: () => "Solo hay oro 18k, plata 925 y platino 950; otra ley la confirma el joyero.",
     en: () => "Only 18k gold, 925 silver and 950 platinum are available; any other alloy needs the jeweler.",
   },
+  unit: {
+    es: (p) => `${p}: usa milímetros o centímetros; no convierto otras unidades.`,
+    en: (p) => `${p}: use millimetres or centimetres; I don't convert other units.`,
+  },
   sameMetal: { es: (m) => `La pieza ya es de ${m}.`, en: (m) => `The piece is already ${m}.` },
   ambiguousBig: {
     es: () => "\"Más grande\" en un anillo puede ser talla, ancho o grosor: propongo ancho y grosor. Si es la talla, dime cuál.",
@@ -152,15 +156,28 @@ export function interpret(prompt: string, doc: DesignDocument, locale: Locale, m
   const ADJ: [RegExp, string][] = category === "ring"
     ? [[/^(anch|wide|width)/, "bandWidth"], [/^(grues|grosor|thick)/, "radialThickness"]]
     : [[/^(anch|wide|width)/, "width"], [/^(alt|larg|tall|long|height)/, "height"], [/^(grues|grosor|thick)/, "thickness"]];
-  for (const m of text.matchAll(new RegExp(`${NUM}\\s*(?:mm|milimetros?)?\\s*(mas|menos|more|less)\\s+(?:de\\s+)?([a-z]+)`, "g"))) {
-    const name = ADJ.find(([re]) => re.test(m[3]))?.[1];
-    if (name && !wants.some((w) => w.name === name)) wants.push({ name, delta: num(m[1]) * (/menos|less/.test(m[2]) ? -1 : 1) });
+  // Units: mm by default; cm is converted; any other unit is refused rather than read as mm.
+  const UNIT = "(mm|milimetros?|cm|centimetros?|in|inch(?:es)?|pulgadas?|\"|m|metros?)?";
+  const toMm = (n: number, unit: string | undefined, name: string): number | null => {
+    if (!unit || /^(mm|milimetro)/.test(unit)) return n;
+    if (/^(cm|centimetro)/.test(unit)) return n * 10;
+    note("UNSUPPORTED", "unit", L(name));
+    return null;
+  };
+  for (const m of text.matchAll(new RegExp(`${NUM}\\s*${UNIT}\\s*(mas|menos|more|less)\\s+(?:de\\s+)?([a-z]+)`, "g"))) {
+    const name = ADJ.find(([re]) => re.test(m[4]))?.[1];
+    if (!name || wants.some((w) => w.name === name)) continue;
+    const d = toMm(num(m[1]), m[2], name);
+    if (d === null) { wants.push({ name, value: Number.NaN }); continue; }
+    wants.push({ name, delta: d * (/menos|less/.test(m[3]) ? -1 : 1) });
   }
   for (const [name, words] of Object.entries(kw)) {
     if (wants.some((w) => w.name === name)) continue;
-    const abs = new RegExp(`\\b(?:${words})\\b(?:\\s+(?:de|a|en|of|to|at|=|:))*\\s*${NUM}\\s*(?:mm|milimetros?)?`).exec(text)
-      ?? new RegExp(`${NUM}\\s*(?:mm|milimetros?)\\s+(?:de\\s+)?(?:${words})\\b`).exec(text);
-    if (abs) wants.push({ name, value: num(abs[1]) });
+    const abs = new RegExp(`\\b(?:${words})\\b(?:\\s+(?:de|a|en|of|to|at|=|:))*\\s*${NUM}\\s*${UNIT}(?![a-z])`).exec(text)
+      ?? new RegExp(`${NUM}\\s*(mm|milimetros?|cm|centimetros?)\\s+(?:de\\s+)?(?:${words})\\b`).exec(text);
+    if (!abs) continue;
+    const v = toMm(num(abs[1]), abs[2], name);
+    wants.push({ name, value: v === null ? Number.NaN : Math.round(v * 100) / 100 });
   }
   if (category === "ring" && !wants.some((w) => w.name === "innerDiameter")) {
     const size = /\b(?:talla|size)\s*(?:us\s*)?(\d{1,2}(?:[.,]5)?)\b/.exec(text);
@@ -184,7 +201,8 @@ export function interpret(prompt: string, doc: DesignDocument, locale: Locale, m
   let materialId: string | null = null;
   for (const [re, id] of METALS) if (re.test(text)) { materialId = id; break; }
   const otherKarat = /\b(10|14|22|24)\s*(k|kt|kilates|quilates|karat)\b/.test(text);
-  if (otherKarat) note("UNSUPPORTED", "karat");
+  // An unavailable purity is never swapped for another alloy, even with a colour named.
+  if (otherKarat) { note("UNSUPPORTED", "karat"); materialId = null; }
   else if (!materialId && /\b(oro|gold)\b/.test(text)) { materialId = "gold-18k-yellow"; note("ASSUMPTION", "plainGold"); }
   const ops0: DesignOperation[] = [];
   if (materialId) {
@@ -200,6 +218,7 @@ export function interpret(prompt: string, doc: DesignDocument, locale: Locale, m
   for (const w of wants) {
     const r = range(w.name);
     if (w.dir) { dirs.push(w); continue; }
+    if (Number.isNaN(w.value)) continue; // unit refused above
     const target = Math.round((w.value ?? current(w.name) + (w.delta ?? 0)) * 100) / 100;
     if (target < r.min || target > r.max) {
       note("OUT_OF_RANGE", "outOfRange", L(w.name), fmt(target, locale), fmt(r.min, locale), fmt(r.max, locale));

@@ -346,11 +346,25 @@ describe("adapter output is untrusted", () => {
         { title: "nan", summary: "s", operations: [op("bandWidth", Number.NaN)], assumptions: [] },
         { title: "metal", summary: "s", operations: [{ type: "change_material", componentId: "ring-base", materialId: "unobtainium" }], assumptions: [] },
         { title: "extra", summary: "s", operations: [op("radialThickness", 2, { sql: "DROP TABLE" })], assumptions: [] },
+        { title: "cancels", summary: "s", operations: [op("bandWidth", 5), op("bandWidth", 4)], assumptions: [] },
+        { title: "same-longer", summary: "s", operations: [op("bandWidth", 4.5), op("bandWidth", 5)], assumptions: [] },
       ],
     }, 5);
     assert.deepEqual(out.options.map((o) => o.title), ["ok", "extra"]);
     assert.deepEqual(out.options[1].operations, [{ type: "modify_parameter", componentId: "ring-base", name: "radialThickness", value: 2 }]);
     assert.deepEqual(out.options.map((o) => o.index), [0, 1]);
+  });
+  test("units: cm converted, other units refused; unavailable purity never becomes another alloy", () => {
+    const cm = interpret("ancho 2 cm", doc, "es", 3);
+    assert.deepEqual(cm.options, []);
+    assert.equal(cm.notes[0].code, "OUT_OF_RANGE");
+    assert.equal(interpret("ancho 0,5 cm", doc, "es", 3).options[0].operations[0].value, 5);
+    const inch = interpret("ancho 1 pulgada", doc, "es", 3);
+    assert.deepEqual(inch.options, []);
+    assert.equal(inch.notes[0].code, "UNSUPPORTED");
+    const k14 = interpret("en oro rosa de 14 kilates", doc, "es", 3);
+    assert.deepEqual(k14.options, []);
+    assert.deepEqual(k14.notes.map((n) => n.code), ["UNSUPPORTED"]);
   });
   test("the simulator is deterministic", () => {
     assert.deepEqual(interpret("más ancho en oro blanco", doc, "es", 3), interpret("más ancho en oro blanco", doc, "es", 3));

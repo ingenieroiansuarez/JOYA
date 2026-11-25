@@ -77,12 +77,14 @@ export function normalize(doc: DesignDocument, raw: AdapterResult, maxOptions: n
     if (!ops.length) continue;
     const r = applyAll(doc, ops);
     if (!r.ok) continue;
-    const key = digestOf(r.document);
-    if (key === digestOf(doc) || seen.has(key)) continue;
+    // applyAll bumps `revision` per operation: compare the designs, not the counters.
+    const key = digestOf({ ...r.document, revision: doc.revision });
+    const changes = diffParameters(doc, r.document);
+    if (!changes.length || key === digestOf(doc) || seen.has(key)) continue;
     seen.add(key);
     options.push({
       index: options.length, title: str(o.title, 80), summary: str(o.summary, 300), operations: ops,
-      changes: diffParameters(doc, r.document).map((d) => ({ ...d, from: d.from ?? null })),
+      changes: changes.map((d) => ({ ...d, from: d.from ?? null })),
       assumptions: (Array.isArray(o.assumptions) ? o.assumptions : []).slice(0, 5).map((a) => str(a, 300)),
       previewRequired: true,
     });
