@@ -31,7 +31,8 @@ jest.mock("expo-crypto", () => ({
     return h.buffer.slice(h.byteOffset, h.byteOffset + h.length);
   },
 }));
-import { DesignProvider } from "../src/design/DesignContext";
+import { Pressable } from "react-native";
+import { DesignProvider, useDesign } from "../src/design/DesignContext";
 import { SqliteDesignStore } from "../src/design/store";
 import { DesignSync } from "../src/design/sync";
 import { SessionProvider } from "../src/session";
@@ -101,6 +102,25 @@ describe("design editor", () => {
     expect(await screen.findByText(en.offlineBanner)).toBeTruthy();
     expect(screen.getAllByText(/Ring|Anillo/).length).toBeGreaterThan(0);
     expect(screen.queryByText(en.designsGuest)).toBeNull();
+    await r.unmount();
+    r.db.close();
+  });
+
+  it("the offline banner goes away once the connection is back, without changing tab", async () => {
+    const server = new FakeDesignServer();
+    const file = join(dir, `${uuid()}.db`);
+    await stored(server, file);
+    server.online = false;
+    function Reconnect() {
+      const { saw } = useDesign();
+      return <Pressable accessibilityRole="button" accessibilityLabel="reconnect" onPress={() => saw(undefined)} />;
+    }
+    const r = await app(server, file, <><DesignsScreen onOpen={() => undefined} onNew={() => undefined} /><Reconnect /></>);
+    expect(await screen.findByText(en.offlineBanner)).toBeTruthy();
+    server.online = true;
+    await fireEvent.press(screen.getByRole("button", { name: "reconnect" })); // e.g. the outbox was sent
+    await waitFor(() => expect(screen.queryByText(en.offlineBanner)).toBeNull());
+    expect(r.api.calls.filter((x) => x.startsWith("GET /projects")).length).toBeGreaterThan(1); // listed again
     await r.unmount();
     r.db.close();
   });
