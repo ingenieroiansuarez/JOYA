@@ -147,6 +147,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const current = existsSync(SBOM_FILE) ? readFileSync(SBOM_FILE, "utf8") : "";
     if (current !== text) {
       console.error("sbom/aurea.cdx.json is stale: run node scripts/sbom.mjs");
+      // Show what differs so a CI-only mismatch can be diagnosed from the log.
+      const a = current.split("\n"), b = text.split("\n");
+      const only = (x, y) => { const set = new Set(y); return x.filter((l) => !set.has(l)); };
+      for (const l of only(a, b).slice(0, 20)) console.error(`- ${l}`);
+      for (const l of only(b, a).slice(0, 20)) console.error(`+ ${l}`);
       process.exit(1);
     }
     console.log("sbom OK");
