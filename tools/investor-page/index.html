@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="AUREA: plataforma de joyería a medida con motor CAD, vista 3D y la asistente de diseño AURA. Material para inversionistas.">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>AUREA para inversionistas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: estuche de joyero. Una columna editorial de 72rem, hero con el anillo vivo a la derecha,
+   secciones que alternan texto a la izquierda y prueba a la derecha. Tema único oscuro, elegido a propósito. */
+:root{
+  --velvet:#0C211C;      /* terciopelo esmeralda del estuche */
+  --velvet-2:#102B25;    /* superficie elevada */
+  --velvet-3:#16362F;    /* borde / separación */
+  --platinum:#E9ECE8;    /* texto principal */
+  --platinum-2:#AFBDB7;  /* texto secundario */
+  --gold:#D8B46A;        /* oro 18k, acento único */
+  --gold-ink:#1B1406;
+  --emerald:#2FA883;     /* serie Colombia */
+  --brass:#C4923A;       /* serie EE. UU. */
+  --warn:#E7A15A;
+  --display:"Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --text:"Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r:14px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--velvet);color:var(--platinum);font-family:var(--text);font-size:17px;line-height:1.6;margin:0;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--velvet)}
+.wrap{max-width:72rem;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--gold)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--display);font-weight:500;text-wrap:balance;margin:0;letter-spacing:-.01em}
+h2{font-size:clamp(2rem,4.2vw,3.2rem);line-height:1.08}
+h3{font-size:1.35rem;line-height:1.25}
+p{margin:0}
+.lede{color:var(--platinum-2);max-width:38rem;font-size:1.08rem}
+.num{font-variant-numeric:tabular-nums lining-nums}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:color-mix(in srgb,var(--velvet) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--velvet-3)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px}
+.brand{font-family:var(--display);font-size:1.35rem;letter-spacing:.32em;color:var(--gold);text-decoration:none}
+.nav ul{display:flex;gap:22px;list-style:none;margin:0;padding:0;font-size:.92rem}
+.nav ul a{color:var(--platinum-2);text-decoration:none}
+.nav ul a:hover{color:var(--platinum)}
+@media (max-width:760px){.nav ul{display:none}}
+
+/* hero */
+.hero{padding-block:56px 72px}
+.hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+@media (max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(2.7rem,6.4vw,5.4rem);line-height:.98;font-weight:400}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero .lede{margin-top:22px}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:999px;font-weight:600;font-size:.98rem;text-decoration:none;border:1px solid var(--gold);transition:background .2s,color .2s}
+.btn.solid{background:var(--gold);color:var(--gold-ink)}
+.btn.solid:hover{background:#E6C78A}
+.btn.ghost{color:var(--gold)}
+.btn.ghost:hover{background:rgba(216,180,106,.1)}
+
+.stage{position:relative;border-radius:22px;background:radial-gradient(120% 90% at 50% 30%,#17443A 0%,var(--velvet-2) 55%,var(--velvet) 100%);border:1px solid var(--velvet-3);overflow:hidden;min-width:0}
+.stage canvas{display:block;width:100%;aspect-ratio:1/0.82;max-width:100%;cursor:grab;touch-action:pan-y}
+.stage .fallback{aspect-ratio:1/0.82;display:grid;place-items:center}
+.spec{position:absolute;left:18px;top:16px;font-size:.78rem;color:var(--platinum-2);line-height:1.5}
+.spec b{color:var(--platinum);font-weight:500}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px;padding:18px 20px 20px;border-top:1px solid var(--velvet-3);background:rgba(12,33,28,.6)}
+@media (max-width:480px){.controls{grid-template-columns:1fr}}
+.ctl label{display:flex;justify-content:space-between;font-size:.86rem;color:var(--platinum-2)}
+.ctl label output{color:var(--platinum);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--gold);margin-top:6px}
+.readout{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 26px;font-size:.88rem;color:var(--platinum-2)}
+.readout b{color:var(--gold);font-weight:600;font-variant-numeric:tabular-nums}
+.note{font-size:.78rem;color:var(--platinum-2);opacity:.85}
+
+section{scroll-margin-top:60px;padding-block:84px;border-top:1px solid var(--velvet-3)}
+.sec-head{display:grid;gap:16px;margin-bottom:44px;max-width:46rem}
+.kicker{color:var(--gold);font-size:.95rem;font-weight:500}
+
+/* problema */
+.contrast{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media (max-width:760px){.contrast{grid-template-columns:1fr}}
+.contrast > div{padding:28px;border-radius:var(--r);border:1px solid var(--velvet-3)}
+.contrast .after{background:var(--velvet-2);border-color:rgba(216,180,106,.35)}
+.contrast ul{margin:14px 0 0;padding-left:1.1rem;color:var(--platinum-2);display:grid;gap:8px}
+.contrast .after ul{color:var(--platinum)}
+
+/* flujo */
+.flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,1fr);gap:0;counter-reset:s}
+@media (max-width:1000px){.flow{grid-template-columns:repeat(3,1fr);row-gap:28px}}
+@media (max-width:560px){.flow{grid-template-columns:1fr}}
+.flow li{counter-increment:s;padding:0 18px 0 0;position:relative}
+.flow li::before{content:counter(s);display:grid;place-items:center;width:40px;height:40px;border-radius:50%;border:1px solid var(--gold);color:var(--gold);font-family:var(--display);font-size:1.15rem;margin-bottom:14px;background:var(--velvet)}
+.flow li::after{content:"";position:absolute;top:20px;left:48px;right:10px;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+.flow li:last-child::after{display:none}
+@media (max-width:560px){.flow li::after{display:none}}
+.flow h3{font-size:1.1rem}
+.flow p{font-size:.92rem;color:var(--platinum-2);margin-top:6px}
+
+/* AURA */
+.aura{display:grid;grid-template-columns:1fr 1.1fr;gap:44px;align-items:start}
+@media (max-width:900px){.aura{grid-template-columns:1fr}}
+.chat{background:var(--velvet-2);border:1px solid var(--velvet-3);border-radius:20px;padding:22px;display:grid;gap:14px;min-width:0}
+.chat .bar{display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--platinum-2);flex-wrap:wrap;gap:8px}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.76rem;border:1px solid var(--velvet-3);color:var(--platinum-2)}
+.pill.gold{border-color:rgba(216,180,106,.5);color:var(--gold)}
+.pill.ok{border-color:rgba(47,168,131,.6);color:#6FD3B1}
+.pill.warn{border-color:rgba(231,161,90,.6);color:var(--warn)}
+.ask{justify-self:end;background:var(--velvet-3);padding:10px 16px;border-radius:16px 16px 4px 16px;max-width:85%}
+.reply{background:rgba(12,33,28,.7);border:1px solid var(--velvet-3);padding:14px 16px;border-radius:16px 16px 16px 4px;font-size:.94rem;display:grid;gap:10px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid var(--velvet-3);border-radius:10px;font-size:.88rem}
+.opt.sel{border-color:var(--gold)}
+.opt span:last-child{color:var(--platinum-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs button{font:inherit;font-size:.85rem;background:transparent;color:var(--platinum-2);border:1px solid var(--velvet-3);border-radius:999px;padding:7px 14px;cursor:pointer}
+.tabs button[aria-selected=true]{color:var(--gold-ink);background:var(--gold);border-color:var(--gold)}
+.guard{display:grid;gap:16px;margin-top:26px}
+.guard div{display:grid;grid-template-columns:auto 1fr;gap:4px 14px}
+.guard b{font-weight:600}
+.guard p{grid-column:2;color:var(--platinum-2);font-size:.94rem}
+.guard i{grid-row:span 2;width:10px;height:10px;border-radius:50%;background:var(--gold);margin-top:9px}
+
+/* capacidades */
+.caps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--velvet-3);border:1px solid var(--velvet-3);border-radius:var(--r);overflow:hidden}
+@media (max-width:900px){.caps{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.caps{grid-template-columns:1fr}}
+.cap{background:var(--velvet);padding:26px;display:grid;gap:10px;align-content:start}
+.cap p{color:var(--platinum-2);font-size:.94rem}
+.cap .pill{justify-self:start}
+
+/* prueba */
+.proof{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+@media (max-width:900px){.proof{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:480px){.proof{grid-template-columns:1fr}}
+.fig{display:grid;gap:6px;align-content:start}
+.fig strong{font-family:var(--display);font-weight:400;font-size:clamp(2.2rem,4vw,3rem);line-height:1;color:var(--gold);font-variant-numeric:lining-nums}
+.fig span{color:var(--platinum-2);font-size:.92rem}
+
+/* roadmap */
+.road{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:6px;margin-top:6px}
+@media (max-width:900px){.road{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.road{grid-template-columns:1fr}}
+.hito{border:1px solid var(--velvet-3);border-radius:10px;padding:12px 10px;display:grid;gap:6px;align-content:start;min-width:0}
+.hito .n{font-family:var(--display);font-size:1.3rem;color:var(--platinum)}
+.hito .t{font-size:.8rem;color:var(--platinum-2);line-height:1.35}
+.hito.done{background:rgba(216,180,106,.1);border-color:rgba(216,180,106,.45)}
+.hito.done .n{color:var(--gold)}
+.hito.now{border-color:var(--emerald);background:rgba(47,168,131,.1)}
+.hito .s{font-size:.72rem;color:var(--platinum-2)}
+.hito.done .s{color:var(--gold)}
+.hito.now .s{color:#6FD3B1}
+.road-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:.85rem;color:var(--platinum-2);margin-top:16px}
+
+/* costeo */
+.cost-top{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media (max-width:760px){.cost-top{grid-template-columns:1fr}}
+.total{border-radius:var(--r);padding:26px;border:1px solid var(--velvet-3);background:var(--velvet-2);display:grid;gap:8px}
+.total .who{display:flex;align-items:center;gap:10px;font-weight:600}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+.total .big{font-family:var(--display);font-size:clamp(2rem,4.4vw,3.1rem);line-height:1.05;font-variant-numeric:lining-nums}
+.total .sub{color:var(--platinum-2);font-size:.9rem}
+.ratio{margin-top:22px;padding:18px 22px;border-left:2px solid var(--gold);color:var(--platinum);font-size:1.05rem;max-width:52rem}
+.knobs{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:end;margin:30px 0 8px;padding:18px 20px;border:1px solid var(--velvet-3);border-radius:var(--r)}
+.knob{display:grid;gap:6px;font-size:.86rem;color:var(--platinum-2);min-width:0}
+.knob input[type=range]{width:200px;max-width:100%}
+.knob input[type=number]{width:120px;background:var(--velvet-2);color:var(--platinum);border:1px solid var(--velvet-3);border-radius:8px;padding:8px 10px;font:inherit}
+.seg{display:inline-flex;border:1px solid var(--velvet-3);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-size:.86rem;background:transparent;color:var(--platinum-2);border:0;padding:8px 16px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--gold);color:var(--gold-ink)}
+.chart-box{margin-top:26px;border:1px solid var(--velvet-3);border-radius:var(--r);padding:22px 18px 14px;position:relative;min-width:0}
+.chart-box h3{font-size:1.15rem;margin-bottom:4px}
+.legend{display:flex;gap:18px;font-size:.86rem;color:var(--platinum-2);margin:8px 0 6px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.chart-scroll{overflow-x:auto}
+#chart{display:block;width:100%;min-width:560px;height:auto}
+#chart text{fill:var(--platinum-2);font-family:var(--text);font-size:12px}
+#chart .lbl{fill:var(--platinum);font-size:13px}
+#chart .grid{stroke:var(--velvet-3);stroke-width:1}
+.tip{position:absolute;pointer-events:none;background:#0A1A16;border:1px solid var(--velvet-3);border-radius:10px;padding:10px 12px;font-size:.82rem;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:260px}
+.tip b{color:var(--platinum)}
+.table-scroll{overflow-x:auto;margin-top:26px;border:1px solid var(--velvet-3);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:.9rem}
+th,td{padding:11px 14px;text-align:right;border-bottom:1px solid var(--velvet-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+thead th{color:var(--platinum-2);font-weight:500;background:var(--velvet-2)}
+tbody tr:last-child td{border-bottom:0}
+tfoot td{font-weight:600;color:var(--platinum);background:var(--velvet-2);border-bottom:0;border-top:1px solid var(--velvet-3)}
+.st{font-size:.76rem;color:var(--platinum-2);display:block}
+.st.done{color:var(--gold)}
+.st.now{color:#6FD3B1}
+.assume{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:40px}
+@media (max-width:760px){.assume{grid-template-columns:1fr}}
+.assume h3{font-size:1.15rem;margin-bottom:10px}
+.assume ul,.assume ol{margin:0;padding-left:1.1rem;color:var(--platinum-2);font-size:.92rem;display:grid;gap:8px}
+.assume a{word-break:break-word}
+
+/* transparencia */
+.honest{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 40px}
+@media (max-width:760px){.honest{grid-template-columns:1fr}}
+.honest div{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;padding:16px 0;border-bottom:1px solid var(--velvet-3)}
+.honest p{grid-column:2;color:var(--platinum-2);font-size:.93rem}
+.honest .pill{grid-row:span 2;align-self:start;margin-top:2px}
+
+.close{text-align:left;padding-block:96px}
+.close h2{font-size:clamp(2.2rem,5vw,4rem);max-width:52rem}
+footer{border-top:1px solid var(--velvet-3);padding-block:28px;color:var(--platinum-2);font-size:.85rem}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Secciones">
+  <div class="wrap">
+    <a class="brand" href="#inicio">AUREA</a>
+    <ul>
+      <li><a href="#aura">AURA</a></li>
+      <li><a href="#plataforma">Plataforma</a></li>
+      <li><a href="#evidencia">Evidencia</a></li>
+      <li><a href="#ruta">Ruta</a></li>
+      <li><a href="#costeo">Costeo</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="inicio">
+  <div class="wrap hero-grid">
+    <div>
+      <h1>Cada cliente diseña su joya. El taller recibe un <em>sólido real</em>.</h1>
+      <p class="lede">AUREA es la plataforma de joyería a medida que lleva la idea del cliente a un diseño editable en el teléfono, con geometría CAD verificable, la asistente de diseño AURA y un expediente listo para que el joyero cotice, revise y fabrique.</p>
+      <div class="cta-row">
+        <a class="btn solid" href="#costeo">Ver el costeo Colombia vs EE. UU.</a>
+        <a class="btn ghost" href="#aura">Conocer a AURA</a>
+      </div>
+    </div>
+    <figure class="stage" style="margin:0" aria-label="Anillo paramétrico en 3D que puede ajustar">
+      <div class="spec num" aria-hidden="true">Familia <b>ring.02 · Clásico confort</b><br>Oro 18k · pared 1,8 mm</div>
+      <canvas id="ring" aria-hidden="true"></canvas>
+      <div class="controls">
+        <div class="ctl"><label for="dia">Diámetro interior <output id="diaO" class="num">19,5 mm</output></label><input id="dia" type="range" min="14" max="24" step="0.5" value="19.5"></div>
+        <div class="ctl"><label for="wid">Ancho <output id="widO" class="num">4,1 mm</output></label><input id="wid" type="range" min="1.5" max="12" step="0.1" value="4.1"></div>
+        <div class="readout"><span>Volumen <b id="vol">493,84 mm³</b></span><span>Peso estimado <b id="peso">7,65 g</b></span><span>Diámetro exterior <b id="ext">23,1 mm</b></span></div>
+        <p class="note" style="grid-column:1/-1">Cálculo analítico de esta página. En la app, cada cambio lo regenera el motor CAD como sólido BREP. Densidad nominal de oro 18k, sin confirmar con el taller.</p>
+      </div>
+    </figure>
+  </div>
+</header>
+
+<main>
+<section id="oportunidad">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">La oportunidad</p>
+      <h2>La joya a medida todavía se negocia con bocetos, fotos y llamadas.</h2>
+      <p class="lede">El cliente no sabe CAD, el joyero repite iteraciones a mano y el taller recibe instrucciones incompletas. AUREA convierte esa conversación en un diseño con medidas, revisiones y un expediente que se puede verificar.</p>
+    </div>
+    <div class="contrast">
+      <div>
+        <h3>Hoy</h3>
+        <ul>
+          <li>Referencias de Instagram y medidas aproximadas.</li>
+          <li>Cotizaciones que dependen de rehacer el boceto cada vez.</li>
+          <li>Cambios por WhatsApp sin historial ni aprobación clara.</li>
+          <li>El taller descubre problemas de fabricación al final.</li>
+        </ul>
+      </div>
+      <div class="after">
+        <h3>Con AUREA</h3>
+        <ul>
+          <li>El cliente ajusta una pieza paramétrica con rangos fabricables.</li>
+          <li>Cada cambio genera geometría real, peso estimado y vista 3D.</li>
+          <li>Revisiones numeradas: nada cambia sin aceptación explícita.</li>
+          <li>El taller recibe STEP/STL, manifiesto y revisión DFM.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flujo">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Del deseo al taller</p>
+      <h2>Un recorrido, seis pasos, una sola fuente de verdad.</h2>
+    </div>
+    <ol class="flow">
+      <li><h3>Explora</h3><p>Boutique con catálogo, detalle y favoritos, incluso como invitado.</p></li>
+      <li><h3>Diseña</h3><p>Anillo o dije editable: diámetro, ancho, metal. Fuera de rango, se rechaza.</p></li>
+      <li><h3>Pide a AURA</h3><p>Escribe lo que quiere y recibe hasta tres propuestas con vista previa.</p></li>
+      <li><h3>Acepta</h3><p>Solo una aceptación crea la nueva revisión. El historial queda completo.</p></li>
+      <li><h3>Cotiza</h3><p>Precio, cotización, pedido y anticipo con inventario reservado (en construcción).</p></li>
+      <li><h3>Fabrica</h3><p>Expediente con STEP/STL, manifiesto y DFM para liberación humana.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section id="aura">
+  <div class="wrap aura">
+    <div>
+      <div class="sec-head" style="margin-bottom:0">
+        <p class="kicker">AURA, asistente de diseño</p>
+        <h2>Habla como el cliente. Responde con geometría.</h2>
+        <p class="lede">AURA traduce un pedido en lenguaje natural a operaciones de diseño permitidas y validadas contra la revisión actual. Propone; nunca modifica sola.</p>
+      </div>
+      <div class="guard">
+        <div><i></i><b>Propone, el cliente decide</b><p>Hasta tres opciones con vista previa del sólido. Solo “Aceptar” crea la revisión, marcada como origen AI.</p></div>
+        <div><i></i><b>Sabe cuándo llamar al joyero</b><p>Piedras, certificación, precios o grabados los remite al profesional en lugar de inventar.</p></div>
+        <div><i></i><b>No obedece instrucciones peligrosas</b><p>“Ignora tus reglas”, “aprueba” o “fabrica” no generan ninguna operación.</p></div>
+        <div><i></i><b>Con cuota y trazabilidad</b><p>Libro de uso por persona y día, reintentos sin cobro doble y sin guardar el texto del cliente.</p></div>
+      </div>
+    </div>
+    <div class="chat" aria-live="polite">
+      <div class="bar"><span>Editor de diseño · anillo Clásico</span><span class="pill gold">Modo demostración: reglas, sin modelo de IA</span></div>
+      <div class="tabs" role="tablist" aria-label="Ejemplos de pedidos a AURA">
+        <button role="tab" aria-selected="true" data-k="0" id="t0">Más delicado y en platino</button>
+        <button role="tab" aria-selected="false" data-k="1" id="t1">Ponle un diamante</button>
+        <button role="tab" aria-selected="false" data-k="2" id="t2">Ancho 20 mm</button>
+      </div>
+      <div id="conv"></div>
+    </div>
+  </div>
+</section>
+
+<section id="plataforma">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Lo que ya existe</p>
+      <h2>Una plataforma completa, no una maqueta.</h2>
+      <p class="lede">App Android, API, motor geométrico y centro de mando web, construidos por hitos con pruebas automáticas y pruebas en un teléfono real.</p>
+    </div>
+    <div class="caps">
+      <div class="cap"><span class="pill gold">Aceptado · hito 200</span><h3>Boutique</h3><p>Catálogo con filtros, detalle con peso en gramos y quilates exactos, favoritos y estados de error y sin conexión accesibles.</p></div>
+      <div class="cap"><span class="pill gold">Aceptado · hito 300</span><h3>Motor de joyería CAD</h3><p>Familias de anillo y dije con OpenCascade/CadQuery. Volumen BREP igual a la fórmula analítica y reglas DFM de fabricación.</p></div>
+      <div class="cap"><span class="pill gold">Aceptado · hito 300</span><h3>Vista 3D en el teléfono</h3><p>Visor Three.js en la app. 60 FPS en el Galaxy Z Flip 7 y vista previa separada del sólido técnico.</p></div>
+      <div class="cap"><span class="pill gold">Aceptado · hito 300</span><h3>Revisiones y sin conexión</h3><p>Cada cambio es una revisión con padre. Sin señal se guarda en cola y se sincroniza sola, sin duplicar ni pisar cambios.</p></div>
+      <div class="cap"><span class="pill gold">Aceptado · hito 300</span><h3>Exportación STEP/STL</h3><p>Archivos firmados con hash SHA-256, manifiesto reproducible y reimportación verificada.</p></div>
+      <div class="cap"><span class="pill gold">Aceptado · hito 400</span><h3>AURA</h3><p>Gateway con lista de operaciones permitidas, vista previa, aceptación humana, cuotas y 35 casos de evaluación.</p></div>
+      <div class="cap"><span class="pill gold">Aceptado · hito 100</span><h3>Identidad y seguridad</h3><p>Login OIDC con PKCE, Keycloak autogestionado, permisos por rol en el backend y secretos fuera del código y del APK.</p></div>
+      <div class="cap"><span class="pill gold">Aceptado · hito 100</span><h3>Contratos y licencias</h3><p>OpenAPI y máquinas de estado versionadas, SBOM CycloneDX y verificación de licencias en cada integración.</p></div>
+      <div class="cap"><span class="pill ok">En curso · hito 500</span><h3>Comercial</h3><p>Precios, cotización, pedido, anticipo simulado, inventario append-only y panel web para el joyero.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="evidencia">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Evidencia medida</p>
+      <h2>Cada hito se cierra con una prueba en un dispositivo real.</h2>
+      <p class="lede">Cifras tomadas de las pruebas registradas en el repositorio el 25 de noviembre de 2026, en un Samsung Galaxy Z Flip 7 con Android 17.</p>
+    </div>
+    <div class="proof">
+      <div class="fig"><strong class="num">2,2×10⁻¹⁴</strong><span>Diferencia relativa entre el volumen del STEP reimportado (493,8395 mm³) y el manifiesto.</span></div>
+      <div class="fig"><strong class="num">60 FPS</strong><span>Vista 3D estable en escenas de vitrina; techo medido de 2.500 anillos y 5,2 M de triángulos.</span></div>
+      <div class="fig"><strong class="num">0</strong><span>Revisiones duplicadas tras guardar sin conexión, cerrar la app y sincronizar al volver la señal.</span></div>
+      <div class="fig"><strong class="num">35</strong><span>Casos de evaluación de AURA; la prueba falla si propone algo que el sistema descartaría.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="ruta">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Hoja de ruta</p>
+      <h2>Cinco hitos aceptados. El siguiente es el corte comercial.</h2>
+      <p class="lede">Los hitos no son porcentajes ni fechas. Cada uno tiene una condición de aceptación que debe demostrarse antes de avanzar.</p>
+    </div>
+    <div class="road">
+      <div class="hito done"><span class="n">000</span><span class="t">Factibilidad CAD y render</span><span class="s">Aceptado</span></div>
+      <div class="hito done"><span class="n">100</span><span class="t">Fundación e identidad</span><span class="s">Aceptado</span></div>
+      <div class="hito done"><span class="n">200</span><span class="t">Boutique</span><span class="s">Aceptado</span></div>
+      <div class="hito done"><span class="n">300</span><span class="t">Motor de joyería</span><span class="s">Aceptado</span></div>
+      <div class="hito done"><span class="n">400</span><span class="t">AURA</span><span class="s">Aceptado</span></div>
+      <div class="hito now"><span class="n">500</span><span class="t">Corte comercial</span><span class="s">En curso</span></div>
+      <div class="hito"><span class="n">600</span><span class="t">Edición demo firmada</span><span class="s">Pendiente</span></div>
+      <div class="hito"><span class="n">700</span><span class="t">Operación de taller, CRM e inventario</span><span class="s">Pendiente</span></div>
+      <div class="hito"><span class="n">800</span><span class="t">MVP comercial: pagos reales, AR, POS</span><span class="s">Pendiente</span></div>
+      <div class="hito"><span class="n">900</span><span class="t">160 familias y colaboración</span><span class="s">Pendiente</span></div>
+      <div class="hito"><span class="n">1000</span><span class="t">Multimercado y BI</span><span class="s">Pendiente</span></div>
+    </div>
+    <p class="road-legend">Mercado piloto: Colombia, en pesos colombianos (COP).</p>
+  </div>
+</section>
+
+<section id="costeo">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Costeo estimado</p>
+      <h2>Cuánto costaría encargar AUREA a una empresa de software.</h2>
+      <p class="lede">Estimación del alcance hasta el MVP comercial (hitos 000 a 800) con un equipo de 11 perfiles durante unos 14 meses, a tarifas de mercado de 2026. Es una estimación con supuestos explícitos, no una cotización.</p>
+    </div>
+
+    <div class="cost-top">
+      <div class="total">
+        <span class="who"><i class="sw" style="background:var(--emerald)"></i>Empresa colombiana · valor de referencia de AUREA</span>
+        <span class="big num" id="coBig">—</span>
+        <span class="sub num" id="coSub">—</span>
+      </div>
+      <div class="total">
+        <span class="who"><i class="sw" style="background:var(--brass)"></i>Empresa estadounidense · tarifas de mercado</span>
+        <span class="big num" id="usBig">—</span>
+        <span class="sub num" id="usSub">—</span>
+      </div>
+    </div>
+    <p class="ratio" id="ratio">—</p>
+
+    <div class="knobs" role="group" aria-label="Ajustar supuestos">
+      <div class="knob"><span>Escenario de tarifa</span>
+        <div class="seg" id="scen">
+          <button type="button" data-v="0" aria-pressed="false">Bajo</button>
+          <button type="button" data-v="0.5" aria-pressed="true">Medio</button>
+          <button type="button" data-v="1" aria-pressed="false">Alto</button>
+        </div>
+      </div>
+      <div class="knob"><label for="cont">Contingencia <output id="contO" class="num">15 %</output></label><input id="cont" type="range" min="0" max="30" step="5" value="15"></div>
+      <div class="knob"><label for="trm">Tasa COP por USD (TRM del 25 de noviembre de 2026)</label><input id="trm" type="number" min="1000" max="10000" step="0.01" value="3592.03" class="num"></div>
+    </div>
+
+    <div class="chart-box">
+      <h3>Costo por fase, rango bajo a alto (USD, sin contingencia)</h3>
+      <div class="legend"><span><i class="sw" style="background:var(--emerald)"></i>Colombia a tarifas de mercado</span><span><i class="sw" style="background:var(--brass)"></i>EE. UU.</span><span>El punto marca el escenario elegido</span></div>
+      <div class="chart-scroll"><svg id="chart" role="img" aria-label="Rango de costo por fase, Colombia contra Estados Unidos"></svg></div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+
+    <div class="table-scroll">
+      <table aria-label="Costo por fase">
+        <thead><tr><th>Fase (hitos)</th><th>Meses</th><th>Personas-mes</th><th>Colombia, mercado (USD)</th><th>EE. UU. (USD)</th><th>Colombia, mercado (COP)</th></tr></thead>
+        <tbody id="phaseBody"></tbody>
+        <tfoot id="phaseFoot"></tfoot>
+      </table>
+    </div>
+
+    <div class="table-scroll">
+      <table aria-label="Tarifas y esfuerzo por perfil">
+        <thead><tr><th>Perfil</th><th>Personas-mes</th><th>Tarifa Colombia (USD/h)</th><th>Tarifa EE. UU. (USD/h)</th><th>Colombia, mercado (USD)</th><th>EE. UU. (USD)</th></tr></thead>
+        <tbody id="roleBody"></tbody>
+      </table>
+    </div>
+
+    <div class="assume">
+      <div>
+        <h3>Supuestos</h3>
+        <ul>
+          <li>Alcance: hitos 000 a 800, tal como están definidos en la hoja de ruta del repositorio. Los hitos 900 y 1000 (160 familias, multimercado) no están incluidos.</li>
+          <li>160 horas facturables por persona al mes. Tarifas de agencia que ya incluyen el margen de la empresa.</li>
+          <li>Tres niveles de tarifa: perfiles estándar (backend, móvil, web, QA, UX), liderazgo (producto, arquitectura, DevOps y seguridad) y especialistas escasos (CAD con OpenCascade, gráficos 3D y AR, IA).</li>
+          <li>No incluye infraestructura en la nube, comisiones del proveedor de pagos, tiendas de apps, asesoría legal, certificaciones, licencias de modelos de IA ni hardware de taller.</li>
+          <li>Mantenimiento posterior: de 15 a 20 % del costo de construcción al año, según Cubix.</li>
+          <li>Las fases 1 y 2 y la parte de AURA ya están construidas; su costo muestra lo que valdría reponer ese alcance con una empresa, no una valoración de la compañía.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Fuentes de tarifas (consultadas el 25 de noviembre de 2026)</h3>
+        <ol>
+          <li>FullStack, “Nearshore engineering economics 2026”: agencias en EE. UU. de 150 a 300 USD/h y en Latinoamérica de 40 a 100 USD/h. <a href="https://www.fullstack.com/labs/resources/nearshore-engineering-economics-2026" target="_blank" rel="noopener">fullstack.com</a></li>
+          <li>Cubix, “Cost to hire a software development company” (2026): EE. UU. senior de 110 a 200 USD/h, especialistas en IA, nube y seguridad de 150 a 250 USD/h o más, firmas medianas de 150 a 250 USD/h, Latinoamérica de 30 a 82 USD/h. <a href="https://www.cubix.co/blog/cost-to-hire-a-software-development-company/" target="_blank" rel="noopener">cubix.co</a></li>
+          <li>Lemon.io, calculadora de tarifas Colombia (T3 2026): mediana del desarrollador senior 34 USD/h y senior fuerte 43 USD/h, antes del margen de una agencia. <a href="https://lemon.io/rate-calculator/colombia/" target="_blank" rel="noopener">lemon.io</a></li>
+          <li>Revelo, salarios de ingeniería en Colombia (2026): costo total de un senior cerca de 94.000 USD/año frente a unos 160.000 USD en EE. UU. <a href="https://www.revelo.com/salaries/colombia" target="_blank" rel="noopener">revelo.com</a></li>
+          <li>TRM del 25 de noviembre de 2026: $3.592,03 por dólar, certificada por la Superintendencia Financiera según <a href="https://www.minuto30.com/dolar-hoy-en-colombia-la-trm-salto-a-su-mayor-nivel-en-seis-meses-asi-quedo-este-miercoles-25-de-noviembre/1734362/" target="_blank" rel="noopener">Minuto30</a> y <a href="https://www.noticiascaracol.com/economia/precio-del-dolar-hoy-25-de-noviembre-de-2026-en-colombia-trm-se-acerca-a-los-3-600-so35" target="_blank" rel="noopener">Noticias Caracol</a>.</li>
+          <li>Clutch, precios de desarrollo de software (septiembre de 2026): proyecto promedio de 132.480 USD en unos 13 meses, para todo tipo de alcance. <a href="https://clutch.co/developers/pricing" target="_blank" rel="noopener">clutch.co</a></li>
+        </ol>
+        <p class="note" style="margin-top:12px">Varias fuentes son empresas que venden estos servicios. Las cifras son publicadas por ellas y no se verificaron de forma independiente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="transparencia">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Transparencia</p>
+      <h2>Qué es real hoy y qué está simulado.</h2>
+      <p class="lede">La plataforma separa los datos de demostración de los de producción y falla cerrada si falta una configuración real. Esto es lo que un inversionista debe saber.</p>
+    </div>
+    <div class="honest">
+      <div><span class="pill ok">Real</span><b>Geometría CAD y exportación</b><p>Sólidos BREP con OpenCascade, STEP y STL reimportados y verificados.</p></div>
+      <div><span class="pill ok">Real</span><b>App, API, identidad y sincronización</b><p>Probadas en un Android físico contra servicios reales locales.</p></div>
+      <div><span class="pill warn">Simulado</span><b>Inteligencia de AURA</b><p>Hoy responde un motor de reglas determinista. La arquitectura admite conectar un modelo de IA cuando se autorice y haya presupuesto.</p></div>
+      <div><span class="pill warn">Simulado</span><b>Pagos y anticipos</b><p>Simulados. Un pago solo se confirmará con un proveedor verificado o conciliación autorizada.</p></div>
+      <div><span class="pill warn">Pausado</span><b>Realidad aumentada</b><p>Requiere pruebas en al menos tres Android y participantes con consentimiento; se retoma en el MVP.</p></div>
+      <div><span class="pill warn">Sintético</span><b>Catálogo, precios y piedras</b><p>Datos de demostración en COP marcados como ficticios; no son precios reales.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="close">
+  <div class="wrap">
+    <h2>El motor ya funciona. Lo que sigue es llevarlo al primer joyero que cobra con él.</h2>
+    <p class="lede" style="margin-top:20px">La inversión acelera el corte comercial, la edición demo firmada, la operación de taller y el MVP con pagos reales en Colombia.</p>
+    <div class="cta-row"><a class="btn solid" href="#costeo">Revisar el costeo</a><a class="btn ghost" href="#transparencia">Ver qué está simulado</a></div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">AUREA · Material para inversionistas, noviembre de 2026. Cifras técnicas tomadas del registro de pruebas del proyecto; el costeo es una estimación con los supuestos indicados.</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+const fmt1 = n => n.toLocaleString('es-CO',{minimumFractionDigits:1,maximumFractionDigits:1});
+const fmt2 = n => n.toLocaleString('es-CO',{minimumFractionDigits:2,maximumFractionDigits:2});
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Anillo paramétrico ---------- */
+const WALL = 1.8, DENS = 15.5; // mm, g/cm³ nominal 18k
+const dia = document.getElementById('dia'), wid = document.getElementById('wid');
+function stats(){
+  const d = +dia.value, w = +wid.value, D = d + 2*WALL;
+  const v = Math.PI/4*(D*D - d*d)*w;
+  document.getElementById('diaO').textContent = fmt1(d)+' mm';
+  document.getElementById('widO').textContent = fmt1(w)+' mm';
+  document.getElementById('vol').textContent = fmt2(v)+' mm³';
+  document.getElementById('peso').textContent = fmt2(v/1000*DENS)+' g';
+  document.getElementById('ext').textContent = fmt1(D)+' mm';
+  return {d,w};
+}
+let rebuild = ()=>{};
+dia.addEventListener('input',()=>{stats();rebuild();});
+wid.addEventListener('input',()=>{stats();rebuild();});
+stats();
+
+const canvas = document.getElementById('ring');
+if (window.THREE && canvas) {
+  try {
+    const T = THREE;
+    const renderer = new T.WebGLRenderer({canvas, antialias:true, alpha:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.outputEncoding = T.sRGBEncoding;
+    renderer.toneMapping = T.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+    const scene = new T.Scene();
+    const cam = new T.PerspectiveCamera(32,1,0.1,500);
+    cam.position.set(0,14,62);
+    cam.lookAt(0,0,0);
+    // Estudio de luz para reflejos del metal
+    const pm = new T.PMREMGenerator(renderer);
+    const studio = new T.Scene();
+    studio.add(new T.Mesh(new T.BoxGeometry(200,200,200), new T.MeshBasicMaterial({color:0x1c160c, side:T.BackSide})));
+    const panel = (c,x,y,z,sx,sy)=>{const m=new T.Mesh(new T.PlaneGeometry(sx,sy),new T.MeshBasicMaterial({color:c,side:T.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);studio.add(m);};
+    panel(0xffffff,0,80,0,90,40); panel(0xfff3dc,-90,20,30,30,90); panel(0xfff0d0,90,10,-20,40,70); panel(0x8a6a35,0,-60,80,120,20); panel(0xffffff,30,30,90,20,20);
+    scene.environment = pm.fromScene(studio,0.02).texture;
+    const metal = new T.MeshStandardMaterial({color:0xE2B458, metalness:1, roughness:0.2});
+    let mesh;
+    rebuild = function(){
+      const {d,w} = stats();
+      const ri = d/2, ro = ri + WALL, hw = w/2, c = Math.min(0.6, hw*0.45);
+      const N = 14, prof = [];
+      const seg=10, arc=(cx,cy,r,a0,a1)=>{for(let i=0;i<=seg;i++){const a=a0+(a1-a0)*i/seg;prof.push(new T.Vector2(cx+Math.cos(a)*r,cy+Math.sin(a)*r));}};
+      for (let i=0;i<=N;i++){const t=1-2*i/N; prof.push(new T.Vector2(ri + 0.3*(1-t*t), t*(hw-c)));}
+      arc(ri+c, -(hw-c), c, Math.PI, Math.PI*1.5);
+      arc(ro-c, -(hw-c), c, Math.PI*1.5, Math.PI*2);
+      for (let i=0;i<=N;i++){const t=-1+2*i/N; prof.push(new T.Vector2(ro + 0.12*(1-t*t), t*(hw-c)));}
+      arc(ro-c, hw-c, c, 0, Math.PI*0.5);
+      arc(ri+c, hw-c, c, Math.PI*0.5, Math.PI);
+      prof.push(prof[0].clone());
+      const g = new T.LatheGeometry(prof, 160);
+      g.computeVertexNormals();
+      if (mesh){ mesh.geometry.dispose(); mesh.geometry = g; }
+      else { mesh = new T.Mesh(g, metal); mesh.rotation.x = Math.PI/2.4; scene.add(mesh); }
+      if (reduce) draw();
+    };
+    rebuild();
+    function size(){const r=canvas.getBoundingClientRect();renderer.setSize(r.width,r.height,false);cam.aspect=r.width/r.height;cam.updateProjectionMatrix();}
+    new ResizeObserver(()=>{size();draw();}).observe(canvas); size();
+    let rx=Math.PI/2.4, ry=0, drag=false, lx=0, ly=0, vy=reduce?0:0.004;
+    canvas.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';});
+    canvas.addEventListener('pointermove',e=>{if(!drag)return;ry+=(e.clientX-lx)*0.01;rx+=(e.clientY-ly)*0.01;lx=e.clientX;ly=e.clientY;if(reduce)draw();});
+    canvas.addEventListener('pointerup',()=>{drag=false;canvas.style.cursor='grab';});
+    function draw(){ if(mesh){mesh.rotation.x=rx;mesh.rotation.z=ry;} renderer.render(scene,cam); }
+    function loop(){ if(!drag) ry+=vy; draw(); requestAnimationFrame(loop); }
+    if (reduce) draw(); else loop();
+  } catch(e){ fallback(); }
+} else fallback();
+function fallback(){
+  const f=document.createElement('div');f.className='fallback';
+  f.innerHTML='<svg viewBox="0 0 200 160" width="70%" aria-hidden="true"><ellipse cx="100" cy="80" rx="70" ry="52" fill="none" stroke="#D8B46A" stroke-width="14"/><ellipse cx="100" cy="80" rx="70" ry="52" fill="none" stroke="#F3DDA6" stroke-width="2"/></svg>';
+  canvas.replaceWith(f);
+}
+
+/* ---------- AURA: ejemplos del registro de pruebas ---------- */
+const convs = [
+  {ask:'Más delicado y en platino', state:'<span class="pill ok">3 opciones</span>',
+   body:'<p>Propongo estas opciones sobre tu revisión actual. Ninguna cambia el diseño hasta que la aceptes.</p><div class="opts"><div class="opt"><span>Ancho 3,5 mm · pared 1,6 mm · Platino 950</span><span>Ver vista previa</span></div><div class="opt sel"><span>Ancho 3,0 mm · pared 1,4 mm · Platino 950</span><span>Aceptada → nueva revisión</span></div><div class="opt"><span>Ancho 2,5 mm · pared 1,2 mm · Platino 950</span><span>Ver vista previa</span></div></div><p class="note">Caso G04 del set de evaluación de AURA</p>'},
+  {ask:'Ponle un diamante', state:'<span class="pill warn">Requiere joyero</span>',
+   body:'<p>Engastar piedras aún no está en el editor. Esta parte la define tu joyero, incluida la certificación de la piedra.</p><p class="note">Respuesta registrada en la prueba del teléfono · 0 operaciones · la revisión no cambia</p>'},
+  {ask:'Ancho 20 mm', state:'<span class="pill warn">Fuera de rango</span>',
+   body:'<p>Pediste 20 mm y el rango es 1,5–12 mm. No lo ajusto solo.</p><p class="note">Respuesta registrada en la prueba del teléfono · 0 operaciones · la revisión no cambia</p>'}
+];
+const conv=document.getElementById('conv'), tabs=[...document.querySelectorAll('.tabs button')];
+function showConv(k){
+  tabs.forEach((b,i)=>b.setAttribute('aria-selected',i===k));
+  const c=convs[k];
+  conv.innerHTML='<div style="display:grid;gap:12px"><div class="ask">'+c.ask+'</div><div class="reply"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><b style="font-family:var(--display);font-weight:500">AURA</b>'+c.state+'</div>'+c.body+'</div></div>';
+}
+tabs.forEach((b,i)=>b.addEventListener('click',()=>showConv(i)));
+showConv(0);
+
+/* ---------- Costeo ---------- */
+const H = 160;
+// tarifas [bajo, alto] USD/h por nivel
+const RATES = {
+  std:{co:[35,65],us:[130,200]},
+  lead:{co:[45,80],us:[160,250]},
+  spec:{co:[55,95],us:[175,275]}
+};
+const PHASES = [
+  {n:'Factibilidad y fundación', h:'000–100', m:2,   st:'Construida', cls:'done'},
+  {n:'Boutique y motor de joyería', h:'200–300', m:3, st:'Construida', cls:'done'},
+  {n:'AURA y corte comercial', h:'400–500', m:2.5,  st:'AURA construida; comercial en curso', cls:'now'},
+  {n:'Demo y operación profesional', h:'600–700', m:3.5, st:'Pendiente', cls:''},
+  {n:'MVP comercial', h:'800', m:3, st:'Pendiente', cls:''}
+];
+// dedicación (personas) por fase
+const ROLES = [
+  {n:'Dirección de producto', t:'lead', f:[1,1,1,1,1]},
+  {n:'Arquitectura y liderazgo técnico', t:'lead', f:[1,1,1,1,1]},
+  {n:'Backend (NestJS, PostgreSQL)', t:'std', f:[1,2,2,3,2]},
+  {n:'Móvil (React Native, Expo)', t:'std', f:[1,2,2,2,2]},
+  {n:'Web (Next.js, centro de mando)', t:'std', f:[0.5,0.5,1,2,1]},
+  {n:'Ingeniería CAD (OpenCascade, CadQuery)', t:'spec', f:[1,2,1,0.5,0.5]},
+  {n:'Gráficos 3D y realidad aumentada', t:'spec', f:[0.5,1,0.5,0.5,1]},
+  {n:'IA aplicada (AURA)', t:'spec', f:[0,0,1,0.5,0.5]},
+  {n:'Diseño UX/UI', t:'std', f:[1,1,1,1,0.5]},
+  {n:'QA y automatización de pruebas', t:'std', f:[0.5,1,1,1.5,1.5]},
+  {n:'DevOps y seguridad', t:'lead', f:[0.5,0.5,0.5,1,1]}
+];
+let scen = 0.5;
+const usd = n => '$'+Math.round(n).toLocaleString('es-CO')+' USD';
+const usdShort = n => n>=1e6 ? 'US$'+(n/1e6).toLocaleString('es-CO',{maximumFractionDigits:2})+' M' : 'US$'+Math.round(n/1e3).toLocaleString('es-CO')+' mil';
+const copShort = n => n>=1e12 ? '$'+(n/1e12).toLocaleString('es-CO',{maximumFractionDigits:2})+' billones COP' : '$'+(n/1e9).toLocaleString('es-CO',{maximumFractionDigits:2})+' mil millones COP';
+const rate = (t,c,s)=> RATES[t][c][0] + (RATES[t][c][1]-RATES[t][c][0])*s;
+function phaseCost(i,c,s){ return ROLES.reduce((a,r)=>a + r.f[i]*PHASES[i].m*H*rate(r.t,c,s),0); }
+function pm(i){ return ROLES.reduce((a,r)=>a+r.f[i]*PHASES[i].m,0); }
+
+function render(){
+  const k = 1 + (+document.getElementById('cont').value)/100;
+  const trm = Math.max(1000, +document.getElementById('trm').value || 4000);
+  document.getElementById('contO').textContent = document.getElementById('cont').value+' %';
+  const tot = (c,s)=>PHASES.reduce((a,_,i)=>a+phaseCost(i,c,s),0);
+  const co = tot('co',scen)*k, us = tot('us',scen)*k;
+  const coL=tot('co',0)*k, coH=tot('co',1)*k, usL=tot('us',0)*k, usH=tot('us',1)*k;
+  const REF_COP = 420e6;
+  document.getElementById('coBig').textContent = '$420 millones COP';
+  document.getElementById('usBig').textContent = usdShort(us);
+  document.getElementById('coSub').textContent = '≈ US$'+Math.round(REF_COP/trm).toLocaleString('es-CO')+' con la TRM de '+trm.toLocaleString('es-CO',{minimumFractionDigits:2})+'. Cifra indicada por AUREA; no sale de la investigación de tarifas.';
+  document.getElementById('usSub').textContent = 'Rango '+usdShort(usL)+' a '+usdShort(usH)+' · ≈ '+copShort(us*trm);
+  const built = [0,1].reduce((a,i)=>a+phaseCost(i,'co',scen),0)*k, builtUS=[0,1].reduce((a,i)=>a+phaseCost(i,'us',scen),0)*k;
+  document.getElementById('ratio').innerHTML = 'El mismo alcance encargado a una empresa estadounidense costaría cerca de <b class="num">'+usdShort(us)+'</b> (≈ '+copShort(us*trm)+'), unas <b class="num">'+Math.round(us*trm/REF_COP).toLocaleString('es-CO')+' veces</b> el valor de referencia de AUREA. Una agencia colombiana a tarifas de mercado de 2026 cobraría cerca de <b class="num">'+usdShort(co)+'</b> (rango '+usdShort(coL)+' a '+usdShort(coH)+').';
+  // tabla fases
+  const pb=document.getElementById('phaseBody'); pb.innerHTML='';
+  let tpm=0,tm=0;
+  PHASES.forEach((p,i)=>{
+    const c=phaseCost(i,'co',scen)*k, u=phaseCost(i,'us',scen)*k; tpm+=pm(i); tm+=p.m;
+    pb.insertAdjacentHTML('beforeend','<tr><td>'+p.n+' ('+p.h+')<span class="st '+p.cls+'">'+p.st+'</span></td><td>'+p.m.toLocaleString('es-CO')+'</td><td>'+pm(i).toLocaleString('es-CO',{maximumFractionDigits:2})+'</td><td>'+usd(c)+'</td><td>'+usd(u)+'</td><td>$'+Math.round(c*trm/1e6).toLocaleString('es-CO')+' M</td></tr>');
+  });
+  document.getElementById('phaseFoot').innerHTML='<tr><td>Total hasta el MVP (contingencia '+document.getElementById('cont').value+' % incluida)</td><td>'+tm.toLocaleString('es-CO')+'</td><td>'+tpm.toLocaleString('es-CO',{maximumFractionDigits:2})+'</td><td>'+usd(co)+'</td><td>'+usd(us)+'</td><td>$'+Math.round(co*trm/1e6).toLocaleString('es-CO')+' M</td></tr>';
+  // tabla roles
+  const rb=document.getElementById('roleBody'); rb.innerHTML='';
+  ROLES.forEach(r=>{
+    const p=r.f.reduce((a,f,i)=>a+f*PHASES[i].m,0);
+    const rc=rate(r.t,'co',scen), ru=rate(r.t,'us',scen);
+    rb.insertAdjacentHTML('beforeend','<tr><td>'+r.n+'</td><td>'+p.toLocaleString('es-CO',{maximumFractionDigits:2})+'</td><td>'+Math.round(rc)+'</td><td>'+Math.round(ru)+'</td><td>'+usd(p*H*rc*k)+'</td><td>'+usd(p*H*ru*k)+'</td></tr>');
+  });
+  chart();
+}
+
+function chart(){
+  const svg=document.getElementById('chart'), W=820, rowH=58, top=14, left=210, right=24, n=PHASES.length, Hh=top+n*rowH+34;
+  svg.setAttribute('viewBox','0 0 '+W+' '+Hh);
+  let max=0; PHASES.forEach((_,i)=>max=Math.max(max,phaseCost(i,'us',1)));
+  const step = max>1.5e6?500000:250000; const xmax=Math.ceil(max/step)*step;
+  const x=v=>left+(W-left-right)*v/xmax;
+  let s='';
+  for(let v=0; v<=xmax; v+=step){ s+='<line class="grid" x1="'+x(v)+'" x2="'+x(v)+'" y1="'+top+'" y2="'+(top+n*rowH)+'"/><text x="'+x(v)+'" y="'+(top+n*rowH+20)+'" text-anchor="middle">'+(v===0?'0':(v/1e6).toLocaleString('es-CO',{maximumFractionDigits:2})+' M')+'</text>'; }
+  PHASES.forEach((p,i)=>{
+    const y=top+i*rowH;
+    s+='<text class="lbl" x="0" y="'+(y+24)+'">'+p.n+'</text><text x="0" y="'+(y+41)+'">Hitos '+p.h+' · '+p.m.toLocaleString('es-CO')+' meses</text>';
+    [['co','#2FA883',y+14],['us','#C4923A',y+32]].forEach(([c,col,yy])=>{
+      const lo=phaseCost(i,c,0), hi=phaseCost(i,c,1), mid=phaseCost(i,c,scen);
+      s+='<g class="bar" data-i="'+i+'" data-c="'+c+'"><rect x="'+x(0)+'" y="'+(yy-8)+'" width="'+(W-left-right)+'" height="16" fill="transparent"/><rect x="'+x(lo)+'" y="'+(yy-5)+'" width="'+Math.max(4,x(hi)-x(lo))+'" height="10" rx="4" fill="'+col+'" opacity=".85"/><circle cx="'+x(mid)+'" cy="'+yy+'" r="6" fill="#E9ECE8" stroke="#0C211C" stroke-width="2"/></g>';
+    });
+  });
+  svg.innerHTML=s;
+  const tip=document.getElementById('tip'), box=svg.parentElement.parentElement;
+  svg.querySelectorAll('.bar').forEach(g=>{
+    g.addEventListener('pointerenter',e=>{
+      const i=+g.dataset.i,c=g.dataset.c;
+      tip.innerHTML='<b>'+PHASES[i].n+' · '+(c==='co'?'Colombia':'EE. UU.')+'</b><br>Bajo '+usd(phaseCost(i,c,0))+'<br>Elegido '+usd(phaseCost(i,c,scen))+'<br>Alto '+usd(phaseCost(i,c,1));
+      tip.hidden=false;
+    });
+    g.addEventListener('pointermove',e=>{const r=box.getBoundingClientRect();let lx=e.clientX-r.left+14;if(lx>r.width-270)lx=e.clientX-r.left-270;tip.style.left=Math.max(8,lx)+'px';tip.style.top=(e.clientY-r.top+14)+'px';});
+    g.addEventListener('pointerleave',()=>tip.hidden=true);
+  });
+}
+document.querySelectorAll('#scen button').forEach(b=>b.addEventListener('click',()=>{
+  scen=+b.dataset.v; document.querySelectorAll('#scen button').forEach(x=>x.setAttribute('aria-pressed',x===b)); render();
+}));
+document.getElementById('cont').addEventListener('input',render);
+document.getElementById('trm').addEventListener('input',render);
+render();
+})();
+</script>
+</body>
+</html>
