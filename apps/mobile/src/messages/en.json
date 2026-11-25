@@ -220,5 +220,18 @@
   "illustration3d": "3D illustration of {name}, not a photograph",
   "illustration3dNote": "The image is a 3D illustration made from the piece description; the real jewel may vary.",
   "brandOverline": "AUREA · Fine jewelry",
-  "familyArtNote": "Images show each family in the chosen alloy at its starting size; your design appears in 3D in the editor."
+  "familyArtNote": "Images show each family in the chosen alloy at its starting size; your design appears in 3D in the editor.",
+  "quoteBreakdown": "Price breakdown",
+  "orderPayments": "Payments",
+  "journeyA11y": "Step {n} of {total}: {step}",
+  "journeyDone": "All steps complete: piece delivered",
+  "step_review": "Review",
+  "step_price": "Price",
+  "step_order": "Order",
+  "step_deposit": "Deposit",
+  "step_workshop": "Workshop",
+  "step_delivery": "Delivery",
+  "profileAccount": "Your account",
+  "profileAbout": "This app",
+  "profileWelcome": "Welcome to AUREA"
 }

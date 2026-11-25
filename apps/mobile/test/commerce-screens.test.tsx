@@ -190,10 +190,11 @@ describe("order", () => {
     await waitFor(() => expect(api.calls.some((c) => c.path === "/orders/o1")).toBe(true));
     expect(await screen.findByText("Waiting for the deposit")).toBeTruthy();
     expect(screen.getByText("Simulated payment: no real money is charged.")).toBeTruthy();
-    expect(screen.getByText("Gold 18k yellow (demo): 7.637 g · held")).toBeTruthy();
+    expect(screen.getByLabelText("Gold 18k yellow (demo): 7.637 g · held")).toBeTruthy();
+    expect(screen.getByLabelText("Step 4 of 6: Deposit")).toBeTruthy();
     fireEvent.press(screen.getByText("Pay deposit of $ 1,511,100 COP (simulated)"));
     expect(await screen.findByText("Order confirmed")).toBeTruthy();
-    expect(screen.getByText("Gold 18k yellow (demo): 7.637 g · allocated to your piece")).toBeTruthy();
+    expect(screen.getByLabelText("Gold 18k yellow (demo): 7.637 g · allocated to your piece")).toBeTruthy();
     expect(screen.getByLabelText("Balance: $ 3,525,813 COP")).toBeTruthy();
     expect(api.calls.filter((c) => c.path === "/payment-intents")).toHaveLength(1);
     expect(api.calls.find((c) => c.path === "/payment-intents")!.body).toEqual({ orderId: "o1", kind: "DEPOSIT", amount: money("1511100") });
@@ -218,5 +219,14 @@ describe("order", () => {
     await show(api, <OrderScreen id="o1" onBack={() => undefined} pollMs={30} />);
     expect(await screen.findByText("Your payment is under review. An advisor will contact you.")).toBeTruthy();
     expect(screen.queryByText(/Pay deposit/)).toBeNull();
+  });
+});
+
+describe("journey", () => {
+  it("maps quote and order states to steps and stops on a lapsed or cancelled one", () => {
+    const { quoteStep, orderStep, JOURNEY } = require("../src/screens/commerce-ui");
+    expect([quoteStep("DRAFT"), quoteStep("ISSUED"), quoteStep("ACCEPTED"), quoteStep("EXPIRED")]).toEqual([0, 1, 2, null]);
+    expect([orderStep("PENDING_PAYMENT"), orderStep("CONFIRMED"), orderStep("READY"), orderStep("DELIVERED"), orderStep("CANCELLED")])
+      .toEqual([3, 4, 5, JOURNEY.length, null]);
   });
 });

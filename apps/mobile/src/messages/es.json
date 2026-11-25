@@ -220,5 +220,18 @@
   "illustration3d": "Ilustración 3D de {name}, no es una fotografía",
   "illustration3dNote": "La imagen es una ilustración 3D generada a partir de la descripción de la pieza; la joya real puede variar.",
   "brandOverline": "AUREA · Alta joyería",
-  "familyArtNote": "Las imágenes muestran cada familia en el metal elegido con sus medidas iniciales; tu diseño se ve en 3D en el editor."
+  "familyArtNote": "Las imágenes muestran cada familia en el metal elegido con sus medidas iniciales; tu diseño se ve en 3D en el editor.",
+  "quoteBreakdown": "Detalle del precio",
+  "orderPayments": "Pagos",
+  "journeyA11y": "Paso {n} de {total}: {step}",
+  "journeyDone": "Todos los pasos completos: pieza entregada",
+  "step_review": "Revisión",
+  "step_price": "Precio",
+  "step_order": "Pedido",
+  "step_deposit": "Anticipo",
+  "step_workshop": "Taller",
+  "step_delivery": "Entrega",
+  "profileAccount": "Tu cuenta",
+  "profileAbout": "Esta app",
+  "profileWelcome": "Te damos la bienvenida a AUREA"
 }
