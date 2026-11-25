@@ -78,7 +78,9 @@ export class JobRunner {
   private timer: NodeJS.Timeout | null = null;
   private busy = false;
 
-  constructor(private readonly pool: Pool, private readonly worker: GeometryWorker, private readonly store: ArtifactStore) {}
+  /** `retryDelayMs`: first backoff after a busy worker; doubles per attempt. */
+  constructor(private readonly pool: Pool, private readonly worker: GeometryWorker, private readonly store: ArtifactStore,
+    private readonly retryDelayMs = 2000) {}
 
   start(intervalMs = 500): void {
     this.timer = setInterval(() => void this.drain(), intervalMs);
@@ -110,7 +112,8 @@ export class JobRunner {
     const claimed = await this.pool.query<JobRow & { lease: string }>(
       `UPDATE aurea.job SET state = 'RUNNING', attempts = attempts + 1, lease_until = now() + make_interval(secs => $1), updated_at = now()
         WHERE id = (SELECT id FROM aurea.job
-                     WHERE state = 'QUEUED' OR (state = 'RUNNING' AND lease_until < now())
+                     WHERE (state = 'QUEUED' AND (lease_until IS NULL OR lease_until <= now()))
+                        OR (state = 'RUNNING' AND lease_until < now())
                      ORDER BY created_at, id FOR UPDATE SKIP LOCKED LIMIT 1)
         RETURNING ${JOB_COLUMNS}, lease_until::text AS lease`,
       [LEASE_S],
@@ -125,9 +128,13 @@ export class JobRunner {
     const result = await this.worker.regenerate(job.id, job.document);
     if (!result.ok) {
       if (result.retry && job.attempts < MAX_ATTEMPTS) {
+        // Back off instead of re-claiming at once: a busy worker needs a moment, and drain() would
+        // otherwise burn every attempt in a tight loop. On a QUEUED job, lease_until is "not before".
+        const delayMs = this.retryDelayMs * 2 ** (job.attempts - 1);
         await this.pool.query(
-          "UPDATE aurea.job SET state = 'QUEUED', lease_until = NULL, updated_at = now() WHERE id = $1 AND state = 'RUNNING' AND lease_until = $2",
-          [job.id, job.lease]);
+          `UPDATE aurea.job SET state = 'QUEUED', lease_until = now() + make_interval(secs => $3), updated_at = now()
+            WHERE id = $1 AND state = 'RUNNING' AND lease_until = $2`,
+          [job.id, job.lease, delayMs / 1000]);
       } else {
         await this.finish(job, "FAILED", { errorCode: result.code });
       }

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Headers, HttpCode, Inject, Post, Query, Req } from "@nestjs/common";
 import type { Pool, PoolClient } from "pg";
-import { applyOperation, canRebase, diffParameters, MAIN_BRANCH, type DesignOperation } from "@aurea/design";
+import { applyOperation, canRebase, diffParameters, MAIN_BRANCH, type DesignDocument, type DesignOperation } from "@aurea/design";
 import { DATABASE } from "../database";
 import { correlationId } from "../errors.filter";
 import { RequirePermission } from "../identity/permission.decorator";
@@ -27,6 +27,27 @@ function wellFormed(op: unknown): op is SyncOp {
     && typeof o.branch === "string" && Number.isInteger(o.sequence) && (o.sequence as number) >= 1
     && typeof o.createdAt === "string" && !Number.isNaN(Date.parse(o.createdAt))
     && !!o.operation && typeof o.operation === "object";
+}
+
+/**
+ * Operations equivalent to every revision step from `base` to `head` on the main chain, or null when
+ * `head` does not descend from `base` (then nothing can be rebased safely).
+ */
+async function writesSince(c: PoolClient, projectId: string, base: { id: string; number: number }, head: { id: string; number: number }) {
+  const { rows } = await c.query<{ id: string; parent_id: string | null; document: DesignDocument }>(
+    "SELECT id, parent_id, document FROM aurea.revision WHERE project_id = $1 AND number BETWEEN $2 AND $3 ORDER BY number",
+    [projectId, base.number, head.number]);
+  if (rows[0]?.id !== base.id || rows[rows.length - 1]?.id !== head.id) return null;
+  const ops: DesignOperation[] = [];
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i].parent_id !== rows[i - 1].id) return null;
+    for (const d of diffParameters(rows[i - 1].document, rows[i].document)) {
+      ops.push(d.name === "materialId"
+        ? { type: "change_material", componentId: d.componentId, materialId: String(d.to) }
+        : { type: "modify_parameter", componentId: d.componentId, name: d.name, value: Number(d.to) });
+    }
+  }
+  return ops;
 }
 
 /** OpenAPI syncPush / syncPull (22_OFFLINE_AND_SYNC/SYNC.md). */
@@ -58,6 +79,9 @@ export class SyncController {
 
   private async one(c: PoolClient, subject: string, deviceId: string, op: SyncOp, blocked: boolean, corr: string): Promise<Result> {
     const bodyDigest = canonicalSha(op);
+    // Concurrent pushes of the same operation id (two devices, a retry racing the first try) queue
+    // here, so the second one sees the first one's stored result instead of hitting the key.
+    await c.query("SELECT pg_advisory_xact_lock(hashtextextended('sync_operation:' || $1, 0))", [op.id]);
     const prior = await c.query<{ actor: string; body_digest: string; result: Result }>(
       "SELECT actor, body_digest, result FROM aurea.sync_operation WHERE id = $1", [op.id]);
     if (prior.rows[0]) {
@@ -89,12 +113,10 @@ export class SyncController {
     }
     const head = base.id === project.head_id ? base : await revision(c, project.id, project.head_id);
     if (base.id !== head.id) {
-      // Independent parameters only: what changed between base and head must not touch what this op writes.
-      const since = diffParameters(base.document, head.document).map((d) =>
-        d.name === "materialId"
-          ? { type: "change_material", componentId: d.componentId, materialId: String(d.to) }
-          : { type: "modify_parameter", componentId: d.componentId, name: d.name, value: Number(d.to) });
-      if (!canRebase(op.operation, since as DesignOperation[])) {
+      // Independent parameters only: no revision since the base may have written what this op writes.
+      // Every step counts, not the net difference: 4 → 5 → 4 still touched the value.
+      const since = await writesSince(c, project.id, base, head);
+      if (!since || !canRebase(op.operation, since)) {
         return store({ operationId: op.id, status: "CONFLICT", serverRevisionId: head.id, error: { code: "VERSION_CONFLICT", message: "the same value changed on the server" } });
       }
     }

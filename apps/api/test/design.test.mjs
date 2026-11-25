@@ -49,6 +49,7 @@ async function admin(sql) {
 const REAL = process.env.AUREA_REAL_WORKER_URL;
 const WORKER_SECRET = process.env.AUREA_REAL_WORKER_SECRET ?? "w".repeat(40);
 const FILE_SECRET = "f".repeat(40);
+const RETRY_MS = 100;
 const ISSUER = "http://127.0.0.1:1/realms/test";
 const ALICE = "3c1e9f50-0000-4000-8000-00000000a11c";
 const BOB = "3c1e9f50-0000-4000-8000-000000000b0b";
@@ -119,8 +120,19 @@ const modify = (name, value, componentId = "ring-base") => ({ type: "modify_para
 async function previewAndWait(projectId, baseRevisionId, operation) {
   const r = await call("POST", `/v1/projects/${projectId}/operations`, { body: { baseRevisionId, operation } });
   assert.equal(r.status, 202, JSON.stringify(r.body));
-  await runner.drain();
-  return (await call("GET", `/v1/jobs/${r.body.id}`)).body;
+  return settle(r.body.id);
+}
+
+/** Drain until the job is final; retries after a busy worker wait out their backoff first. */
+async function settle(jobId, ms = 10_000) {
+  const deadline = Date.now() + ms;
+  for (;;) {
+    await runner.drain();
+    const job = (await call("GET", `/v1/jobs/${jobId}`)).body;
+    if (!["QUEUED", "RUNNING"].includes(job.state)) return job;
+    assert.ok(Date.now() < deadline, `job still ${job.state}`);
+    await new Promise((res) => setTimeout(res, 25));
+  }
 }
 
 describe("design API (hito 300)", { skip }, () => {
@@ -144,7 +156,7 @@ describe("design API (hito 300)", { skip }, () => {
     await app.listen(0, "127.0.0.1");
     const { port } = app.getHttpServer().address();
     s = { app, url: (p) => `http://127.0.0.1:${port}${p}` };
-    runner = new JobRunner(pool, new GeometryWorker(workerUrl, WORKER_SECRET, 120_000), new ArtifactStore(artifactDir));
+    runner = new JobRunner(pool, new GeometryWorker(workerUrl, WORKER_SECRET, 120_000), new ArtifactStore(artifactDir), RETRY_MS);
   });
   after(async () => {
     await s?.app.close();
@@ -307,9 +319,19 @@ describe("design API (hito 300)", { skip }, () => {
 
   test("worker busy is retried; timeout fails the job with its code", { skip: REAL ? "fake worker only" : false }, async () => {
     const p = (await newProject()).body;
-    fake.mode = "busy"; fake.failuresLeft = 1;
-    let job = await previewAndWait(p.id, p.headRevisionId, modify("bandWidth", 6));
+    fake.mode = "busy"; fake.failuresLeft = 2;
+    const queued = await call("POST", `/v1/projects/${p.id}/operations`, { body: { baseRevisionId: p.headRevisionId, operation: modify("bandWidth", 6) } });
+    const started = Date.now();
+    await runner.drain();
+    // Not re-claimed in a tight loop: after one busy answer the job waits out its backoff.
+    assert.equal((await call("GET", `/v1/jobs/${queued.body.id}`)).body.state, "QUEUED");
+    assert.equal(fake.failuresLeft, 1);
+    let job = await settle(queued.body.id);
     assert.equal(job.state, "SUCCEEDED");
+    assert.ok(Date.now() - started >= RETRY_MS * 3, "backoff 100 ms then 200 ms before the third attempt");
+    fake.mode = "busy"; fake.failuresLeft = 3;
+    job = await previewAndWait(p.id, p.headRevisionId, modify("bandWidth", 6.5));
+    assert.deepEqual([job.state, job.errorCode], ["FAILED", "SERVICE_UNAVAILABLE"], "gives up after 3 attempts");
     fake.mode = "timeout"; fake.failuresLeft = 1;
     job = await previewAndWait(p.id, p.headRevisionId, modify("bandWidth", 7));
     assert.equal(job.state, "FAILED");
@@ -353,6 +375,23 @@ describe("design API (hito 300)", { skip }, () => {
     assert.equal((await call("GET", `/v1/projects/${p.id}`)).body.headRevisionNumber, 3, "no last-write-wins");
     // Alone, the second one applies (it was not stored as a conflict).
     assert.equal((await push([after])).body.results[0].status, "APPLIED");
+
+    // A value changed on the server and changed back (net difference empty) was still written:
+    // an offline edit of it made before those writes conflicts.
+    const q = (await call("GET", `/v1/projects/${p.id}`)).body;
+    const round1 = await push([op(modify("bandWidth", 9), 10, q.headRevisionId)]);
+    const round2 = await push([op(modify("bandWidth", 5), 11, round1.body.results[0].revisionId)]);
+    assert.deepEqual([round1, round2].map((x) => x.body.results[0].status), ["APPLIED", "APPLIED"]);
+    const stale = await push([op(modify("bandWidth", 7), 12, q.headRevisionId)]);
+    assert.equal(stale.body.results[0].status, "CONFLICT", "5 → 9 → 5 round trips are not erased");
+    const fresh = await push([op(modify("innerDiameter", 21), 13, q.headRevisionId)]);
+    assert.equal(fresh.body.results[0].status, "APPLIED", "an untouched value still rebases across them");
+
+    // Two pushes of the same operation at once: one result, no 500, no second revision.
+    const twin = op(modify("radialThickness", 1.9), 14, q.headRevisionId);
+    const both = await Promise.all([push([twin]), push([twin])]);
+    assert.deepEqual(both.map((x) => x.status), [200, 200]);
+    assert.deepEqual(both[0].body.results[0], both[1].body.results[0]);
 
     const bad = await push([op(modify("radialThickness", 9), 5, (await call("GET", `/v1/projects/${p.id}`)).body.headRevisionId)]);
     assert.deepEqual([bad.body.results[0].status, bad.body.results[0].error.code], ["REJECTED", "OUT_OF_RANGE"]);
