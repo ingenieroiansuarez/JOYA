@@ -16766,6 +16766,31 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/react-native-safe-area-context@5.11.1",
+      "name": "react-native-safe-area-context",
+      "version": "5.11.1",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/react-native-safe-area-context@5.11.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "c8296d5d7c21c29e36bcca9f840b07e415a0032b1b2cd8307e7dcf0f03693a7fc28307ccf9e31681271921b1db33325834b8b96ca2443885041b847028d88408"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/react-native@0.88.1",
       "name": "react-native",
       "version": "0.88.1",
