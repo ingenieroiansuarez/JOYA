@@ -19,6 +19,7 @@
     "rxjs": "7.8.2"
   },
   "devDependencies": {
+    "@aurea/db": "workspace:*",
     "@types/node": "22.20.6",
     "@types/pg": "8.23.1",
     "ajv": "8.20.0",
