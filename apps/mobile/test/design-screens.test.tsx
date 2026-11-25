@@ -2,17 +2,22 @@
 // invalid input refused, offline save, restart offline, sync, conflict decision, online preview and
 // explicit acceptance. Auth is mocked as a signed-in customer.
 import { mkdtempSync } from "node:fs";
-import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 import en from "../src/messages/en.json";
-import { DesignApi, FakeDesignServer, GLB_BYTES, sqlite, uuid } from "./designFakes";
+import { DesignApi, FakeDesignServer, GLB_BYTES, PREVIEW_BYTES, PREVIEW_SHA, sqlite, uuid } from "./designFakes";
 
 jest.mock("../src/auth", () => ({
   discover: async () => ({ authorizationEndpoint: "a", tokenEndpoint: "t" }),
-  refresh: async () => ((globalThis as { __guest?: boolean }).__guest ? null : { accessToken: "tok", refreshToken: "r", expiresAt: Date.now() + 3_600_000 }),
+  refresh: async () => {
+    const g = globalThis as { __guest?: boolean; __offlineLaunch?: boolean };
+    if (g.__offlineLaunch) throw new Error("network down"); // the IdP cannot be reached
+    return g.__guest ? null : { accessToken: "tok", refreshToken: "r", expiresAt: Date.now() + 3_600_000 };
+  },
+  rememberSubject: async () => undefined,
+  rememberedSubject: async () => ((globalThis as { __guest?: boolean }).__guest ? null : "3c1e9f50-0000-4000-8000-00000000a11c"),
   isFresh: (s: { accessToken?: string } | null) => !!s?.accessToken,
   signIn: async () => null,
   signOut: async () => undefined,
@@ -37,7 +42,17 @@ const config = { env: "ci" as const, issuer: "http://127.0.0.1:8080/realms/aurea
 const OWNER = "3c1e9f50-0000-4000-8000-00000000a11c";
 const dir = mkdtempSync(join(tmpdir(), "aurea-editor-"));
 
-(globalThis as { fetch: unknown }).fetch = async () => ({ ok: true, status: 200, arrayBuffer: async () => GLB_BYTES.buffer.slice(0) });
+// The preview's mesh arrives well after its metrics, as on a slow connection.
+const MESH_DELAY_MS = 1500;
+const slow = { timeout: 4000 };
+let previewMeshServed = false;
+(globalThis as { fetch: unknown }).fetch = async (url: string) => {
+  const preview = url.endsWith(PREVIEW_SHA);
+  if (preview) await new Promise((r) => setTimeout(r, MESH_DELAY_MS));
+  if (preview) previewMeshServed = true;
+  const bytes = preview ? PREVIEW_BYTES : GLB_BYTES;
+  return { ok: true, status: 200, arrayBuffer: async () => bytes.buffer.slice(0) };
+};
 
 async function app(server: FakeDesignServer, file: string, ui: React.ReactElement) {
   const api = new DesignApi(server);
@@ -61,7 +76,11 @@ async function stored(server: FakeDesignServer, file: string) {
 }
 const input = (name: string) => screen.getByLabelText(`${name} in millimetres`);
 
-beforeEach(() => { (globalThis as { __guest?: boolean }).__guest = false; posted.length = 0; });
+beforeEach(() => {
+  Object.assign(globalThis, { __guest: false, __offlineLaunch: false });
+  previewMeshServed = false;
+  posted.length = 0;
+});
 
 describe("design editor", () => {
   it("a guest is asked to sign in", async () => {
@@ -69,6 +88,20 @@ describe("design editor", () => {
     await app(new FakeDesignServer(), join(dir, `${uuid()}.db`), <DesignsScreen onOpen={() => undefined} onNew={() => undefined} />);
     expect(await screen.findByText(en.designsGuest)).toBeTruthy();
     expect(screen.getByRole("button", { name: en.signIn })).toBeTruthy();
+  });
+
+  it("after a launch without connection, the stored account's designs are still listed", async () => {
+    const server = new FakeDesignServer();
+    const file = join(dir, `${uuid()}.db`);
+    await stored(server, file);
+    server.online = false;
+    (globalThis as { __offlineLaunch?: boolean }).__offlineLaunch = true;
+    const r = await app(server, file, <DesignsScreen onOpen={() => undefined} onNew={() => undefined} />);
+    expect(await screen.findByText(en.offlineBanner)).toBeTruthy();
+    expect(screen.getAllByText(/Ring|Anillo/).length).toBeGreaterThan(0);
+    expect(screen.queryByText(en.designsGuest)).toBeNull();
+    await r.unmount();
+    r.db.close();
   });
 
   it("refuses out-of-range input without adjusting it, saves offline, survives a restart and syncs", async () => {
@@ -92,13 +125,15 @@ describe("design editor", () => {
     await first.unmount();
     first.db.close();
 
-    // Restart, still offline: the change is still there, nothing was sent.
+    // Restart, still offline (the IdP cannot be reached either): the change is still there, nothing was sent.
+    (globalThis as { __offlineLaunch?: boolean }).__offlineLaunch = true;
     const second = await app(server, file, <EditorScreen id={p.id} onBack={() => undefined} />);
     expect(await screen.findByText("Inner diameter → 19.5 mm · pending")).toBeTruthy();
     expect(server.pushes).toEqual([]);
     expect(screen.getByText(en.offlineBanner)).toBeTruthy();
 
     server.online = true;
+    (globalThis as { __offlineLaunch?: boolean }).__offlineLaunch = false;
     await fireEvent.press(screen.getByRole("button", { name: en.syncNow }));
     await waitFor(() => expect(screen.queryByText(/pending/)).toBeNull());
     expect(await screen.findByText(/Revision 2/)).toBeTruthy();
@@ -129,6 +164,27 @@ describe("design editor", () => {
     r.db.close();
   });
 
+  it("a lost acceptance answer is retried with the same key: one revision, not a conflict", async () => {
+    const server = new FakeDesignServer();
+    const file = join(dir, `${uuid()}.db`);
+    const p = await stored(server, file);
+    const r = await app(server, file, <EditorScreen id={p.id} onBack={() => undefined} />);
+    await screen.findByText("Revision 1", { exact: false });
+    await fireEvent.changeText(input("Band width"), "5");
+    await fireEvent(input("Band width"), "endEditing");
+    await fireEvent.press(await screen.findByRole("button", { name: en.preview }));
+    r.api.dropNextAccept = true;
+    await fireEvent.press(await screen.findByRole("button", { name: en.accept }, slow));
+    expect(await screen.findByText(en.acceptFailed)).toBeTruthy();
+    expect(server.head(p.id).number).toBe(2); // the server did commit it
+    await fireEvent.press(screen.getByRole("button", { name: en.accept }));
+    expect(await screen.findByText(/Revision 2/)).toBeTruthy();
+    expect(screen.queryByText(en.acceptConflict)).toBeNull();
+    expect(server.head(p.id).number).toBe(2);
+    await r.unmount();
+    r.db.close();
+  });
+
   it("online: preview shows real metrics and the mesh, and only acceptance creates the revision", async () => {
     const server = new FakeDesignServer();
     const file = join(dir, `${uuid()}.db`);
@@ -139,8 +195,14 @@ describe("design editor", () => {
     await waitFor(() => expect(r.api.calls.some((x) => x.startsWith("POST /geometry/jobs"))).toBe(true));
     await fireEvent.changeText(input("Band width"), "5");
     await fireEvent(input("Band width"), "endEditing");
-    await fireEvent.press(await screen.findByRole("button", { name: en.preview }));
-    expect(await screen.findByText("Band width: 4 mm → 5 mm")).toBeTruthy();
+    // Accept is offered only once the preview's own mesh is in: never with the previous head's.
+    const pressing = fireEvent.press(await screen.findByRole("button", { name: en.preview }));
+    await new Promise((r) => setTimeout(r, MESH_DELAY_MS / 3));
+    expect(screen.queryByRole("button", { name: en.accept })).toBeNull();
+    await pressing;
+    expect(await screen.findByRole("button", { name: en.accept }, slow)).toBeTruthy();
+    expect(previewMeshServed).toBe(true);
+    expect(screen.getByText("Band width: 4 mm → 5 mm")).toBeTruthy();
     expect(screen.getByLabelText("Solid volume: 481.795 mm³")).toBeTruthy();
     expect(screen.getByLabelText("Estimated weight: 7.468 g")).toBeTruthy();
     expect(screen.getByText(en.dfmReview)).toBeTruthy();
@@ -150,8 +212,8 @@ describe("design editor", () => {
     expect(server.head(p.id).document.components[0].parameters.bandWidth).toBe(5);
     const db = sqlite(file);
     const store = await SqliteDesignStore.open(db, OWNER);
-    expect(await store.glb(server.head(p.id).digest)).toBe(Buffer.from(GLB_BYTES).toString("base64"));
-    expect(createHash("sha256").update(GLB_BYTES).digest("hex")).toHaveLength(64);
+    // The accepted revision is cached with the preview's own mesh, never the previous head's.
+    expect(await store.glb(server.head(p.id).digest)).toBe(Buffer.from(PREVIEW_BYTES).toString("base64"));
     db.close();
     await r.unmount();
     r.db.close();

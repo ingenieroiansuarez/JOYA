@@ -119,6 +119,36 @@ describe("offline design changes", () => {
     expect(server.head(p.id).document.components[0].parameters.bandWidth).toBe(6);
   });
 
+  it("a rebased change does not let the next queued change skip another device's write", async () => {
+    const { server, sync, p } = await setup();
+    server.online = false;
+    expect((await sync.saveOffline(p.id, set("bandWidth", 5))).ok).toBe(true);
+    expect((await sync.saveOffline(p.id, set("innerDiameter", 19))).ok).toBe(true);
+    server.change(p.id, set("innerDiameter", 20)); // another device, before this phone syncs
+    server.online = true;
+    // bandWidth is independent and rebased; innerDiameter was written elsewhere: conflict, not overwrite.
+    expect(await sync.flush()).toEqual({ state: "done", applied: 1, conflicts: 1, rejected: 0 });
+    const head = server.head(p.id).document.components[0].parameters;
+    expect(head).toMatchObject({ bandWidth: 5, innerDiameter: 20 });
+    const d = (await sync.draft(p.id))!;
+    expect(d.problems.map((e) => [e.status, e.op.operation])).toEqual([["CONFLICT", set("innerDiameter", 19)]]);
+  });
+
+  it("a conflict applied again keeps its place ahead of the changes made after it", async () => {
+    const { server, sync, store, p } = await setup();
+    server.online = false;
+    expect((await sync.saveOffline(p.id, set("bandWidth", 7))).ok).toBe(true);
+    expect((await sync.saveOffline(p.id, set("bandWidth", 8))).ok).toBe(true);
+    server.change(p.id, set("bandWidth", 6));
+    server.online = true;
+    expect(await sync.flush()).toEqual({ state: "done", applied: 0, conflicts: 1, rejected: 0 });
+    const conflict = (await sync.draft(p.id))!.problems[0];
+    expect((await sync.retryOnLatest(conflict.op.id)).ok).toBe(true);
+    expect((await store.outbox(p.id)).map((e) => e.op.operation.type === "modify_parameter" && e.op.operation.value)).toEqual([7, 8]);
+    expect(await sync.flush()).toEqual({ state: "done", applied: 2, conflicts: 0, rejected: 0 });
+    expect(server.head(p.id).document.components[0].parameters.bandWidth).toBe(8); // the person's latest value
+  });
+
   it("another customer on the same phone sees none of it", async () => {
     const { db, sync, p } = await setup(join(dir, "shared.db"));
     await sync.saveOffline(p.id, set("bandWidth", 6));

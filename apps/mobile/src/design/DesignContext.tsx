@@ -45,13 +45,13 @@ async function openSqlite(owner: string): Promise<DesignStore> {
 export function DesignProvider({ children, openStore = openSqlite, newId = randomUUID }: {
   children: React.ReactNode; openStore?: OpenStore; newId?: () => string;
 }) {
-  const { api, withToken, me, status } = useSession();
+  const { api, withToken, localOwner } = useSession();
   const client = useMemo(() => new DesignClient(api, withToken), [api, withToken]);
   const [store, setStore] = useState<DesignStore | null>(null);
   const [connectivity, setConnectivity] = useState<Connectivity>("unknown");
   const [version, setVersion] = useState(0);
   const bump = useCallback(() => setVersion((v) => v + 1), []);
-  const owner = status === "signedIn" ? me?.subject ?? null : null;
+  const owner = localOwner;
 
   useEffect(() => {
     let cancelled = false;

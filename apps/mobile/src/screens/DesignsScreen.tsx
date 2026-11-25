@@ -13,7 +13,7 @@ type State = { phase: "loading" } | { phase: "ready"; rows: Row[]; refreshed: bo
 const MAX_PAGES = 5;
 
 export function DesignsScreen({ onOpen, onNew }: { onOpen: (id: string) => void; onNew: () => void }) {
-  const { t, locale, status, signIn } = useSession();
+  const { t, locale, status, signIn, localOwner } = useSession();
   const { store, sync, client, connectivity, version, saw, ready } = useDesign();
   const [state, setState] = useState<State>({ phase: "loading" });
 
@@ -54,7 +54,7 @@ export function DesignsScreen({ onOpen, onNew }: { onOpen: (id: string) => void;
 
   const header = <Header title={t("designsTitle")} subtitle={t("designsSubtitle")} />;
   if (status === "restoring") return <View style={styles.screen}>{header}<Loading label={t("restoring")} /></View>;
-  if (status !== "signedIn") {
+  if (!localOwner) {
     return (
       <View style={styles.screen}>
         {header}

@@ -124,7 +124,7 @@
   "accept": "Aceptar este cambio",
   "accepting": "Guardando la revisión…",
   "discardPreview": "Descartar",
-  "acceptFailed": "No se pudo guardar la revisión. Tu diseño no cambió.",
+  "acceptFailed": "No se pudo confirmar la revisión. Inténtalo de nuevo: no se guardará dos veces.",
   "acceptConflict": "El diseño cambió en otro dispositivo. Vuelve a calcular la vista previa.",
   "saveOffline": "Guardar sin conexión",
   "saveOfflineHint": "Se aplica como revisión nueva cuando el teléfono se conecte.",

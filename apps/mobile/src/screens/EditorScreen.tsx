@@ -18,9 +18,12 @@ type Preview =
   | { phase: "computing" }
   | { phase: "failed"; code: string }
   | { phase: "offline" }
-  | { phase: "ready"; job: Job; op: DesignOperation }
-  | { phase: "accepting"; job: Job; op: DesignOperation }
-  | { phase: "acceptFailed"; job: Job; op: DesignOperation; conflict: boolean };
+  // `mesh` is this preview's own verified GLB (null if it could not be loaded: the metrics stand alone).
+  // `attempt` is fixed on the first Accept so a retry after a lost answer reuses its idempotency key.
+  | { phase: "ready"; job: Job; op: DesignOperation; mesh: string | null }
+  | { phase: "accepting"; job: Job; op: DesignOperation; mesh: string | null; attempt: Attempt }
+  | { phase: "acceptFailed"; job: Job; op: DesignOperation; mesh: string | null; attempt: Attempt; conflict: boolean };
+interface Attempt { key: string; baseRevisionId: string }
 
 const STEP = 0.1;
 const round = (v: number) => Math.round(v * 1000) / 1000;
@@ -118,8 +121,11 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
       const job = await waitForJob(client, queued.id, { signal: alive.current });
       saw(undefined);
       if (job.state !== "SUCCEEDED") { setPreview({ phase: "failed", code: job.errorCode ?? job.state }); return; }
-      setPreview({ phase: "ready", job, op });
-      setGlb(await loadGlb(client, job).catch(() => null));
+      // The mesh is loaded and verified before Accept is offered, so an accepted revision is never
+      // cached with the previous head's geometry.
+      const mesh = await loadGlb(client, job).catch((err) => { if (err instanceof GlbIntegrityError) throw err; return null; });
+      if (mesh) setGlb(mesh);
+      setPreview({ phase: "ready", job, op, mesh });
     } catch (e) {
       saw(e);
       if (e instanceof ApiError && e.kind === "offline") setPreview({ phase: "offline" });
@@ -130,19 +136,20 @@ export function EditorScreen({ id, onBack }: { id: string; onBack: () => void })
 
   const accept = async () => {
     if (preview.phase !== "ready" && preview.phase !== "acceptFailed") return;
-    const { job, op: accepted } = preview;
-    setPreview({ phase: "accepting", job, op: accepted });
+    const { job, op: accepted, mesh } = preview;
+    const attempt = preview.phase === "acceptFailed" ? preview.attempt : { key: newId(), baseRevisionId: local.local.head.id };
+    setPreview({ phase: "accepting", job, op: accepted, mesh, attempt });
     try {
-      const rev = await client.acceptPreview(id, local.local.head.id, job.id, newId());
+      const rev = await client.acceptPreview(id, attempt.baseRevisionId, job.id, attempt.key);
       const project = await client.getProject(id);
       await store?.putProject({ project, head: rev });
-      if (glb) await store?.putGlb(rev.digest, glb);
+      if (mesh) await store?.putGlb(rev.digest, mesh);
       saw(undefined);
       setPreview({ phase: "none" });
       bump();
     } catch (e) {
       saw(e);
-      setPreview({ phase: "acceptFailed", job, op: accepted, conflict: e instanceof ApiError && e.kind === "conflict" });
+      setPreview({ phase: "acceptFailed", job, op: accepted, mesh, attempt, conflict: e instanceof ApiError && e.kind === "conflict" });
     }
   };
 

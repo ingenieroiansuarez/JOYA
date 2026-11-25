@@ -4,7 +4,7 @@
 import type { DiscoveryDocument } from "expo-auth-session";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Api, ApiError } from "./api";
-import { discover, fetchMe, isFresh, refresh, signIn as browserSignIn, signOut as revoke, type Me, type Session } from "./auth";
+import { discover, fetchMe, isFresh, refresh, rememberedSubject, rememberSubject, signIn as browserSignIn, signOut as revoke, type Me, type Session } from "./auth";
 import type { AppConfig } from "./config";
 import { ensureDiscovery } from "./login";
 import { deviceLocale, translator, type Locale } from "./i18n";
@@ -19,6 +19,12 @@ interface SessionValue {
   api: Api;
   status: AuthStatus;
   me: Me | null;
+  /**
+   * Whose local data (offline designs) this device may open: the signed-in subject, or, after a launch
+   * without connection, the subject whose refresh token is still stored. Not a sign-in: the API still
+   * needs a token, and the first successful refresh signs the customer in.
+   */
+  localOwner: string | null;
   signIn(): Promise<void>;
   signOut(): Promise<void>;
   /** Runs fn with a valid access token: refreshes when stale and retries once after a 401. */
@@ -45,6 +51,7 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
   const api = useMemo(() => apiOverride ?? new Api(config, locale), [apiOverride, config, locale]);
   const [status, setStatus] = useState<AuthStatus>("restoring");
   const [me, setMe] = useState<Me | null>(null);
+  const [offlineSubject, setOfflineSubject] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<ReadonlySet<string>>(new Set());
   const [favoritesVersion, setFavoritesVersion] = useState(0);
   const discovery = useRef<DiscoveryDocument | null>(null);
@@ -68,6 +75,7 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
     session.current = null;
     hydrated.current = false;
     setMe(null);
+    setOfflineSubject(null);
     setFavorites(new Set());
     setStatus("guest");
   }, []);
@@ -87,8 +95,11 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
 
   const establish = useCallback(async (s: Session) => {
     session.current = s;
-    setMe(await fetchMe(config, s));
+    const who = await fetchMe(config, s);
+    setMe(who);
+    setOfflineSubject(null);
     setStatus("signedIn");
+    rememberSubject(who.subject).catch(() => undefined);
     // Favorites failing to load must not sign the customer out; the Favorites tab shows its own error.
     loadFavorites(s.accessToken).catch(() => undefined);
   }, [config, loadFavorites]);
@@ -103,7 +114,12 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
         if (s) await establish(s);
         else becomeGuest();
       } catch {
-        if (!cancelled) becomeGuest(); // offline at launch: browse as guest; signing in retries discovery
+        // Offline at launch: browse as guest (signing in retries discovery), but keep the stored
+        // account's local designs reachable.
+        if (cancelled) return;
+        becomeGuest();
+        const subject = await rememberedSubject().catch(() => null);
+        if (!cancelled) setOfflineSubject(subject);
       }
     })();
     return () => { cancelled = true; };
@@ -133,9 +149,12 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
       becomeGuest();
       throw new ApiError("unauthenticated");
     }
+    const restoring = !session.current;
     session.current = s;
+    // Launched offline and the connection is back: finish signing in (profile, favorites).
+    if (restoring) establish(s).catch(() => undefined);
     return s.accessToken;
-  }, [refreshOnce, becomeGuest]);
+  }, [refreshOnce, becomeGuest, establish]);
 
   const withToken = useCallback(async <T,>(fn: (token: string) => Promise<T>): Promise<T> => {
     try {
@@ -171,9 +190,10 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
     }
   }, [favorites, withToken, api]);
 
+  const localOwner = status === "signedIn" ? me?.subject ?? null : offlineSubject;
   const value = useMemo<SessionValue>(() => ({
-    config, locale, t, api, status, me, signIn, signOut, withToken, favorites, favoritesVersion, ensureFavorites, setFavorite,
-  }), [config, locale, t, api, status, me, signIn, signOut, withToken, favorites, favoritesVersion, ensureFavorites, setFavorite]);
+    config, locale, t, api, status, me, localOwner, signIn, signOut, withToken, favorites, favoritesVersion, ensureFavorites, setFavorite,
+  }), [config, locale, t, api, status, me, localOwner, signIn, signOut, withToken, favorites, favoritesVersion, ensureFavorites, setFavorite]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

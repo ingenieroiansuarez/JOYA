@@ -81,7 +81,8 @@ export class DesignSync {
     for (const e of await this.store.outbox(entry.op.projectId)) {
       if (e.status === "PENDING") await this.store.setBase(e.op.id, local.head.id);
     }
-    const op: SyncOperation = { ...entry.op, id: this.newId(), baseRevisionId: local.head.id, sequence: await this.store.nextSequence(), createdAt: this.now().toISOString() };
+    // Same place in the queue: the changes waiting behind it were made on top of it.
+    const op: SyncOperation = { ...entry.op, id: this.newId(), baseRevisionId: local.head.id, sequence: entry.op.sequence, createdAt: this.now().toISOString() };
     await this.store.enqueue(op);
     return { ok: true };
   }
@@ -124,9 +125,16 @@ export class DesignSync {
       if (!result || result.operationId !== next.op.id) return { state: "failed" };
       if (result.status === "APPLIED") {
         await this.store.remove(next.op.id);
-        // Operations made after this one were made on top of it: they now start from its revision.
-        for (const later of (await this.store.outbox(next.op.projectId)).filter((x) => x.status === "PENDING")) {
-          if (later.op.baseRevisionId === next.op.baseRevisionId) await this.store.setBase(later.op.id, result.revisionId);
+        // Operations made after this one were made on top of it. They move onto its revision only when
+        // the server applied it directly on its base: if it was rebased, that revision also holds
+        // other devices' writes, and moving past them would hide those writes from the later
+        // operations' conflict check. They then keep their base and a write of the same value by this
+        // phone shows as a conflict for the person to resolve, never as a silent overwrite.
+        const applied = await this.client.getRevision(next.op.projectId, result.revisionId).catch(() => null);
+        if (applied?.parentId === next.op.baseRevisionId) {
+          for (const later of (await this.store.outbox(next.op.projectId)).filter((x) => x.status === "PENDING")) {
+            if (later.op.baseRevisionId === next.op.baseRevisionId) await this.store.setBase(later.op.id, result.revisionId);
+          }
         }
         await this.refresh(next.op.projectId).catch(() => undefined); // the head is fetched again next time otherwise
         report.applied++;

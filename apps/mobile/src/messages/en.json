@@ -124,7 +124,7 @@
   "accept": "Accept this change",
   "accepting": "Saving the revision…",
   "discardPreview": "Discard",
-  "acceptFailed": "The revision could not be saved. Your design did not change.",
+  "acceptFailed": "The revision could not be confirmed. Try again: it will not be saved twice.",
   "acceptConflict": "The design changed on another device. Compute the preview again.",
   "saveOffline": "Save offline",
   "saveOfflineHint": "Applied as a new revision when the phone connects.",

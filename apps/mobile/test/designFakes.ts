@@ -122,10 +122,17 @@ import type { ProductPage } from "../src/api";
 
 export const GLB_BYTES = new Uint8Array([0x67, 0x6c, 0x54, 0x46, 2, 0, 0, 0]);
 export const GLB_SHA = createHash("sha256").update(GLB_BYTES).digest("hex");
+/** A preview's mesh differs from the head's, so a test can tell which one was cached. */
+export const PREVIEW_BYTES = new Uint8Array([0x67, 0x6c, 0x54, 0x46, 2, 0, 0, 1]);
+export const PREVIEW_SHA = createHash("sha256").update(PREVIEW_BYTES).digest("hex");
 
 export class DesignApi extends Api {
   jobs = new Map<string, Job>();
   calls: string[] = [];
+  /** Idempotency-Key → revision, as apps/api answers a repeated acceptance. */
+  accepted = new Map<string, Revision>();
+  /** The next acceptance is committed but its answer is lost. */
+  dropNextAccept = false;
   constructor(readonly server: FakeDesignServer) {
     super({ env: "ci", issuer: "http://127.0.0.1:8080/realms/aurea-local", apiUrl: "http://127.0.0.1:3000" }, "en");
   }
@@ -136,7 +143,7 @@ export class DesignApi extends Api {
     const comp = document?.components[0];
     const job: Job = {
       id: uuid(), kind, state: "SUCCEEDED", projectId, revisionId, simulated: false, errorCode: null,
-      artifacts: [{ id: uuid(), kind: "GLB_PREVIEW", units: "m", sha256: GLB_SHA, bytes: GLB_BYTES.length, name: "ring-base.glb" }],
+      artifacts: [{ id: uuid(), kind: "GLB_PREVIEW", units: "m", sha256: kind === "PREVIEW" ? PREVIEW_SHA : GLB_SHA, bytes: GLB_BYTES.length, name: "ring-base.glb" }],
       summary: comp && base ? {
         document: document!, changes: diffParametersOf(base, document!), dfmState: "REVIEW", humanApprovalRequired: true, engineVersion: "fake", status: "POC",
         components: [{ id: comp.id, family: comp.family, materialId: comp.materialId, volumeMm3: "481.795", massGramsEstimate: "7.468",
@@ -147,7 +154,7 @@ export class DesignApi extends Api {
     return job;
   }
 
-  async send<T>(method: string, path: string, opts: { body?: unknown } = {}): Promise<T | undefined> {
+  async send<T>(method: string, path: string, opts: { body?: unknown; idempotencyKey?: string } = {}): Promise<T | undefined> {
     this.calls.push(`${method} ${path}`);
     const s = this.server;
     const c = s.client() as unknown as Record<string, (...a: unknown[]) => Promise<unknown>>;
@@ -172,10 +179,15 @@ export class DesignApi extends Api {
       return job as T;
     }
     if (method === "POST" && (m = /^\/projects\/([^/]+)\/revisions$/.exec(path))) {
+      const prior = opts.idempotencyKey ? this.accepted.get(opts.idempotencyKey) : undefined;
+      if (prior) return prior as T;
       const head = s.head(m[1]);
       if (body!.baseRevisionId !== head.id) throw new ApiError("conflict", 409, "VERSION_CONFLICT");
       const job = this.jobs.get(String(body!.previewJobId)) as Job & { op: DesignOperation };
-      return s.change(m[1], job.op) as T;
+      const rev = s.change(m[1], job.op);
+      if (opts.idempotencyKey) this.accepted.set(opts.idempotencyKey, rev);
+      if (this.dropNextAccept) { this.dropNextAccept = false; throw new ApiError("offline"); }
+      return rev as T;
     }
     if (method === "POST" && path === "/geometry/jobs") {
       for (const [pid, p] of s.projects) {
@@ -185,7 +197,10 @@ export class DesignApi extends Api {
       throw new ApiError("notFound", 404);
     }
     if ((m = /^\/jobs\/([^/]+)$/.exec(path))) return this.jobs.get(m[1]) as T;
-    if ((m = /^\/jobs\/([^/]+)\/artifacts\/([^/]+)$/.exec(path))) return { url: `http://files.test/${GLB_SHA}`, expiresAt: "", sha256: GLB_SHA } as T;
+    if ((m = /^\/jobs\/([^/]+)\/artifacts\/([^/]+)$/.exec(path))) {
+      const sha = this.jobs.get(m[1])!.artifacts[0].sha256;
+      return { url: `http://files.test/${sha}`, expiresAt: "", sha256: sha } as T;
+    }
     if (method === "POST" && path === "/sync/push") return c.push(body!.deviceId, body!.operations) as Promise<T>;
     throw new Error(`unrouted ${method} ${path}`);
   }
