@@ -6,7 +6,8 @@ import { useDesign } from "../design/DesignContext";
 import { alloyName, mm, paramLabel } from "../design/describe";
 import type { AiProposal, AiProposalOption, AiQuota } from "../design/types";
 import { useSession } from "../session";
-import { Button, c, Loading, s, styles, type } from "../ui";
+import { Button, c, fonts, Loading, s, styles, type } from "../ui";
+import { ChangeLine } from "./commerce-ui";
 
 type Ask =
   | { phase: "idle" }
@@ -75,8 +76,8 @@ export function AuraPanel({ projectId, baseRevisionId, familyId, disabled, previ
   };
 
   const change = (ch: AiProposalOption["changes"][number]) => ch.name === "materialId"
-    ? `${t("material")}: ${alloyName(String(ch.from), locale)} → ${alloyName(String(ch.to), locale)}`
-    : `${paramLabel(familyId, ch.name, locale)}: ${mm(Number(ch.from), locale)} → ${mm(Number(ch.to), locale)}`;
+    ? <ChangeLine key={ch.name} label={t("material")} from={alloyName(String(ch.from), locale)} to={alloyName(String(ch.to), locale)} />
+    : <ChangeLine key={ch.name} label={paramLabel(familyId, ch.name, locale)} from={mm(Number(ch.from), locale)} to={mm(Number(ch.to), locale)} />;
 
   const proposal = ask.phase === "done" ? ask.proposal : null;
   return (
@@ -120,7 +121,7 @@ export function AuraPanel({ projectId, baseRevisionId, familyId, disabled, previ
           {proposal.options.map((o) => (
             <View key={o.index} style={[au.option, previewing === o.index && { borderColor: c.accent }]}>
               <Text accessibilityRole="header" style={au.optTitle}>{t("auraOption", { n: String(o.index + 1), title: o.title })}</Text>
-              {o.changes.map((ch) => <Text key={ch.name} style={styles.body}>{change(ch)}</Text>)}
+              {o.changes.map(change)}
               {o.assumptions.map((a, i) => <Text key={i} style={styles.muted}>{a}</Text>)}
               <Button variant={previewing === o.index ? "primary" : "secondary"} selected={previewing === o.index}
                 label={previewing === o.index ? t("auraPreviewing") : t("preview")} disabled={!!disabled || previewing !== null}
@@ -135,15 +136,15 @@ export function AuraPanel({ projectId, baseRevisionId, familyId, disabled, previ
 }
 
 const au = StyleSheet.create({
-  card: { backgroundColor: c.surface, borderRadius: 12, padding: s[3], gap: s[2], borderWidth: 1, borderColor: c.accent },
+  card: { backgroundColor: c.surface, borderRadius: 12, padding: s[4], gap: s[3], borderWidth: 1, borderColor: "rgba(197,160,89,0.55)" },
   head: { flexDirection: "row", alignItems: "center", gap: s[2] },
   gem: { width: 14, height: 14, backgroundColor: c.accent, transform: [{ rotate: "45deg" }], borderRadius: 2 },
-  h: { color: c.text, fontSize: type[3], fontWeight: "600" },
+  h: { color: c.text, fontSize: type[4], fontFamily: fonts.display },
   badge: { color: c.textMuted, fontSize: type[0], borderWidth: 1, borderColor: c.inputBorder, borderRadius: tokens.radius[0], paddingHorizontal: s[2], paddingVertical: s[1], alignSelf: "flex-start" },
   input: {
     minHeight: tokens.touchTargetDp * 1.5, borderWidth: 1, borderColor: c.inputBorder, borderRadius: tokens.radius[0],
     color: c.text, paddingHorizontal: s[3], paddingVertical: s[2], fontSize: type[2], textAlignVertical: "top",
   },
-  option: { borderWidth: 1, borderColor: c.inputBorder, borderRadius: tokens.radius[0], padding: s[3], gap: s[1] },
-  optTitle: { color: c.text, fontSize: type[2], fontWeight: "600" },
+  option: { borderWidth: StyleSheet.hairlineWidth, borderColor: c.inputBorder, borderRadius: 10, padding: s[3], gap: s[2], backgroundColor: c.background },
+  optTitle: { color: c.text, fontSize: type[3], fontFamily: fonts.display },
 });

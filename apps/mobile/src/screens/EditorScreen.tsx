@@ -14,6 +14,7 @@ import { formatDecimal } from "../format";
 import { useSession } from "../session";
 import { Button, c, Header, Loading, Notice, s, styles, type } from "../ui";
 import { AuraPanel } from "./AuraPanel";
+import { ChangeLine, goldCard, Tile, tileGrid } from "./commerce-ui";
 
 type Preview =
   | { phase: "none" }
@@ -217,10 +218,10 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
 
   return (
     <View style={styles.screen}>
-      <Header title={title} subtitle={`${familyName(fam.id, locale)} · ${revLine}`} onBack={onBack} backLabel={t("back")} />
+      <Header overline={familyName(fam.id, locale)} title={title} subtitle={revLine} onBack={onBack} backLabel={t("back")} />
       {offline && <Text accessibilityRole="alert" style={styles.banner}>{t("offlineBanner")}</Text>}
       <ScrollView contentContainerStyle={ed.content} keyboardShouldPersistTaps="handled">
-        <Viewer glb={glb} color={studioColor(comp.materialId)} label={t("viewerLabel", { name: title })}
+        <Viewer glb={glb} color={studioColor(comp.materialId)} label={t("viewerLabel", { name: title })} height={340}
           onSnapshot={(shown, jpeg) => {
             // Only a picture of the head as saved: its mesh and its alloy (a pending offline change of
             // material recolours the same mesh, and that is not the head yet).
@@ -277,6 +278,7 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
         )}
 
         <Text accessibilityRole="header" style={ed.h}>{t("parameters")}</Text>
+        <View style={ed.card}>
         {fam.parameters.map((p) => {
           const label = p.label[locale];
           const current = Number(comp.parameters[p.name]);
@@ -312,6 +314,7 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
             </View>
           );
         })}
+        </View>
 
         <Text accessibilityRole="header" style={ed.h}>{t("alloy")}</Text>
         <View accessibilityRole="radiogroup" style={ed.chips}>
@@ -357,18 +360,16 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
         {summary && metrics && (
           <View style={ed.card} accessibilityLabel={t("previewTitle")}>
             <Text accessibilityRole="header" style={ed.h}>{t("previewTitle")}</Text>
-            {summary.changes.map((ch) => (
-              <Text key={ch.name} style={styles.body}>
-                {ch.name === "materialId"
-                  ? `${t("material")}: ${alloyName(String(ch.from), locale)} → ${alloyName(String(ch.to), locale)}`
-                  : `${paramLabel(fam.id, ch.name, locale)}: ${mm(Number(ch.from), locale)} → ${mm(Number(ch.to), locale)}`}
-              </Text>
-            ))}
-            <Metric k={t("metricVolume")} v={formatDecimal(metrics.volumeMm3, "mm³", locale)} />
-            <Metric k={t("metricMass")} v={formatDecimal(metrics.massGramsEstimate, "g", locale)} />
+            {summary.changes.map((ch) => (ch.name === "materialId"
+              ? <ChangeLine key={ch.name} label={t("material")} from={alloyName(String(ch.from), locale)} to={alloyName(String(ch.to), locale)} />
+              : <ChangeLine key={ch.name} label={paramLabel(fam.id, ch.name, locale)} from={mm(Number(ch.from), locale)} to={mm(Number(ch.to), locale)} />))}
+            <View style={tileGrid}>
+              <Tile k={t("metricVolume")} v={formatDecimal(metrics.volumeMm3, "mm³", locale)} />
+              <Tile k={t("metricMass")} v={formatDecimal(metrics.massGramsEstimate, "g", locale)} />
+              <Tile k={t("metricSize")} v={metrics.boundingBoxMm.map((x) => formatDecimal(String(x), "", locale).trim()).join(" × ") + " mm"} />
+              <Tile k={t("metricWall")} v={mm(metrics.minWallMm, locale)} />
+            </View>
             <Text style={styles.muted}>{t("metricMassNote")}</Text>
-            <Metric k={t("metricSize")} v={metrics.boundingBoxMm.map((x) => formatDecimal(String(x), "", locale).trim()).join(" × ") + " mm"} />
-            <Metric k={t("metricWall")} v={mm(metrics.minWallMm, locale)} />
             <Text style={[styles.body, { color: c.warning }]}>{t("dfmReview")}</Text>
             <Button label={preview.phase === "accepting" ? t("accepting") : t("accept")} disabled={preview.phase === "accepting"} onPress={accept} />
             {auraOption !== null && <Text style={styles.muted}>{t("auraFromOption", { n: String(auraOption + 1) })}</Text>}
@@ -389,19 +390,10 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
   );
 }
 
-function Metric({ k, v }: { k: string; v: string }) {
-  return (
-    <View style={ed.metric} accessible accessibilityLabel={`${k}: ${v}`}>
-      <Text style={styles.muted}>{k}</Text>
-      <Text style={styles.body}>{v}</Text>
-    </View>
-  );
-}
-
 const ed = StyleSheet.create({
   content: { padding: s[4], gap: s[3], paddingBottom: s[6] },
   h: { color: c.accent, fontSize: type[0], fontWeight: "600", letterSpacing: 2, textTransform: "uppercase", marginTop: s[2] },
-  card: { backgroundColor: c.surface, borderRadius: 12, padding: s[3], gap: s[2] },
+  card: goldCard,
   param: { gap: s[1] },
   paramHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
   stepper: { flexDirection: "row", alignItems: "center", gap: s[2] },
@@ -419,5 +411,4 @@ const ed = StyleSheet.create({
     minHeight: tokens.touchTargetDp, flexDirection: "row", alignItems: "center", gap: s[1], paddingLeft: s[1], paddingRight: s[3],
     borderRadius: tokens.touchTargetDp / 2, borderWidth: 1, borderColor: c.inputBorder, backgroundColor: c.surface,
   },
-  metric: { flexDirection: "row", justifyContent: "space-between" },
 });
