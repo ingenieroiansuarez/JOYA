@@ -358,3 +358,35 @@ class SyncTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DesignDocumentTest(unittest.TestCase):
+    def setUp(self):
+        self.design = json.loads(cc.DESIGN.read_text())
+        self.api = yaml.safe_load(cc.OPENAPI.read_text())
+
+    def test_in_sync(self):
+        self.assertEqual(cc.check_design(self.design, self.api), [])
+
+    def test_drift_detected(self):
+        api = copy.deepcopy(self.api)
+        api["components"]["schemas"]["Revision"]["properties"]["document"] = {"type": "object"}
+        self.assertTrue(any("$ref DesignDocument" in e for e in cc.check_design(self.design, api)))
+        design = copy.deepcopy(self.design)
+        design["properties"]["units"] = {"const": "in"}
+        self.assertTrue(any("differs" in e for e in cc.check_design(design, self.api)))
+
+    def test_document_validation(self):
+        v = validator("Revision")
+        comp = {"id": "band", "family": "ring.band", "familyVersion": "1.0.0", "materialId": "au750",
+                "parameters": {"innerDiameter": 17.3}, "transform": {"translation": [0, 0, 0],
+                "rotationQuaternion": [0, 0, 0, 1]}, "dependsOn": []}
+        doc = {"schemaVersion": "1.0.0", "projectId": "00000000-0000-0000-0000-000000000001", "revision": 1,
+               "units": "mm", "components": [comp], "operations": [], "constraints": []}
+        ok = {"id": "00000000-0000-0000-0000-000000000002", "projectId": doc["projectId"], "number": 1,
+              "digest": "a" * 64, "document": doc, "state": "DRAFT"}
+        v.validate(ok)
+        for bad_doc in ({**doc, "components": []}, {**doc, "units": "in"},
+                        {**doc, "components": [{**comp, "id": "../etc"}]},
+                        {**doc, "components": [{**comp, "dependsOn": ["a", "a"]}]}):
+            self.assertFalse(v.is_valid({**ok, "document": bad_doc}), bad_doc)
