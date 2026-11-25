@@ -1,5 +1,6 @@
 """Fail when SQL or OpenAPI state values drift from 08_STATE_MACHINES/machines.json,
-or when a machine action has no trigger in 08_STATE_MACHINES/transitions.json.
+or when a machine action has no trigger in 08_STATE_MACHINES/transitions.json,
+or when OpenAPI Event / SQL outbox drift from 07_DOMAIN_MODELS/event.schema.json.
 
     python tools/contracts/check_contracts.py            # check, exit 1 on drift
     python tools/contracts/check_contracts.py --emit     # print the OpenAPI state schemas
@@ -25,6 +26,13 @@ OPENAPI = ROOT / "06_API_CONTRACTS/openapi.yaml"
 TOOLS = ROOT / "13_AI_PROMPTS_AND_TOOLS/tools.json"
 FAMILIES = ROOT / "11_3D_ASSET_LIBRARY/families.json"
 TRANSITIONS = ROOT / "08_STATE_MACHINES/transitions.json"
+EVENT = ROOT / "07_DOMAIN_MODELS/event.schema.json"
+# Envelope field -> SQL outbox column.
+OUTBOX_COLUMNS = {
+    "eventId": "id", "eventType": "event_type", "schemaVersion": "schema_version",
+    "aggregateId": "aggregate_id", "aggregateVersion": "aggregate_version", "occurredAt": "occurred_at",
+    "correlationId": "correlation_id", "causationId": "causation_id", "payload": "payload",
+}
 VIA = {"api", "provider-webhook", "system", "worker", "pending"}
 
 
@@ -261,6 +269,58 @@ def schemas_required(openapi: dict, name: str) -> list[str]:
     return openapi["components"]["schemas"].get(name, {}).get("required", [])
 
 
+def event_schema(envelope: dict) -> dict:
+    """OpenAPI `Event`: the envelope without its JSON Schema header."""
+    return {k: v for k, v in envelope.items() if k not in ("$schema", "title")}
+
+
+def emit_event(envelope: dict) -> str:
+    body = yaml.safe_dump({"Event": event_schema(envelope)}, sort_keys=False, allow_unicode=True, width=1000)
+    return "".join("    " + line + "\n" for line in body.splitlines())
+
+
+def outbox_columns(sql: str) -> dict[str, str] | None:
+    """outbox column -> its definition text, or None when the table is missing."""
+    m = re.search(r"CREATE TABLE outbox\((.*?)\);\s*\n", sql, re.S)
+    if m is None:
+        return None
+    cols, depth, cur = {}, 0, ""
+    for ch in m.group(1) + ",":
+        if ch == "," and depth == 0:
+            name = cur.strip().split(" ", 1)
+            if name[0] and name[0].upper() not in ("UNIQUE", "CHECK", "PRIMARY"):
+                cols[name[0]] = name[1] if len(name) > 1 else ""
+            cur = ""
+            continue
+        depth += (ch == "(") - (ch == ")")
+        cur += ch
+    return cols
+
+
+def check_events(envelope: dict, openapi: dict, sql: str) -> list[str]:
+    """One envelope: OpenAPI Event and SQL outbox follow 07_DOMAIN_MODELS/event.schema.json."""
+    errs = []
+    if openapi["components"]["schemas"].get("Event") != event_schema(envelope):
+        errs.append("OpenAPI Event differs from 07_DOMAIN_MODELS/event.schema.json (--emit prints it)")
+    cols = outbox_columns(sql)
+    if cols is None:
+        return errs + ["SQL has no outbox table"]
+    required = set(envelope["required"])
+    fields = set(envelope["properties"])
+    if fields != set(OUTBOX_COLUMNS):
+        errs.append(f"OUTBOX_COLUMNS {sorted(OUTBOX_COLUMNS)} != envelope fields {sorted(fields)}")
+    for field, col in OUTBOX_COLUMNS.items():
+        if col not in cols:
+            errs.append(f"SQL outbox lacks column {col} for {field}")
+            continue
+        not_null = "NOT NULL" in cols[col] or "PRIMARY KEY" in cols[col]
+        if (field in required) != not_null:
+            errs.append(f"SQL outbox.{col}: NOT NULL must match envelope required ({field})")
+    if not re.search(r"UNIQUE\(aggregate_id,\s*aggregate_version\)", sql):
+        errs.append("SQL outbox needs UNIQUE(aggregate_id, aggregate_version) to detect gaps and duplicates")
+    return errs
+
+
 def _op_schema_name(tool: str) -> str:
     return "Op" + "".join(p.capitalize() for p in tool.split("_"))
 
@@ -297,7 +357,7 @@ def main(argv: list[str] | None = None) -> int:
     bindings = json.loads(BINDINGS.read_text())
     tools = json.loads(TOOLS.read_text())
     if args.emit:
-        print(emit(machines, bindings) + emit_operations(tools), end="")
+        print(emit(machines, bindings) + emit_operations(tools) + emit_event(json.loads(EVENT.read_text())), end="")
         return 0
     api = yaml.safe_load(OPENAPI.read_text())
     families = json.loads(FAMILIES.read_text())
@@ -306,7 +366,8 @@ def main(argv: list[str] | None = None) -> int:
     sql = SQL.read_text()
     errs = (check(machines, bindings, sql, api) + check_operations(tools, api)
             + check_create_ring_ranges(tools, families)
-            + check_transitions(machines, bindings, transitions, api) + check_digest_bound(api))
+            + check_transitions(machines, bindings, transitions, api) + check_digest_bound(api)
+            + check_events(json.loads(EVENT.read_text()), api, sql))
     if not re.search(r"CREATE TABLE quote\([^;]*\bdigest char\(64\) NOT NULL", sql):
         errs.append("SQL quote has no `digest char(64) NOT NULL`")
     for e in errs:

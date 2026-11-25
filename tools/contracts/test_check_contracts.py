@@ -224,5 +224,57 @@ class TransitionsTest(unittest.TestCase):
             self.assertFalse(v.is_valid(base), op_id)
 
 
+class EventEnvelopeTest(unittest.TestCase):
+    def setUp(self):
+        self.env = json.loads(cc.EVENT.read_text())
+        self.api = yaml.safe_load(cc.OPENAPI.read_text())
+        self.sql = cc.SQL.read_text()
+
+    def test_one_envelope(self):
+        self.assertEqual(cc.check_events(self.env, self.api, self.sql), [])
+        self.assertIn(cc.emit_event(self.env), cc.OPENAPI.read_text())
+
+    def test_handoff_v1_envelopes_disagreed(self):
+        def at(path):
+            return subprocess.run(["git", "show", f"fa3cad2:{path}"], cwd=ROOT, check=True,
+                                  capture_output=True, text=True).stdout
+        try:
+            api, sql = yaml.safe_load(at("06_API_CONTRACTS/openapi.yaml")), at("05_DATABASE/core_reference.sql")
+        except subprocess.CalledProcessError:
+            self.skipTest("handoff commit not available (shallow clone)")
+        errs = "\n".join(cc.check_events(self.env, api, sql))
+        for needle in ("OpenAPI Event differs", "outbox lacks column event_type", "outbox lacks column correlation_id"):
+            self.assertIn(needle, errs)
+
+    def test_openapi_drift(self):
+        api = copy.deepcopy(self.api)
+        api["components"]["schemas"]["Event"]["properties"]["version"] = {"type": "integer"}
+        self.assertTrue(cc.check_events(self.env, api, self.sql))
+
+    def test_sql_drift(self):
+        sql = self.sql.replace("correlation_id uuid NOT NULL, ", "correlation_id uuid, ")
+        self.assertIn("SQL outbox.correlation_id: NOT NULL must match envelope required (correlationId)",
+                      cc.check_events(self.env, self.api, sql))
+        sql = self.sql.replace(", UNIQUE(aggregate_id,aggregate_version)", "")
+        self.assertTrue(any("UNIQUE" in e for e in cc.check_events(self.env, self.api, sql)))
+
+    def test_new_envelope_field_needs_column(self):
+        env = copy.deepcopy(self.env)
+        env["properties"]["tenantId"] = {"type": "string", "format": "uuid"}
+        self.assertTrue(any("OUTBOX_COLUMNS" in e for e in cc.check_events(env, self.api, self.sql)))
+
+    def test_envelope_validation(self):
+        v = validator("Event")
+        ok = {"eventId": "00000000-0000-0000-0000-000000000001", "eventType": "QuoteAccepted", "schemaVersion": 1,
+              "aggregateId": "00000000-0000-0000-0000-000000000002", "aggregateVersion": 3,
+              "occurredAt": "2026-11-25T10:00:00Z", "correlationId": "00000000-0000-0000-0000-000000000003",
+              "causationId": None, "payload": {}}
+        v.validate(ok)
+        for bad in ({**ok, "eventType": "quote.accepted"}, {**ok, "aggregateVersion": 0},
+                    {k: x for k, x in ok.items() if k != "correlationId"}, {**ok, "type": "QuoteAccepted"},
+                    {**ok, "payload": []}):
+            self.assertFalse(v.is_valid(bad), bad)
+
+
 if __name__ == "__main__":
     unittest.main()

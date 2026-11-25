@@ -1,5 +1,16 @@
 # Contratos — changelog
 
+## 1.4.0 — 2026-11-25 (hito 100, sobre de eventos)
+Había tres sobres distintos: `07_DOMAIN_MODELS/event.schema.json` (completo), `Event` de OpenAPI (`type`, `version`; sin `schemaVersion`, `occurredAt`, `correlationId` ni `causationId`) y la tabla `outbox` (las mismas carencias). Ahora hay uno solo: `event.schema.json`. `check_contracts.py` falla en CI si `Event` u `outbox` se desvían de él.
+
+- `Event` (OpenAPI, usado por `syncPull`) se genera del esquema: `eventId`, `eventType`, `schemaVersion`, `aggregateId`, `aggregateVersion`, `occurredAt`, `correlationId`, `causationId` (opcional, puede ser null) y `payload`. No editar a mano (`check_contracts.py --emit`).
+- `eventType` en PascalCase (`QuoteAccepted`), 3 a 64 caracteres; `causationId` pasa de texto libre a UUID.
+- SQL `outbox`: columnas `event_type`, `schema_version`, `aggregate_version`, `occurred_at`, `correlation_id`, `causation_id`; `payload` debe ser objeto; `UNIQUE(aggregate_id, aggregate_version)` para detectar duplicados y huecos por agregado. Probado en PostgreSQL 16 con `05_DATABASE/tests/outbox_checks.sql` (casos positivos y 5 negativos).
+
+Compatibilidad: cambio incompatible para quien leyera `type`/`version` en `Event`; no hay clientes ni backend todavía. Migración: el SQL es de referencia; la primera migración real parte de esta versión.
+
+Sigue libre (pendiente): `payload` de cada tipo de evento (un esquema por `eventType` cuando se implementen los consumidores), `payload` de sincronización y `Error.details`.
+
 ## 1.3.0 — 2026-11-25 (hito 100, transiciones)
 Fuente nueva: `08_STATE_MACHINES/transitions.json` asigna a cada acción de cada máquina su disparador: `api` (operación de OpenAPI), `provider-webhook`, `system`, `worker` o `pending` con hito. `check_contracts.py` falla si una acción no tiene entrada, si la operación no existe, no es POST, no exige `Idempotency-Key` o no devuelve el estado de su máquina.
 
