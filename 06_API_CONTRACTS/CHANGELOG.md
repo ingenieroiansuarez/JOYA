@@ -1,5 +1,16 @@
 # Contratos — changelog
 
+## 1.9.0 — 2026-11-25 (hito 300, motor de joyería)
+- Proyectos: `GET /projects` (`listProjects`, propios, el más reciente primero, `ProjectPage`). `createProject` pide `title` (1–80), `templateId` (familia implementada) y `materialId`; crea la revisión 1 con los valores por defecto de la familia. `Project` suma `familyId`, `headRevisionNumber`, `createdAt` y `updatedAt`.
+- Revisiones: `listRevisions` devuelve `RevisionPage` de `RevisionSummary` (número, padre, digest, estado, origen `CREATE`/`PREVIEW`/`SYNC`, `changes` respecto del padre). Nuevo `GET /projects/{id}/revisions/{revisionId}` (`getRevision`). `Revision` suma `parentId` y `createdAt`; `digest` es el SHA-256 del JSON canónico.
+- Trabajos: `Job` suma `projectId` y `summary` (`JobSummary`: documento resultante, cambios, métricas por componente con volumen y peso estimado en decimal exacto de 3 cifras, estado DFM, `humanApprovalRequired: true`). `JobArtifact` suma `name`. `GET /geometry/families` devuelve `FamilyCatalog` (familias y aleaciones con densidad nominal).
+- Descarga: `GET /files/{sha256}?exp&sig` (`downloadFile`), URL firmada de 5 min que entrega `getJobArtifact`; sin token, la firma es la autorización.
+- Sync: comportamiento de `syncPush` documentado (rebase solo de parámetros independientes, conflicto sin last-write-wins, idempotencia por id). `syncPull` entrega `RevisionCreated` con `RevisionCreatedPayload`, el primer evento con payload tipado.
+- Permisos: `customer` recibe `job.read` con alcance `own` (ver sus vistas previas y exportaciones).
+- Errores de detalle: `UNKNOWN_MATERIAL`, `UNKNOWN_COMPONENT`, `NO_CHANGE`.
+- SQL (migración 0002): `project.family_id`/`updated_at`; `revision.created_by`/`source`/`source_id`/`created_at` y digest hexadecimal; revisiones inmutables salvo `state` y nunca borradas (trigger); `outbox.seq`/`tx` para leer eventos en orden de confirmación; tablas `job`, `job_artifact` y `sync_operation`. `Job` queda ligado a `job.state` en `bindings.json`.
+- Aleaciones: `09_JEWELRY_ENGINE/materials.json` con densidades nominales marcadas `NOMINAL_UNCONFIRMED` (hay que configurarlas con las del proveedor de ian antes de cotizar).
+
 ## 1.8.1 — 2026-11-25 (hito 300, worker de geometría)
 - `errors.json`: `GEOMETRY_TIMEOUT` (504) y `GEOMETRY_FAILED` (500), los fallos del worker CAD que la API pondrá en `Job.errorCode`. Sin cambios de esquema.
 - Familias `ring.02` (confort) y `pendant.02` (óvalo con agujero para argolla) implementadas en `services/geometry` con los parámetros y rangos de `families.json`.

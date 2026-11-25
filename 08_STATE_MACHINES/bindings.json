@@ -29,9 +29,8 @@
     "openapi": "OrderState"
   },
   "Job": {
-    "sql": null,
-    "openapi": "JobState",
-    "pending": "job table: hito 100 backend bootstrap"
+    "sql": "job.state",
+    "openapi": "JobState"
   },
   "Certificate": {
     "sql": null,

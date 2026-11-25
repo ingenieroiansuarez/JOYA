@@ -3,8 +3,9 @@ CREATE SCHEMA IF NOT EXISTS aurea;
 SET search_path TO aurea,public;
 CREATE TABLE customer(id uuid PRIMARY KEY, subject text UNIQUE NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
 CREATE TABLE location(id uuid PRIMARY KEY, name text NOT NULL, kind text NOT NULL CHECK(kind IN ('STORE','WORKSHOP','VAULT','WAREHOUSE')));
-CREATE TABLE project(id uuid PRIMARY KEY, owner_id uuid NOT NULL REFERENCES customer, title text NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
-CREATE TABLE revision(id uuid PRIMARY KEY, project_id uuid NOT NULL REFERENCES project, parent_id uuid, number int NOT NULL CHECK(number>0), document jsonb NOT NULL, digest char(64) NOT NULL, state text NOT NULL DEFAULT 'DRAFT' CHECK(state IN ('DRAFT','REVIEW','APPROVED','SUPERSEDED')), UNIQUE(project_id,number), UNIQUE(project_id,id), FOREIGN KEY(project_id,parent_id) REFERENCES revision(project_id,id));
+CREATE TABLE project(id uuid PRIMARY KEY, owner_id uuid NOT NULL REFERENCES customer, title text NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), family_id text NOT NULL CHECK(family_id ~ '^[a-z]+\.[a-z0-9]+$'), updated_at timestamptz NOT NULL DEFAULT now());
+CREATE INDEX project_owner_recent ON project(owner_id,updated_at DESC,id);
+CREATE TABLE revision(id uuid PRIMARY KEY, project_id uuid NOT NULL REFERENCES project, parent_id uuid, number int NOT NULL CHECK(number>0), document jsonb NOT NULL, digest char(64) NOT NULL, state text NOT NULL DEFAULT 'DRAFT' CHECK(state IN ('DRAFT','REVIEW','APPROVED','SUPERSEDED')), created_by text NOT NULL, source text NOT NULL CHECK(source IN ('CREATE','PREVIEW','SYNC')), source_id uuid, created_at timestamptz NOT NULL DEFAULT now(), UNIQUE(project_id,number), UNIQUE(project_id,id), FOREIGN KEY(project_id,parent_id) REFERENCES revision(project_id,id), CONSTRAINT revision_digest_check CHECK(digest ~ '^[0-9a-f]{64}$'), CONSTRAINT revision_source_id_check CHECK((source = 'CREATE') = (source_id IS NULL)));
 CREATE TABLE branch(project_id uuid NOT NULL REFERENCES project, name text NOT NULL CHECK(name ~ '^[a-z0-9][a-z0-9._-]{0,63}$'), head_id uuid NOT NULL, PRIMARY KEY(project_id,name), FOREIGN KEY(project_id,head_id) REFERENCES revision(project_id,id));
 CREATE TABLE dfm_report(id uuid PRIMARY KEY, revision_id uuid NOT NULL REFERENCES revision, rules_version text NOT NULL, state text NOT NULL CHECK(state IN ('PASS','WARN','REVIEW','FAIL')), report jsonb NOT NULL, created_at timestamptz DEFAULT now());
 CREATE TABLE quote(id uuid PRIMARY KEY, revision_id uuid NOT NULL REFERENCES revision, currency char(3) NOT NULL, amount numeric(20,6) NOT NULL CHECK(amount>=0), snapshot jsonb NOT NULL, digest char(64) NOT NULL CHECK(digest ~ '^[0-9a-f]{64}$'), expires_at timestamptz NOT NULL, state text NOT NULL CHECK(state IN ('DRAFT','ISSUED','ACCEPTED','EXPIRED','REJECTED','SUPERSEDED')), accepted_at timestamptz, CHECK(state <> 'ACCEPTED' OR accepted_at IS NOT NULL));
@@ -17,7 +18,8 @@ CREATE TABLE stock_movement(id uuid PRIMARY KEY, lot_id uuid NOT NULL REFERENCES
 CREATE TABLE work_order(id uuid PRIMARY KEY, order_id uuid NOT NULL REFERENCES sales_order, revision_id uuid NOT NULL REFERENCES revision, state text NOT NULL CHECK(state IN ('PLANNED','RELEASED','IN_PROGRESS','BLOCKED','QA','DONE','CANCELLED')), approved_by text, CHECK(state NOT IN ('RELEASED','IN_PROGRESS','QA','DONE') OR approved_by IS NOT NULL));
 CREATE TABLE work_task(id uuid PRIMARY KEY, work_order_id uuid NOT NULL REFERENCES work_order, name text NOT NULL, state text NOT NULL, assigned_to text, planned_start timestamptz, planned_end timestamptz, CHECK(planned_end>=planned_start));
 CREATE TABLE audit_event(id uuid PRIMARY KEY, actor text NOT NULL, action text NOT NULL, resource_id uuid NOT NULL, correlation_id uuid NOT NULL, recorded_at timestamptz NOT NULL DEFAULT now(), details jsonb NOT NULL DEFAULT '{}');
-CREATE TABLE outbox(id uuid PRIMARY KEY, event_type text NOT NULL CHECK(event_type ~ '^[A-Z][A-Za-z0-9]{2,63}$'), schema_version int NOT NULL CHECK(schema_version>=1), aggregate_id uuid NOT NULL, aggregate_version int NOT NULL CHECK(aggregate_version>=1), occurred_at timestamptz NOT NULL, correlation_id uuid NOT NULL, causation_id uuid, payload jsonb NOT NULL CHECK(jsonb_typeof(payload)='object'), created_at timestamptz NOT NULL DEFAULT now(), published_at timestamptz, UNIQUE(aggregate_id,aggregate_version));
+CREATE TABLE outbox(id uuid PRIMARY KEY, event_type text NOT NULL CHECK(event_type ~ '^[A-Z][A-Za-z0-9]{2,63}$'), schema_version int NOT NULL CHECK(schema_version>=1), aggregate_id uuid NOT NULL, aggregate_version int NOT NULL CHECK(aggregate_version>=1), occurred_at timestamptz NOT NULL, correlation_id uuid NOT NULL, causation_id uuid, payload jsonb NOT NULL CHECK(jsonb_typeof(payload)='object'), created_at timestamptz NOT NULL DEFAULT now(), published_at timestamptz, seq bigint GENERATED ALWAYS AS IDENTITY, tx xid8 NOT NULL DEFAULT pg_current_xact_id(), UNIQUE(aggregate_id,aggregate_version));
+CREATE INDEX outbox_pull ON outbox(tx,seq);
 CREATE INDEX outbox_pending ON outbox(created_at) WHERE published_at IS NULL;
 CREATE TABLE inbox(consumer text NOT NULL,event_id uuid NOT NULL,processed_at timestamptz DEFAULT now(),PRIMARY KEY(consumer,event_id));
 CREATE TABLE idempotency(actor text NOT NULL, scope text NOT NULL, key text NOT NULL, request_digest char(64) NOT NULL, response jsonb, created_at timestamptz DEFAULT now(),PRIMARY KEY(actor,scope,key));
@@ -25,4 +27,22 @@ CREATE TABLE product(id uuid PRIMARY KEY, sku text UNIQUE NOT NULL CHECK(sku ~ '
 CREATE INDEX product_published ON product(position,id) WHERE published_at IS NOT NULL;
 CREATE TABLE favorite(customer_id uuid NOT NULL REFERENCES customer, product_id uuid NOT NULL REFERENCES product, created_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(customer_id,product_id));
 CREATE INDEX favorite_recent ON favorite(customer_id,created_at DESC,product_id);
+-- Hito 300 (migration 0002): revisions immutable except state; jobs, artifacts, sync operations.
+CREATE FUNCTION revision_immutable() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    RAISE EXCEPTION 'revision % cannot be deleted', OLD.id USING ERRCODE = 'check_violation';
+  END IF;
+  IF (NEW.id, NEW.project_id, NEW.parent_id, NEW.number, NEW.document, NEW.digest, NEW.created_by, NEW.source, NEW.source_id, NEW.created_at)
+     IS DISTINCT FROM (OLD.id, OLD.project_id, OLD.parent_id, OLD.number, OLD.document, OLD.digest, OLD.created_by, OLD.source, OLD.source_id, OLD.created_at) THEN
+    RAISE EXCEPTION 'revision % is immutable', OLD.id USING ERRCODE = 'check_violation';
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER revision_immutable BEFORE UPDATE OR DELETE ON revision FOR EACH ROW EXECUTE FUNCTION revision_immutable();
+CREATE TABLE job(id uuid PRIMARY KEY, kind text NOT NULL CHECK(kind IN ('PREVIEW','GEOMETRY','VALIDATION','AI')), state text NOT NULL DEFAULT 'QUEUED' CHECK(state IN ('QUEUED','RUNNING','SUCCEEDED','FAILED','CANCELLED')), actor text NOT NULL, project_id uuid NOT NULL REFERENCES project, revision_id uuid NOT NULL, operation jsonb, document jsonb NOT NULL CHECK(jsonb_typeof(document)='object'), input_digest char(64) NOT NULL CHECK(input_digest ~ '^[0-9a-f]{64}$'), quality text NOT NULL CHECK(quality IN ('INTERACTIVE','LUXURY','PHOTOREAL')), simulated boolean NOT NULL DEFAULT false, error_code text, summary jsonb, attempts int NOT NULL DEFAULT 0 CHECK(attempts>=0), lease_until timestamptz, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(), FOREIGN KEY(project_id,revision_id) REFERENCES revision(project_id,id), CHECK((kind = 'PREVIEW') = (operation IS NOT NULL)), CHECK(state <> 'FAILED' OR error_code IS NOT NULL), CHECK(state <> 'RUNNING' OR lease_until IS NOT NULL));
+CREATE INDEX job_queue ON job(created_at,id) WHERE state IN ('QUEUED','RUNNING');
+CREATE INDEX job_cache ON job(input_digest,kind) WHERE state = 'SUCCEEDED';
+CREATE TABLE job_artifact(id uuid PRIMARY KEY, job_id uuid NOT NULL REFERENCES job, kind text NOT NULL CHECK(kind IN ('STEP','STL','GLB_PREVIEW','DFM_REPORT','MANIFEST','OPERATION_DIFF','MESH_REPORT')), units text NOT NULL CHECK(units IN ('mm','m','none')), name text NOT NULL CHECK(name ~ '^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$'), sha256 char(64) NOT NULL CHECK(sha256 ~ '^[0-9a-f]{64}$'), bytes bigint NOT NULL CHECK(bytes>=0), UNIQUE(job_id,name));
+CREATE TABLE sync_operation(id uuid PRIMARY KEY, actor text NOT NULL, device_id uuid NOT NULL, project_id uuid NOT NULL REFERENCES project, body_digest char(64) NOT NULL CHECK(body_digest ~ '^[0-9a-f]{64}$'), status text NOT NULL CHECK(status IN ('APPLIED','CONFLICT','REJECTED')), result jsonb NOT NULL CHECK(jsonb_typeof(result)='object'), created_at timestamptz NOT NULL DEFAULT now());
 -- Application-level transaction rules and grants are mandatory. Protect append-only tables and immutable revisions with restricted DB roles/triggers in production.

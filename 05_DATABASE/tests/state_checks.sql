@@ -4,8 +4,8 @@
 SET search_path TO aurea;
 BEGIN;
 INSERT INTO customer VALUES ('00000000-0000-0000-0000-000000000001','sub');
-INSERT INTO project VALUES ('00000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000001','t');
-INSERT INTO revision(id,project_id,number,document,digest) VALUES ('00000000-0000-0000-0000-000000000003','00000000-0000-0000-0000-000000000002',1,'{}',repeat('a',64));
+INSERT INTO project(id,owner_id,title,family_id) VALUES ('00000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000001','t','ring.classic');
+INSERT INTO revision(id,project_id,number,document,digest,created_by,source) VALUES ('00000000-0000-0000-0000-000000000003','00000000-0000-0000-0000-000000000002',1,'{}',repeat('a',64),'sub','CREATE');
 SELECT 'revision default', state FROM revision;
 INSERT INTO dfm_report(id,revision_id,rules_version,state,report) VALUES (gen_random_uuid(),'00000000-0000-0000-0000-000000000003','v','REVIEW','{}');
 INSERT INTO quote(id,revision_id,currency,amount,snapshot,digest,expires_at,state) VALUES ('00000000-0000-0000-0000-000000000004','00000000-0000-0000-0000-000000000003','XXX',1,'{}',repeat('a',64),now(),'ISSUED');

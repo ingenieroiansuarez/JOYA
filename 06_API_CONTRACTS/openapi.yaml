@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: AUREA API V1 — contract baseline
-  version: 1.8.1
+  version: 1.9.0
   description: Contratos iniciales; extender por vertical slice. No API implementada.
 servers:
 - url: http://localhost:3000/v1
@@ -21,7 +21,7 @@ paths:
       - in: query
         name: cursor
         required: false
-        schema: &id001
+        schema: &id005
           type: string
       - in: query
         name: limit
@@ -106,9 +106,10 @@ paths:
       - in: path
         name: id
         required: true
-        schema: &id002
+        schema: &id001
           type: string
           format: uuid
+          description: 'PREVIEW: revisión base de la operación. GEOMETRY: revisión que se construye.'
       - $ref: '#/components/parameters/AcceptLanguage'
       responses:
         '200':
@@ -167,9 +168,79 @@ paths:
                 $ref: '#/components/schemas/Error'
       security: []
   /projects:
+    get:
+      operationId: listProjects
+      summary: Proyectos propios, el más reciente primero
+      tags:
+      - projects
+      x-permission: project.read
+      x-first-milestone: '300'
+      parameters:
+      - &id002
+        in: query
+        name: cursor
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPage'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto de versión o idempotencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invariante de negocio incumplida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       operationId: createProject
-      summary: Crear borrador propio
+      summary: Crear proyecto propio desde una familia (revisión 1 con los valores por defecto)
       tags:
       - projects
       x-permission: project.create
@@ -244,11 +315,20 @@ paths:
             schema:
               type: object
               properties:
-                title: *id001
-                templateId: *id001
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 80
+                templateId:
+                  type: string
+                  description: Id de familia implementada (GET /geometry/families).
+                materialId:
+                  type: string
+                  description: Aleación de 09_JEWELRY_ENGINE/materials.json.
               required:
               - title
               - templateId
+              - materialId
               additionalProperties: false
   /projects/{id}:
     get:
@@ -262,7 +342,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       responses:
         '200':
           description: Resultado
@@ -321,27 +401,27 @@ paths:
   /projects/{id}/revisions:
     get:
       operationId: listRevisions
-      summary: Revisiones del proyecto
+      summary: Revisiones del proyecto, la más reciente primero
       tags:
       - projects
       x-permission: project.read
       x-first-milestone: '300'
       parameters:
-      - in: path
+      - &id003
+        in: path
         name: id
         required: true
-        schema: *id002
-      - in: query
-        name: cursor
-        required: false
-        schema: *id001
+        schema: &id004
+          type: string
+          format: uuid
+      - *id002
       responses:
         '200':
           description: Resultado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Page'
+                $ref: '#/components/schemas/RevisionPage'
         '400':
           description: Error
           content:
@@ -401,7 +481,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -471,8 +551,8 @@ paths:
             schema:
               type: object
               properties:
-                baseRevisionId: *id002
-                previewJobId: *id002
+                baseRevisionId: *id001
+                previewJobId: *id001
                 accepted:
                   type: boolean
               required:
@@ -480,6 +560,76 @@ paths:
               - previewJobId
               - accepted
               additionalProperties: false
+      description: Crea la revisión con el documento exacto que construyó el trabajo PREVIEW, solo si su revisión base sigue siendo la cabeza de main (si no, 409 VERSION_CONFLICT). `accepted` es la aceptación explícita de la persona; false se rechaza.
+  /projects/{id}/revisions/{revisionId}:
+    get:
+      operationId: getRevision
+      summary: Revisión con su documento
+      tags:
+      - projects
+      x-permission: project.read
+      x-first-milestone: '300'
+      parameters:
+      - *id003
+      - in: path
+        name: revisionId
+        required: true
+        schema: *id004
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Revision'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto de versión o idempotencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invariante de negocio incumplida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /projects/{id}/revisions/{revisionId}/submit:
     post:
       operationId: submitDesign
@@ -493,11 +643,11 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: path
         name: revisionId
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -567,7 +717,7 @@ paths:
             schema:
               type: object
               properties:
-                expectedDigest: *id001
+                expectedDigest: *id005
                 note:
                   type: string
                   maxLength: 2000
@@ -587,11 +737,11 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: path
         name: revisionId
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -661,8 +811,8 @@ paths:
             schema:
               type: object
               properties:
-                expectedDigest: *id001
-                dfmReportId: *id002
+                expectedDigest: *id005
+                dfmReportId: *id001
                 measurementsConfirmed:
                   type: boolean
                   const: true
@@ -686,11 +836,11 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: path
         name: revisionId
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -760,7 +910,7 @@ paths:
             schema:
               type: object
               properties:
-                expectedDigest: *id001
+                expectedDigest: *id005
                 reason:
                   type: string
                   minLength: 1
@@ -781,7 +931,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -851,13 +1001,14 @@ paths:
             schema:
               type: object
               properties:
-                baseRevisionId: *id002
+                baseRevisionId: *id001
                 operation:
                   $ref: '#/components/schemas/DesignOperation'
               required:
               - baseRevisionId
               - operation
               additionalProperties: false
+      description: 'Aplica una operación permitida (hito 300: modify_parameter, change_material) a la revisión base y encola un trabajo PREVIEW que regenera el sólido. No crea revisión ni muta la activa. Operación inválida → 422 INVALID_DOCUMENT con detalles; base que no es la cabeza → 409 VERSION_CONFLICT.'
   /projects/{id}/branches:
     post:
       operationId: createBranch
@@ -870,7 +1021,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -940,7 +1091,7 @@ paths:
             schema:
               type: object
               properties:
-                baseRevisionId: *id002
+                baseRevisionId: *id001
                 name:
                   $ref: '#/components/schemas/BranchName'
               required:
@@ -959,7 +1110,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -1029,13 +1180,13 @@ paths:
             schema:
               type: object
               properties:
-                revisionId: *id002
-                componentId: *id001
+                revisionId: *id001
+                componentId: *id005
                 position:
                   type: array
                   items:
                     type: number
-                text: *id001
+                text: *id005
               required:
               - revisionId
               - componentId
@@ -1054,7 +1205,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -1124,7 +1275,7 @@ paths:
             schema:
               type: object
               properties:
-                subjectId: *id002
+                subjectId: *id001
                 permission:
                   type: string
                   enum:
@@ -1138,23 +1289,20 @@ paths:
   /geometry/families:
     get:
       operationId: listFamilies
-      summary: Familias publicadas y compatibles
+      summary: Familias implementadas y aleaciones (textos según Accept-Language)
       tags:
       - geometry
       x-permission: catalog.read
       x-first-milestone: '300'
       parameters:
-      - in: query
-        name: cursor
-        required: false
-        schema: *id001
+      - $ref: '#/components/parameters/AcceptLanguage'
       responses:
         '200':
           description: Resultado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Page'
+                $ref: '#/components/schemas/FamilyCatalog'
         '400':
           description: Error
           content:
@@ -1282,7 +1430,7 @@ paths:
             schema:
               type: object
               properties:
-                revisionId: *id002
+                revisionId: *id001
                 quality:
                   type: string
                   enum:
@@ -1293,6 +1441,7 @@ paths:
               - revisionId
               - quality
               additionalProperties: false
+      description: 'Encola un trabajo GEOMETRY que exporta la revisión: STEP y STL (mm), GLB de vista previa (m, Y arriba), DFM y manifiesto. Reutiliza un resultado anterior con el mismo digest de entrada, versión de motor y reglas.'
   /validation/jobs:
     post:
       operationId: validateDesign
@@ -1371,8 +1520,8 @@ paths:
             schema:
               type: object
               properties:
-                revisionId: *id002
-                rulesVersion: *id001
+                revisionId: *id001
+                rulesVersion: *id005
               required:
               - revisionId
               - rulesVersion
@@ -1389,7 +1538,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       responses:
         '200':
           description: Resultado
@@ -1457,11 +1606,11 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: path
         name: artifactId
         required: true
-        schema: *id002
+        schema: *id001
       responses:
         '200':
           description: Resultado
@@ -1529,7 +1678,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -1599,7 +1748,7 @@ paths:
             schema:
               type: object
               properties:
-                reason: *id001
+                reason: *id005
               required:
               - reason
               additionalProperties: false
@@ -1681,8 +1830,8 @@ paths:
             schema:
               type: object
               properties:
-                projectId: *id002
-                revisionId: *id002
+                projectId: *id001
+                revisionId: *id001
                 task:
                   type: string
                   enum:
@@ -1692,10 +1841,10 @@ paths:
                   - STYLE
                   - RESTORE
                   - MARKETING
-                prompt: *id001
+                prompt: *id005
                 attachmentIds:
                   type: array
-                  items: *id002
+                  items: *id001
               required:
               - projectId
               - revisionId
@@ -1781,8 +1930,8 @@ paths:
             schema:
               type: object
               properties:
-                revisionId: *id002
-                currency: *id001
+                revisionId: *id001
+                currency: *id005
                 budget:
                   $ref: '#/components/schemas/Money'
               required:
@@ -1868,8 +2017,8 @@ paths:
             schema:
               type: object
               properties:
-                revisionId: *id002
-                currency: *id001
+                revisionId: *id001
+                currency: *id005
               required:
               - revisionId
               - currency
@@ -1886,7 +2035,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       responses:
         '200':
           description: Resultado
@@ -1954,7 +2103,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -2024,13 +2173,13 @@ paths:
             schema:
               type: object
               properties:
-                expectedDigest: *id001
+                expectedDigest: *id005
                 expiresAt:
                   type: string
                   format: date-time
                 total:
                   $ref: '#/components/schemas/Money'
-                termsVersion: *id001
+                termsVersion: *id005
               required:
               - expectedDigest
               - expiresAt
@@ -2049,7 +2198,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -2119,8 +2268,8 @@ paths:
             schema:
               type: object
               properties:
-                expectedDigest: *id001
-                termsVersion: *id001
+                expectedDigest: *id005
+                termsVersion: *id005
               required:
               - expectedDigest
               - termsVersion
@@ -2138,7 +2287,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -2208,7 +2357,7 @@ paths:
             schema:
               type: object
               properties:
-                expectedDigest: *id001
+                expectedDigest: *id005
                 reason:
                   type: string
                   minLength: 1
@@ -2229,7 +2378,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       responses:
         '200':
           description: Resultado
@@ -2298,7 +2447,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -2453,8 +2602,8 @@ paths:
             schema:
               type: object
               properties:
-                cartId: *id002
-                checkoutRevision: &id003
+                cartId: *id001
+                checkoutRevision: &id006
                   type: integer
                   minimum: 0
               required:
@@ -2539,7 +2688,7 @@ paths:
             schema:
               type: object
               properties:
-                currency: *id001
+                currency: *id005
                 lines:
                   type: array
                   items:
@@ -2551,8 +2700,8 @@ paths:
                         - SKU
                         - SERVICE
                         - QUOTE
-                      referenceId: *id002
-                      quantity: *id003
+                      referenceId: *id001
+                      quantity: *id006
                     required:
                     - kind
                     - referenceId
@@ -2640,8 +2789,8 @@ paths:
             schema:
               type: object
               properties:
-                orderId: *id002
-                installmentId: *id002
+                orderId: *id001
+                installmentId: *id001
                 amount:
                   $ref: '#/components/schemas/Money'
               required:
@@ -2661,7 +2810,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       responses:
         '200':
           description: Resultado
@@ -2729,7 +2878,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -2801,7 +2950,7 @@ paths:
               properties:
                 amount:
                   $ref: '#/components/schemas/Money'
-                reason: *id001
+                reason: *id005
               required:
               - amount
               - reason
@@ -2818,7 +2967,7 @@ paths:
       - in: query
         name: cursor
         required: false
-        schema: *id001
+        schema: *id005
       responses:
         '200':
           description: Resultado
@@ -2952,9 +3101,9 @@ paths:
             schema:
               type: object
               properties:
-                orderId: *id002
-                lotId: *id002
-                quantity: &id004
+                orderId: *id001
+                lotId: *id001
+                quantity: &id007
                   type: string
                   pattern: ^\d+(\.\d{1,6})?$
               required:
@@ -2974,7 +3123,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -3044,7 +3193,7 @@ paths:
             schema:
               type: object
               properties:
-                reason: *id001
+                reason: *id005
               required:
               - reason
               additionalProperties: false
@@ -3126,12 +3275,12 @@ paths:
             schema:
               type: object
               properties:
-                lotId: *id002
+                lotId: *id001
                 delta:
                   type: string
                   pattern: ^-?\d+(\.\d{1,6})?$
-                reason: *id001
-                evidenceId: *id002
+                reason: *id005
+                evidenceId: *id001
               required:
               - lotId
               - delta
@@ -3216,10 +3365,10 @@ paths:
             schema:
               type: object
               properties:
-                itemId: *id002
-                toLocationId: *id002
-                recipientId: *id002
-                evidenceId: *id002
+                itemId: *id001
+                toLocationId: *id001
+                recipientId: *id001
+                evidenceId: *id001
               required:
               - itemId
               - toLocationId
@@ -3304,9 +3453,9 @@ paths:
             schema:
               type: object
               properties:
-                orderId: *id002
-                revisionId: *id002
-                routeVersion: *id001
+                orderId: *id001
+                revisionId: *id001
+                routeVersion: *id005
               required:
               - orderId
               - revisionId
@@ -3324,7 +3473,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -3394,9 +3543,9 @@ paths:
             schema:
               type: object
               properties:
-                revisionId: *id002
-                dfmReportId: *id002
-                approvalId: *id002
+                revisionId: *id001
+                dfmReportId: *id001
+                approvalId: *id001
               required:
               - revisionId
               - dfmReportId
@@ -3414,7 +3563,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       responses:
         '200':
           description: Resultado
@@ -3482,7 +3631,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -3559,11 +3708,11 @@ paths:
                   - BLOCK
                   - RESUME
                   - COMPLETE
-                expectedVersion: *id003
+                expectedVersion: *id006
                 evidenceIds:
                   type: array
-                  items: *id002
-                minutes: *id003
+                  items: *id001
+                minutes: *id006
               required:
               - action
               - expectedVersion
@@ -3648,17 +3797,17 @@ paths:
             schema:
               type: object
               properties:
-                workOrderId: *id002
-                revisionId: *id002
+                workOrderId: *id001
+                revisionId: *id001
                 results:
                   type: array
                   items:
                     type: object
                     properties:
-                      checkId: *id001
+                      checkId: *id005
                       passed:
                         type: boolean
-                      evidenceId: *id002
+                      evidenceId: *id001
                     required:
                     - checkId
                     - passed
@@ -3747,8 +3896,8 @@ paths:
             schema:
               type: object
               properties:
-                itemId: *id002
-                inspectionId: *id002
+                itemId: *id001
+                inspectionId: *id001
               required:
               - itemId
               - inspectionId
@@ -3765,7 +3914,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       responses:
         '200':
           description: Resultado
@@ -3834,7 +3983,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       - in: header
         name: Idempotency-Key
         required: true
@@ -3904,7 +4053,7 @@ paths:
             schema:
               type: object
               properties:
-                reason: *id001
+                reason: *id005
               required:
               - reason
               additionalProperties: false
@@ -3920,7 +4069,7 @@ paths:
       - in: query
         name: cursor
         required: false
-        schema: *id001
+        schema: *id005
       responses:
         '200':
           description: Resultado
@@ -3988,7 +4137,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: *id002
+        schema: *id001
       responses:
         '200':
           description: Resultado
@@ -4122,9 +4271,9 @@ paths:
             schema:
               type: object
               properties:
-                customerId: *id002
-                stage: *id001
-                ownerId: *id002
+                customerId: *id001
+                stage: *id005
+                ownerId: *id001
               required:
               - customerId
               - stage
@@ -4208,15 +4357,15 @@ paths:
             schema:
               type: object
               properties:
-                supplierId: *id002
+                supplierId: *id001
                 lines:
                   type: array
                   items:
                     type: object
                     properties:
-                      itemKey: *id001
-                      quantity: *id004
-                      unit: *id001
+                      itemKey: *id005
+                      quantity: *id007
+                      unit: *id005
                       price:
                         $ref: '#/components/schemas/Money'
                     required:
@@ -4307,9 +4456,9 @@ paths:
             schema:
               type: object
               properties:
-                orderId: *id002
-                carrierId: *id001
-                serviceId: *id001
+                orderId: *id001
+                carrierId: *id005
+                serviceId: *id005
                 insuranceAccepted:
                   type: boolean
               required:
@@ -4330,7 +4479,7 @@ paths:
       - in: query
         name: cursor
         required: false
-        schema: *id001
+        schema: *id005
       responses:
         '200':
           description: Resultado
@@ -4464,7 +4613,7 @@ paths:
             schema:
               type: object
               properties:
-                deviceId: *id002
+                deviceId: *id001
                 operations:
                   type: array
                   minItems: 1
@@ -4475,6 +4624,7 @@ paths:
               - deviceId
               - operations
               additionalProperties: false
+      description: 'Aplica en orden operaciones hechas sin conexión. Base = cabeza: APPLIED con revisión nueva. Base anterior y solo parámetros independientes cambiados desde entonces: se rebasa y APPLIED. Si no: CONFLICT con la cabeza del servidor (nunca last-write-wins). Inválida o sin permiso: REJECTED. Reenviar el mismo id devuelve el resultado original; el mismo id con otro cuerpo es REJECTED IDEMPOTENCY_CONFLICT. Tras una operación no aplicada, las siguientes del mismo proyecto no se aplican (CONFLICT) para no saltarse el orden.'
   /sync/pull:
     get:
       operationId: syncPull
@@ -4487,7 +4637,7 @@ paths:
       - in: query
         name: cursor
         required: false
-        schema: *id001
+        schema: *id005
       responses:
         '200':
           description: Resultado
@@ -4500,7 +4650,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Event'
-                  cursor: *id001
+                  cursor: *id005
                 required:
                 - events
                 - cursor
@@ -4553,6 +4703,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      description: 'Eventos de los proyectos propios en orden de confirmación (hito 300: RevisionCreated, payload RevisionCreatedPayload). El cursor es opaco; sin cursor empieza desde el principio.'
   /documents/uploads:
     post:
       operationId: createUpload
@@ -4577,9 +4728,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  id: *id002
-                  url: *id001
-                  expiresAt: *id001
+                  id: *id001
+                  url: *id005
+                  expiresAt: *id005
                 required:
                 - id
                 - url
@@ -4640,10 +4791,10 @@ paths:
             schema:
               type: object
               properties:
-                resourceId: *id002
-                mime: *id001
-                size: *id003
-                sha256: *id001
+                resourceId: *id001
+                mime: *id005
+                size: *id006
+                sha256: *id005
               required:
               - resourceId
               - mime
@@ -4703,7 +4854,7 @@ paths:
       - in: query
         name: cursor
         required: false
-        schema: *id001
+        schema: *id005
       - $ref: '#/components/parameters/AcceptLanguage'
       responses:
         '200':
@@ -4754,7 +4905,7 @@ paths:
       - in: path
         name: productId
         required: true
-        schema: *id002
+        schema: *id001
       responses:
         '204':
           description: Guardado (o ya lo estaba)
@@ -4805,7 +4956,7 @@ paths:
       - in: path
         name: productId
         required: true
-        schema: *id002
+        schema: *id001
       responses:
         '204':
           description: Quitado (o no estaba)
@@ -4851,7 +5002,7 @@ paths:
       - in: query
         name: cursor
         required: false
-        schema: *id001
+        schema: *id005
       responses:
         '200':
           description: Resultado
@@ -4902,6 +5053,60 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '503':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /files/{sha256}:
+    get:
+      operationId: downloadFile
+      summary: Descarga por URL firmada de getJobArtifact
+      description: 'Sin token: la firma `sig` (HMAC-SHA256 de sha256 y exp con la clave de la API) es la autorización y vence en `exp`. Firma inválida o vencida → 403.'
+      tags:
+      - jobs
+      x-permission: job.read
+      x-first-milestone: '300'
+      security: []
+      parameters:
+      - in: path
+        name: sha256
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+      - in: query
+        name: exp
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: sig
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+      responses:
+        '200':
+          description: Contenido del archivo; Content-Type según el tipo y ETag = sha256
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
           description: Error
           content:
             application/json:
@@ -5206,7 +5411,7 @@ components:
     Money:
       type: object
       properties:
-        amount: *id004
+        amount: *id007
         currency:
           type: string
           pattern: ^[A-Z]{3}$
@@ -5223,7 +5428,7 @@ components:
         message:
           type: string
           maxLength: 500
-        correlationId: *id002
+        correlationId: *id001
         details:
           type: array
           maxItems: 100
@@ -5259,19 +5464,19 @@ components:
     Id:
       type: object
       properties:
-        id: *id002
+        id: *id001
       required:
       - id
       additionalProperties: false
     Job:
       type: object
       properties:
-        id: *id002
+        id: *id001
         kind:
           $ref: '#/components/schemas/JobKind'
         state:
           $ref: '#/components/schemas/JobState'
-        revisionId: *id002
+        revisionId: *id001
         simulated:
           type: boolean
           description: true si lo produjo un adaptador simulado (demo); la UI muestra el banner.
@@ -5285,6 +5490,11 @@ components:
           description: Vacío hasta SUCCEEDED. Cada archivo se descarga con getJobArtifact tras ACL.
           items:
             $ref: '#/components/schemas/JobArtifact'
+        summary:
+          oneOf:
+          - $ref: '#/components/schemas/JobSummary'
+          - type: 'null'
+        projectId: *id004
       required:
       - id
       - kind
@@ -5293,6 +5503,8 @@ components:
       - simulated
       - errorCode
       - artifacts
+      - summary
+      - projectId
       additionalProperties: false
     JobKind:
       type: string
@@ -5304,7 +5516,7 @@ components:
     JobArtifact:
       type: object
       properties:
-        id: *id002
+        id: *id001
         kind:
           type: string
           enum:
@@ -5327,12 +5539,16 @@ components:
         bytes:
           type: integer
           minimum: 0
+        name:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$
       required:
       - id
       - kind
       - units
       - sha256
       - bytes
+      - name
       additionalProperties: false
     ArtifactDownload:
       type: object
@@ -5340,7 +5556,7 @@ components:
         url:
           type: string
           format: uri
-          description: URL firmada de corta duración; no reutilizar ni registrar.
+          description: URL firmada (HMAC, 5 min) a GET /files/{sha256}; no reutilizar ni registrar.
         expiresAt:
           type: string
           format: date-time
@@ -5355,13 +5571,32 @@ components:
     Project:
       type: object
       properties:
-        id: *id002
-        title: *id001
-        headRevisionId: *id002
+        id: *id004
+        title:
+          type: string
+          minLength: 1
+          maxLength: 80
+        familyId:
+          type: string
+          description: Familia de la plantilla (11_3D_ASSET_LIBRARY/families.json).
+        headRevisionId: *id004
+        headRevisionNumber:
+          type: integer
+          minimum: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
       - id
       - title
+      - familyId
       - headRevisionId
+      - headRevisionNumber
+      - createdAt
+      - updatedAt
       additionalProperties: false
     DesignDocument:
       description: 'Documento de diseño de una revisión (Revision.document en OpenAPI se genera de este archivo: tools/contracts/check_contracts.py --emit). Unidades en mm. La validación semántica (rangos, familias, dependencias) la hace services/geometry.'
@@ -5492,14 +5727,24 @@ components:
     Revision:
       type: object
       properties:
-        id: *id002
-        projectId: *id002
-        number: *id003
-        digest: *id001
+        id: *id001
+        projectId: *id001
+        number: *id006
+        digest:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+          description: SHA-256 del JSON canónico del documento (RFC 8785, 09_JEWELRY_ENGINE/fixtures/digests.json).
         document:
           $ref: '#/components/schemas/DesignDocument'
         state:
           $ref: '#/components/schemas/DesignState'
+        parentId:
+          oneOf:
+          - *id004
+          - type: 'null'
+        createdAt:
+          type: string
+          format: date-time
       required:
       - id
       - projectId
@@ -5507,12 +5752,14 @@ components:
       - digest
       - document
       - state
+      - parentId
+      - createdAt
       additionalProperties: false
     Quote:
       type: object
       properties:
-        id: *id002
-        revisionId: *id002
+        id: *id001
+        revisionId: *id001
         state:
           $ref: '#/components/schemas/QuoteState'
         total:
@@ -5520,7 +5767,7 @@ components:
         expiresAt:
           type: string
           format: date-time
-        digest: *id001
+        digest: *id005
       required:
       - id
       - revisionId
@@ -5539,14 +5786,14 @@ components:
           items:
             type: object
             properties:
-              label: *id001
+              label: *id005
               amount:
                 $ref: '#/components/schemas/Money'
             required:
             - label
             - amount
             additionalProperties: false
-        snapshotId: *id002
+        snapshotId: *id001
         estimated:
           type: boolean
       required:
@@ -5558,8 +5805,8 @@ components:
     Payment:
       type: object
       properties:
-        id: *id002
-        orderId: *id002
+        id: *id001
+        orderId: *id001
         amount:
           $ref: '#/components/schemas/Money'
         state:
@@ -5573,8 +5820,8 @@ components:
     Order:
       type: object
       properties:
-        id: *id002
-        quoteId: *id002
+        id: *id001
+        quoteId: *id001
         state:
           $ref: '#/components/schemas/OrderState'
       required:
@@ -5585,9 +5832,9 @@ components:
     Reservation:
       type: object
       properties:
-        id: *id002
-        lotId: *id002
-        quantity: *id004
+        id: *id001
+        lotId: *id001
+        quantity: *id007
         state:
           $ref: '#/components/schemas/ReservationState'
       required:
@@ -5599,9 +5846,9 @@ components:
     WorkOrder:
       type: object
       properties:
-        id: *id002
-        revisionId: *id002
-        orderId: *id002
+        id: *id001
+        revisionId: *id001
+        orderId: *id001
         state:
           $ref: '#/components/schemas/WorkOrderState'
       required:
@@ -5613,11 +5860,11 @@ components:
     Certificate:
       type: object
       properties:
-        id: *id002
+        id: *id001
         state:
           $ref: '#/components/schemas/CertificateState'
-        issuer: *id001
-        publicSummary: &id005
+        issuer: *id005
+        publicSummary: &id008
           type: object
       required:
       - id
@@ -5633,11 +5880,11 @@ components:
       type: object
       description: Operación de diseño hecha sin conexión (22_OFFLINE_AND_SYNC/SYNC.md). La operación es un DesignOperation, la misma lista permitida que en línea.
       properties:
-        id: *id002
-        projectId: *id002
+        id: *id001
+        projectId: *id001
         branch:
           $ref: '#/components/schemas/BranchName'
-        baseRevisionId: *id002
+        baseRevisionId: *id001
         sequence:
           type: integer
           minimum: 1
@@ -5664,7 +5911,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SyncOperationResult'
-        cursor: *id001
+        cursor: *id005
       required:
       - results
       - cursor
@@ -5683,10 +5930,10 @@ components:
     SyncApplied:
       type: object
       properties:
-        operationId: *id002
+        operationId: *id001
         status:
           const: APPLIED
-        revisionId: *id002
+        revisionId: *id001
       required:
       - operationId
       - status
@@ -5696,10 +5943,10 @@ components:
       type: object
       description: La revisión base ya no es la actual. No hay last-write-wins; el cliente conserva la operación y ofrece resolver.
       properties:
-        operationId: *id002
+        operationId: *id001
         status:
           const: CONFLICT
-        serverRevisionId: *id002
+        serverRevisionId: *id001
         error:
           $ref: '#/components/schemas/ErrorDetail'
       required:
@@ -5712,7 +5959,7 @@ components:
       type: object
       description: La operación no se aplicará nunca (permiso, esquema o regla); el cliente no la reintenta.
       properties:
-        operationId: *id002
+        operationId: *id001
         status:
           const: REJECTED
         error:
@@ -5727,7 +5974,7 @@ components:
       properties:
         items:
           type: array
-          items: *id005
+          items: *id008
         nextCursor:
           type:
           - string
@@ -5739,8 +5986,8 @@ components:
     Result:
       type: object
       properties:
-        id: *id002
-        state: *id001
+        id: *id001
+        state: *id005
       required:
       - id
       - state
@@ -5795,7 +6042,7 @@ components:
       type: object
       description: Lo que muestra una tarjeta del catálogo.
       properties:
-        id: *id002
+        id: *id001
         sku: &sku
           type: string
           pattern: ^[A-Z0-9][A-Z0-9-]{2,31}$
@@ -5843,7 +6090,7 @@ components:
       type: object
       description: SKU publicado. Precio de venta al público (nunca costos). Peso del metal en gramos y piedras en quilates, explícitos.
       properties:
-        id: *id002
+        id: *id001
         sku: *sku
         name: *productText
         summary:
@@ -5892,16 +6139,16 @@ components:
     InventoryLot:
       type: object
       properties:
-        id: *id002
-        itemKey: *id001
+        id: *id001
+        itemKey: *id005
         unit:
           type: string
           enum:
           - g
           - ct
           - ea
-        onHand: *id004
-        reserved: *id004
+        onHand: *id007
+        reserved: *id007
       required:
       - id
       - itemKey
@@ -5912,10 +6159,10 @@ components:
     Task:
       type: object
       properties:
-        id: *id002
-        workOrderId: *id002
-        state: *id001
-        assignedTo: *id002
+        id: *id001
+        workOrderId: *id001
+        state: *id005
+        assignedTo: *id001
       required:
       - id
       - workOrderId
@@ -5925,9 +6172,9 @@ components:
     Customer:
       type: object
       properties:
-        id: *id002
-        displayName: *id001
-        consent: *id005
+        id: *id001
+        displayName: *id005
+        consent: *id008
       required:
       - id
       - displayName
@@ -5974,4 +6221,304 @@ components:
           format: uuid
         payload:
           type: object
+      additionalProperties: false
+    ProjectPage:
+      type: object
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/Project'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+      - nextCursor
+      additionalProperties: false
+    ParameterChange:
+      type: object
+      description: Un valor que cambió respecto de la revisión padre.
+      properties:
+        componentId:
+          type: string
+        name:
+          type: string
+          description: Nombre del parámetro o materialId.
+        from:
+          type:
+          - number
+          - string
+          - boolean
+          - 'null'
+        to:
+          type:
+          - number
+          - string
+          - boolean
+      required:
+      - componentId
+      - name
+      - from
+      - to
+      additionalProperties: false
+    RevisionSummary:
+      type: object
+      properties:
+        id: *id004
+        number:
+          type: integer
+          minimum: 1
+        parentId:
+          oneOf:
+          - *id004
+          - type: 'null'
+        digest:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        state:
+          $ref: '#/components/schemas/DesignState'
+        source:
+          type: string
+          enum:
+          - CREATE
+          - PREVIEW
+          - SYNC
+          description: CREATE plantilla; PREVIEW vista previa aceptada; SYNC operación hecha sin conexión.
+        createdAt:
+          type: string
+          format: date-time
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParameterChange'
+      required:
+      - id
+      - number
+      - parentId
+      - digest
+      - state
+      - source
+      - createdAt
+      - changes
+      additionalProperties: false
+    RevisionPage:
+      type: object
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/RevisionSummary'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+      - nextCursor
+      additionalProperties: false
+    ComponentMetrics:
+      type: object
+      properties:
+        id:
+          type: string
+        family:
+          type: string
+        materialId:
+          type: string
+        volumeMm3:
+          type: string
+          pattern: ^\d+\.\d{3}$
+          description: Volumen del sólido BREP en mm³, decimal con 3 cifras.
+        massGramsEstimate:
+          type: string
+          pattern: ^\d+\.\d{3}$
+          description: Volumen × densidad nominal de la aleación; estimación, no ensayo.
+        densityStatus:
+          type: string
+          enum:
+          - NOMINAL_UNCONFIRMED
+          - CONFIGURED
+        boundingBoxMm:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items:
+            type: number
+          description: Tamaño x, y, z en mm.
+        minWallMm:
+          type: number
+      required:
+      - id
+      - family
+      - materialId
+      - volumeMm3
+      - massGramsEstimate
+      - densityStatus
+      - boundingBoxMm
+      - minWallMm
+      additionalProperties: false
+    JobSummary:
+      type: object
+      description: Resultado legible del trabajo; null hasta SUCCEEDED. No sustituye la revisión DFM humana.
+      properties:
+        document:
+          $ref: '#/components/schemas/DesignDocument'
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParameterChange'
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentMetrics'
+        dfmState:
+          type: string
+          enum:
+          - PASS
+          - WARN
+          - REVIEW
+          - FAIL
+        humanApprovalRequired:
+          const: true
+        engineVersion:
+          type: string
+        status:
+          type: string
+          description: POC_ONLY_NOT_APPROVED_FOR_MANUFACTURING mientras no haya liberación.
+      required:
+      - document
+      - changes
+      - components
+      - dfmState
+      - humanApprovalRequired
+      - engineVersion
+      - status
+      additionalProperties: false
+    FamilyParameter:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        min:
+          type: number
+        max:
+          type: number
+        default:
+          type: number
+        unit:
+          const: mm
+      required:
+      - name
+      - label
+      - min
+      - max
+      - default
+      - unit
+      additionalProperties: false
+    Family:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: string
+        category:
+          type: string
+          enum:
+          - ring
+          - pendant
+        name:
+          type: string
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilyParameter'
+      required:
+      - id
+      - version
+      - category
+      - name
+      - parameters
+      additionalProperties: false
+    Material:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        purity:
+          type: string
+        densityGPerCm3:
+          type: string
+          pattern: ^\d+(\.\d+)?$
+        densityStatus:
+          type: string
+          enum:
+          - NOMINAL_UNCONFIRMED
+          - CONFIGURED
+        previewColor:
+          type: string
+          pattern: ^#[0-9a-f]{6}$
+      required:
+      - id
+      - name
+      - purity
+      - densityGPerCm3
+      - densityStatus
+      - previewColor
+      additionalProperties: false
+    FamilyCatalog:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Family'
+        materials:
+          type: array
+          items:
+            $ref: '#/components/schemas/Material'
+        nextCursor:
+          type: 'null'
+      required:
+      - items
+      - materials
+      - nextCursor
+      additionalProperties: false
+    RevisionCreatedPayload:
+      type: object
+      description: payload de Event con eventType RevisionCreated (aggregateId = proyecto, aggregateVersion = número de revisión).
+      properties:
+        projectId: *id004
+        revisionId: *id004
+        number:
+          type: integer
+          minimum: 1
+        parentId:
+          oneOf:
+          - *id004
+          - type: 'null'
+        digest:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        source:
+          type: string
+          enum:
+          - CREATE
+          - PREVIEW
+          - SYNC
+      required:
+      - projectId
+      - revisionId
+      - number
+      - parentId
+      - digest
+      - source
       additionalProperties: false

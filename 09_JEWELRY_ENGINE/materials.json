@@ -1,0 +1,11 @@
+{
+  "$comment": "Alloys a design may use in hito 300. densityGPerCm3 is a NOMINAL reference value for estimating metal weight (mass g = mm³ × density / 1000, ENGINE.md); the real value depends on the supplier's alloy and must be configured from it before quoting. Never an assay. Ids match the boutique Metal enum (lower-case, dashes).",
+  "version": "0.1.0",
+  "materials": [
+    { "id": "gold-18k-yellow", "metal": "GOLD_18K_YELLOW", "name": { "es": "Oro amarillo 18k", "en": "18k yellow gold" }, "purity": "750", "densityGPerCm3": "15.5", "densityStatus": "NOMINAL_UNCONFIRMED", "previewColor": "#d4af37" },
+    { "id": "gold-18k-white", "metal": "GOLD_18K_WHITE", "name": { "es": "Oro blanco 18k", "en": "18k white gold" }, "purity": "750", "densityGPerCm3": "15.6", "densityStatus": "NOMINAL_UNCONFIRMED", "previewColor": "#d8d8d4" },
+    { "id": "gold-18k-rose", "metal": "GOLD_18K_ROSE", "name": { "es": "Oro rosa 18k", "en": "18k rose gold" }, "purity": "750", "densityGPerCm3": "15.2", "densityStatus": "NOMINAL_UNCONFIRMED", "previewColor": "#d9a08b" },
+    { "id": "silver-925", "metal": "SILVER_925", "name": { "es": "Plata 925", "en": "Sterling silver 925" }, "purity": "925", "densityGPerCm3": "10.36", "densityStatus": "NOMINAL_UNCONFIRMED", "previewColor": "#c9cbcf" },
+    { "id": "platinum-950", "metal": "PLATINUM_950", "name": { "es": "Platino 950", "en": "Platinum 950" }, "purity": "950", "densityGPerCm3": "20.7", "densityStatus": "NOMINAL_UNCONFIRMED", "previewColor": "#e0e0dc" }
+  ]
+}

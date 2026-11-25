@@ -15,6 +15,7 @@ export const ROLE_GRANTS: Readonly<Record<string, readonly string[]>> = {
     "favorite.edit",
     "favorite.read",
     "identity.self",
+    "job.read",
     "loyalty.read",
     "notification.read",
     "order.cancel",
@@ -173,7 +174,8 @@ export const SCOPES: Readonly<Record<string, Readonly<Record<string, string>>>> 
     "loyalty.read": "own",
     "identity.self": "self",
     "crm.contact": "assigned",
-    "order.cancel": "own"
+    "order.cancel": "own",
+    "job.read": "own"
   },
   "advisor": {
     "crm.read": "assigned",
