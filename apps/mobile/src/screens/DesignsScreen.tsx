@@ -6,7 +6,7 @@ import { familyName } from "../design/describe";
 import type { LocalProject, OutboxEntry } from "../design/store";
 import { useSession } from "../session";
 import { FamilyArt } from "../design/art";
-import { Button, c, errorKey, fonts, Header, Loading, Notice, s, styles, type } from "../ui";
+import { Button, c, errorKey, fonts, LINING, Header, Loading, Notice, s, styles, type } from "../ui";
 
 type Row = LocalProject & { pending: number; problems: number; thumb: string | null };
 type State = { phase: "loading" } | { phase: "ready"; rows: Row[]; refreshed: boolean; error: ApiError | null };
@@ -123,6 +123,6 @@ const list = StyleSheet.create({
   shot: { aspectRatio: 1, backgroundColor: "#141416" },
   body: { flex: 1, gap: 2 },
   kind: { color: c.textMuted, fontSize: type[0], letterSpacing: 1.2, textTransform: "uppercase" },
-  title: { color: c.text, fontSize: type[3], fontFamily: fonts.display },
+  title: { color: c.text, fontSize: type[3], fontFamily: fonts.display, fontVariant: LINING },
   chevron: { color: c.accent, fontSize: type[4], paddingHorizontal: s[1] },
 });

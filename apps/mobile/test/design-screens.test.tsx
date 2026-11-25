@@ -222,6 +222,32 @@ describe("design editor", () => {
     await r.unmount();
     r.db.close();
   });
+
+  it("one change at a time: a new alloy sets the width aside visibly, and the 3D view shows the proposed alloy", async () => {
+    const server = new FakeDesignServer();
+    const file = join(dir, `${uuid()}.db`);
+    const p = await stored(server, file);
+    const r = await app(server, file, <EditorScreen id={p.id} onBack={() => undefined} />);
+    await screen.findByText("Revision 1", { exact: false });
+    await act(async () => { fromPage({ type: "ready" }); });
+    const lastColor = () => posted.map((d) => JSON.parse(d)).filter((m) => m.type === "show").pop()?.color;
+    await fireEvent.press(screen.getByRole("button", { name: "Increase Band width" }));
+    expect(input("Band width").props.value).toBe("4.1");
+    await fireEvent.press(screen.getByRole("radio", { name: "18k rose gold" }));
+    // The width is no longer part of the change, and the field and a note say so.
+    expect(input("Band width").props.value).toBe("4");
+    expect(screen.getByText(/One change at a time: “Band width/)).toBeTruthy();
+    await fireEvent.press(await screen.findByRole("button", { name: en.preview }));
+    expect(await screen.findByRole("button", { name: en.accept }, slow)).toBeTruthy();
+    expect(screen.getByLabelText("Alloy: 18k yellow gold → 18k rose gold")).toBeTruthy();
+    // The viewer is told to paint the proposed alloy (studio rose), not the head's yellow.
+    await waitFor(() => expect(lastColor()).toBe("#eeb497"), slow);
+    await fireEvent.press(screen.getByRole("button", { name: en.discardPreview }));
+    await waitFor(() => expect(lastColor()).toBe("#f1c76b"), slow);
+    expect(screen.queryByText(/One change at a time/)).toBeNull();
+    await r.unmount();
+    r.db.close();
+  });
 });
 
 describe("AURA in the editor", () => {

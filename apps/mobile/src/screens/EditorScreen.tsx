@@ -29,6 +29,8 @@ type Preview =
 interface Attempt { key: string; baseRevisionId: string }
 
 const STEP = 0.1;
+/** The field an operation changes: a parameter's name, or the alloy. */
+const target = (o: DesignOperation): string => (o.type === "modify_parameter" ? `p:${String(o.name)}` : o.type);
 const round = (v: number) => Math.round(v * 1000) / 1000;
 
 export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () => void; onQuote?: (revisionId: string) => void }) {
@@ -47,6 +49,9 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
   const [syncing, setSyncing] = useState<"idle" | "busy" | "offline">("idle");
   // Option of the AURA proposal whose preview is on screen (null: a manual change or none).
   const [auraOption, setAuraOption] = useState<number | null>(null);
+  // A change is previewed and accepted one at a time: a new one on another field sets the earlier one
+  // aside, and the screen says so instead of leaving its value in the field as if it still counted.
+  const [replaced, setReplaced] = useState<DesignOperation | null>(null);
   const alive = useRef({ aborted: false });
   useEffect(() => () => { alive.current.aborted = true; }, []);
 
@@ -69,6 +74,7 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
     if (!comp) return;
     setTexts(Object.fromEntries(Object.entries(comp.parameters).map(([k, v]) => [k, formatDecimal(String(v), "", locale).trim()])));
     setOp(null);
+    setReplaced(null);
     setIssue(null);
   }, [comp, locale]);
 
@@ -106,6 +112,12 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
     if (!local) return;
     setPreview({ phase: "none" });
     setAuraOption(null);
+    const earlier = op && target(op) !== target(next) ? op : null;
+    setReplaced(earlier);
+    if (earlier?.type === "modify_parameter" && comp) {
+      const name = String(earlier.name);
+      setTexts((x) => ({ ...x, [name]: formatDecimal(String(comp.parameters[name]), "", locale).trim() }));
+    }
     const r = applyOperation(local.document, next);
     if (!r.ok) {
       setOp(null);
@@ -155,6 +167,7 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
   /** AURA option → the same preview and acceptance flow as a manual change. */
   const runAuraPreview = async (proposal: AiProposal, option: AiProposalOption) => {
     setOp(null);
+    setReplaced(null);
     setIssue(null);
     setAuraOption(option.index);
     setPreview({ phase: "computing", aura: option.index });
@@ -212,6 +225,9 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
 
   const summary = preview.phase === "ready" || preview.phase === "accepting" || preview.phase === "acceptFailed" ? preview.job.summary : null;
   const metrics = summary?.components[0];
+  // While a preview is on screen the 3D view shows its alloy, not the head's.
+  const previewAlloy = summary?.changes.find((ch) => ch.name === "materialId")?.to;
+  const shownMaterial = previewAlloy !== undefined ? String(previewAlloy) : comp.materialId;
   const title = local.local.project.title;
   const revLine = t("revisionLine", { number: String(local.local.head.number) })
     + (local.pending.length ? ` · ${local.pending.length === 1 ? t("pendingOne") : t("pendingCount", { count: String(local.pending.length) })}` : "");
@@ -221,7 +237,7 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
       <Header overline={familyName(fam.id, locale)} title={title} subtitle={revLine} onBack={onBack} backLabel={t("back")} />
       {offline && <Text accessibilityRole="alert" style={styles.banner}>{t("offlineBanner")}</Text>}
       <ScrollView contentContainerStyle={ed.content} keyboardShouldPersistTaps="handled">
-        <Viewer glb={glb} color={studioColor(comp.materialId)} label={t("viewerLabel", { name: title })} height={340}
+        <Viewer glb={glb} color={studioColor(shownMaterial)} label={t("viewerLabel", { name: title })} height={340}
           onSnapshot={(shown, jpeg) => {
             // Only a picture of the head as saved: its mesh and its alloy (a pending offline change of
             // material recolours the same mesh, and that is not the head yet).
@@ -335,6 +351,7 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
         {op && preview.phase === "none" && (
           <View style={ed.card}>
             <Text style={styles.body}>{describeOp(op, fam.id, locale, t)}</Text>
+            {replaced && <Text accessibilityLiveRegion="polite" style={styles.muted}>{t("oneChangeAtATime", { change: describeOp(replaced, fam.id, locale, t) })}</Text>}
             {!blocked && !offline && <Button label={t("preview")} onPress={runPreview} />}
             {blocked && !offline && <Text style={styles.muted}>{t("previewNeedsSync")}</Text>}
             {(offline || blocked) && (
@@ -377,6 +394,7 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
               setPreview({ phase: "none" });
               setAuraOption(null);
               setOp(null);
+              setReplaced(null);
               setTexts(Object.fromEntries(Object.entries(comp.parameters).map(([k, v]) => [k, formatDecimal(String(v), "", locale).trim()])));
               void store?.glb(local.local.head.digest).then(setGlb);
             }} />

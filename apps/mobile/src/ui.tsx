@@ -21,6 +21,8 @@ export const fonts = {
   displayStrong: "CormorantGaramond_600SemiBold",
   body: undefined as string | undefined,
 };
+/** Cormorant draws old-style figures by default; names like "PR40" and measures read better lining. */
+export const LINING: ("lining-nums")[] = ["lining-nums"];
 
 export function Button({ label, onPress, disabled, variant = "primary", hint, selected }: {
   label: string; onPress: () => void; disabled?: boolean; variant?: "primary" | "secondary"; hint?: string; selected?: boolean;
@@ -136,8 +138,9 @@ export const styles = StyleSheet.create({
   artImage: { width: "100%", height: "100%" },
   screen: { flex: 1, backgroundColor: c.background },
   banner: { backgroundColor: c.surface, color: c.warning, paddingHorizontal: s[3], paddingVertical: s[1], fontSize: type[1] },
-  header: { paddingHorizontal: s[4], paddingTop: s[3], paddingBottom: s[2], gap: s[0] },
-  title: { color: c.text, fontSize: type[5], fontFamily: fonts.display, letterSpacing: 0.2 },
+  // A hairline under a fixed header, so content scrolling beneath it reads as passing under, not cut off.
+  header: { paddingHorizontal: s[4], paddingTop: s[3], paddingBottom: s[2], gap: s[0], borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: "rgba(197,160,89,0.22)" },
+  title: { color: c.text, fontSize: type[5], fontFamily: fonts.display, fontVariant: LINING, letterSpacing: 0.2 },
   overline: { color: c.accent, fontSize: type[0], letterSpacing: 2.4, textTransform: "uppercase", fontWeight: "600" },
   body: { color: c.text, fontSize: type[2], lineHeight: type[2] * 1.5 },
   muted: { color: c.textMuted, fontSize: type[1], lineHeight: type[1] * 1.5 },

@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import type { OrderState, QuoteState } from "../commerce/client";
 import type { Key } from "../i18n";
-import { c, fonts, s, styles, type } from "../ui";
+import { c, fonts, LINING, s, styles, type } from "../ui";
 
 export const JOURNEY: readonly Key[] = ["step_review", "step_price", "step_order", "step_deposit", "step_workshop", "step_delivery"];
 
@@ -91,7 +91,7 @@ export const qs = StyleSheet.create({
   hero: { flexDirection: "row", gap: s[3], alignItems: "center" },
   heroArt: { width: 96, borderRadius: 10 },
   heroBody: { flex: 1, gap: s[0] },
-  heroTitle: { color: c.text, fontSize: type[4], fontFamily: fonts.display },
+  heroTitle: { color: c.text, fontSize: type[4], fontFamily: fonts.display, fontVariant: LINING },
 });
 
 const GOLD_EDGE = "rgba(197,160,89,0.22)";
@@ -113,7 +113,7 @@ const j = StyleSheet.create({
   totalValue: { color: c.text, fontSize: type[5], fontFamily: fonts.displayStrong, fontVariant: ["lining-nums", "tabular-nums"] },
   status: { flexDirection: "row", alignItems: "center", gap: s[2] },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
-  statusText: { color: c.text, fontSize: type[3], fontFamily: fonts.display, flex: 1 },
+  statusText: { color: c.text, fontSize: type[3], fontFamily: fonts.display, fontVariant: LINING, flex: 1 },
 });
 
 /** A change "from → to", the new value in gold; read as one sentence. */

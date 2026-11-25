@@ -6,7 +6,7 @@ import { ApiError } from "../api";
 import { useDesign } from "../design/DesignContext";
 import { AlloySwatch, FamilyArt } from "../design/art";
 import { useSession } from "../session";
-import { Button, c, fonts, Header, s, styles, type } from "../ui";
+import { Button, c, fonts, LINING, Header, s, styles, type } from "../ui";
 
 type Notice = null | "offline" | "failed" | "name";
 
@@ -109,7 +109,7 @@ const form = StyleSheet.create({
   },
   optionText: { padding: s[2], gap: 2 },
   optionKind: { color: c.textMuted, fontSize: type[0], letterSpacing: 1.2, textTransform: "uppercase" },
-  optionName: { color: c.text, fontSize: type[3], fontFamily: fonts.display },
+  optionName: { color: c.text, fontSize: type[3], fontFamily: fonts.display, fontVariant: LINING },
   check: {
     position: "absolute", top: s[2], right: s[2], width: 26, height: 26, borderRadius: 13, backgroundColor: c.accent,
     alignItems: "center", justifyContent: "center",

@@ -132,6 +132,7 @@
   "saveOfflineHint": "Applied as a new revision when the phone connects.",
   "offerOffline": "Offline. You can save the change and it will be sent later.",
   "pendingTitle": "Changes not sent",
+  "oneChangeAtATime": "One change at a time: “{change}” was set aside. Accept this one, then make the next.",
   "pendingItem": "{change} · pending",
   "syncNow": "Send now",
   "syncing": "Sending…",

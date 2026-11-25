@@ -132,6 +132,7 @@
   "saveOfflineHint": "Se aplica como revisión nueva cuando el teléfono se conecte.",
   "offerOffline": "Sin conexión. Puedes guardar el cambio y se enviará después.",
   "pendingTitle": "Cambios sin enviar",
+  "oneChangeAtATime": "Un cambio a la vez: «{change}» quedó sin aplicar. Acepta este y luego haz el siguiente.",
   "pendingItem": "{change} · pendiente",
   "syncNow": "Enviar ahora",
   "syncing": "Enviando…",

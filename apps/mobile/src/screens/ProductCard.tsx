@@ -1,9 +1,12 @@
 import tokens from "@aurea/tokens";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import type { ProductSummary } from "../api";
 import { formatMoney } from "../format";
 import { useSession } from "../session";
-import { c, fonts, JewelArt, s, type } from "../ui";
+import { c, fonts, LINING, JewelArt, s, type } from "../ui";
+
+// The saved mark is the tab bar's own line-art heart in gold: a "♥" character turns into a red emoji on many phones.
+const HEART: number = require("../../assets/icons/tab-favorites.png");
 
 export function ProductCard({ product, onOpen }: { product: ProductSummary; onOpen: () => void }) {
   const { t, locale, favorites } = useSession();
@@ -17,7 +20,7 @@ export function ProductCard({ product, onOpen }: { product: ProductSummary; onOp
       style={({ pressed }) => [card.root, pressed && card.pressed]}>
       <View importantForAccessibility="no-hide-descendants">
         <JewelArt sku={product.sku} metal={product.metal} label="" />
-        {saved && <View style={card.fav}><Text style={card.favText}>♥</Text></View>}
+        {saved && <View style={card.fav}><Image source={HEART} style={card.favIcon} importantForAccessibility="no" accessibilityIgnoresInvertColors /></View>}
         {!product.available && <Text style={card.soldOut}>{t("soldOut")}</Text>}
         <View style={card.text}>
           <Text style={card.meta} numberOfLines={1}>{metal}</Text>
@@ -37,13 +40,13 @@ const card = StyleSheet.create({
   pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
   text: { paddingHorizontal: s[2], paddingTop: s[2], paddingBottom: s[3], gap: 2 },
   meta: { color: c.textMuted, fontSize: type[0], letterSpacing: 1.2, textTransform: "uppercase" },
-  name: { color: c.text, fontSize: type[3], fontFamily: fonts.display, lineHeight: type[3] * 1.2 },
+  name: { color: c.text, fontSize: type[3], fontFamily: fonts.display, fontVariant: LINING, lineHeight: type[3] * 1.2 },
   price: { color: c.accent, fontSize: type[2], fontFamily: fonts.displayStrong, fontVariant: ["lining-nums"], marginTop: s[0], letterSpacing: 0.3 },
   fav: {
     position: "absolute", right: s[2], top: s[2], width: 30, height: 30, borderRadius: 15, alignItems: "center", justifyContent: "center",
     backgroundColor: "rgba(12,12,13,0.7)",
   },
-  favText: { color: c.accent, fontSize: type[1] },
+  favIcon: { width: 16, height: 16, tintColor: c.accent },
   soldOut: {
     position: "absolute", left: s[2], top: s[2], color: c.warning, fontSize: type[0], letterSpacing: 1, textTransform: "uppercase",
     backgroundColor: "rgba(12,12,13,0.75)", paddingHorizontal: s[1], paddingVertical: 2, borderRadius: 4, overflow: "hidden",
