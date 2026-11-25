@@ -79,7 +79,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
             Gltfio.init()  // loads gltfio-jni
         }
 
-        const val TOOL = "aurea-render-bench-android/0.1.4"
+        const val TOOL = "aurea-render-bench-android/0.1.5"
         const val FILAMENT_VERSION = "1.79.0"
         const val ASSET = "showcase.glb"
         const val SCENE_SECONDS = 15.0
@@ -113,6 +113,13 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
     private var reflections: Texture? = null
     private var indirectLight: IndirectLight? = null
     private var skybox: Skybox? = null
+    private var iblContext: IBLPrefilterContext? = null
+    private var iblToCube: IBLPrefilterContext.EquirectangularToCubemap? = null
+    private var iblSpecular: IBLPrefilterContext.SpecularFilter? = null
+    private var cameraRecoveries = 0
+    private var surfaceW = SURFACE_W
+    private var surfaceH = SURFACE_H
+    private var cameraEye = doubleArrayOf(0.0, 0.012, 0.055)
 
     // glTF
     private lateinit var materialProvider: UbershaderProvider
@@ -181,6 +188,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
             stage("setupFilament"); setupFilament()
             stage("loadAssets"); loadAssets()
             stage("buildLighting"); buildLighting()
+            stage("lit cameraOk=${engine.getCameraComponent(cameraEntity)?.nativeObject == camera.nativeObject}")
             buildScene("vitrina", null)
         } catch (t: Throwable) {
             stage("java-exception-init")
@@ -265,6 +273,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
         }
         // Exposure 1.0 so the procedural environment below is used at face value (no physical camera).
         camera.setExposure(1.0f)
+        stage("camera created entity=$cameraEntity")
 
         // Background 0x121110 like the web bench (linear values; tone mapping applies to the skybox).
         skybox = Skybox.Builder().color(0.0060f, 0.0056f, 0.0050f, 1.0f).build(engine)
@@ -291,7 +300,8 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
 
             override fun onResized(width: Int, height: Int) {
                 view.viewport = Viewport(0, 0, width, height)
-                camera.setProjection(35.0, width.toDouble() / height, 0.001, 10.0, Camera.Fov.VERTICAL)
+                surfaceW = width; surfaceH = height
+                applyProjection()
             }
         }
         uiHelper.setDesiredSize(SURFACE_W, SURFACE_H)
@@ -393,7 +403,10 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
         val specular = IBLPrefilterContext.SpecularFilter(ctx)
         val cube = toCube.run(eq)
         val refl = specular.run(cube)
-        toCube.destroy(); specular.destroy(); ctx.destroy()
+        // Kept alive until onDestroy: destroying the context right away destroys entities and
+        // components mid-setup, and on Filament 1.79 the view's camera was later found freed
+        // (SIGSEGV in FView::computeCameraInfo on the Z Flip 7).
+        iblContext = ctx; iblToCube = toCube; iblSpecular = specular
         envCubemap = cube
         reflections = refl
         indirectLight = IndirectLight.Builder().reflections(refl).intensity(1.0f).build(engine)
@@ -434,7 +447,32 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
         currentTriangles = n * (ringTriangles + if (withGem) gemTriangles else 0)
         renderStagePending = "$kind:$n"
         val camZ = if (n > 1) max(0.26, grid * GRID_STEP * 1.9) else 0.055
-        camera.lookAt(0.0, 0.012, camZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+        cameraEye = doubleArrayOf(0.0, 0.012, camZ)
+        applyLookAt()
+    }
+
+    private fun applyProjection() =
+        camera.setProjection(35.0, surfaceW.toDouble() / surfaceH, 0.001, 10.0, Camera.Fov.VERTICAL)
+
+    private fun applyLookAt() =
+        camera.lookAt(cameraEye[0], cameraEye[1], cameraEye[2], 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+
+    /**
+     * Guard for the crash seen on the Z Flip 7: if the engine no longer has our camera component,
+     * rendering would dereference a freed FCamera. Record it and rebuild the camera instead.
+     */
+    private fun ensureCamera() {
+        val live = engine.getCameraComponent(cameraEntity)
+        if (live != null && live.nativeObject == camera.nativeObject) return
+        val em = EntityManager.get()
+        val alive = em.isAlive(cameraEntity)
+        cameraRecoveries++
+        stage("camera-lost alive=$alive component=${live != null} n=$cameraRecoveries")
+        if (!alive) cameraEntity = em.create()
+        camera = live ?: engine.createCamera(cameraEntity)
+        camera.setExposure(1.0f)
+        applyProjection(); applyLookAt()
+        view.camera = camera
     }
 
     /** Same motion as the web bench: rotation.y = t/2400 (t in ms), rotation.x = 0.35 (XYZ order). */
@@ -481,6 +519,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
         spin(frameTimeNanos)
         val sc = swapChain ?: return
         if (!uiHelper.isReadyToRender) return
+        ensureCamera()
         val pendingStage = renderStagePending
         if (pendingStage != null) stage("render:$pendingStage")
         val cpuStart = System.nanoTime()
@@ -646,6 +685,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
             put("sceneSeconds", SCENE_SECONDS)
             put("warmupSeconds", WARMUP_SECONDS)
             put("displayCadenceMs", round2(cadenceMs))
+            put("cameraRecoveries", cameraRecoveries)
             put("results", JSONArray(results))
             put("ramp", JSONObject().apply {
                 put("secondsPerStep", 6)
@@ -742,7 +782,10 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
 
     /** Last step reached, written synchronously so it survives a native abort. */
     private fun stage(name: String) {
-        diagPrefs.edit().putString("stage", name).putLong("stageAt", System.currentTimeMillis()).commit()
+        // Also keep the last few steps, so the report shows how the app got there.
+        val trail = (diagPrefs.getString("trail", "")!!.split(" | ").filter { it.isNotEmpty() } + name).takeLast(10)
+        diagPrefs.edit().putString("stage", name).putString("trail", trail.joinToString(" | "))
+            .putLong("stageAt", System.currentTimeMillis()).commit()
     }
 
     private fun installJavaCrashMarker() {
@@ -786,6 +829,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
             append("motivo=$reason estado=${info.status} hora=${Instant.ofEpochMilli(info.timestamp)}\n")
             append("descripción=${info.description}\n")
             append("última etapa=${diagPrefs.getString("stage", "?")}\n")
+            append("etapas=${diagPrefs.getString("trail", "?")}\n")
             append("dispositivo=${Build.MANUFACTURER} ${Build.MODEL} Android ${Build.VERSION.RELEASE}\n")
             diagPrefs.getString("javaCrash", null)?.let { append("\nJava:\n$it\n") }
             // Some builds report a SIGSEGV as REASON_CRASH, so always try the tombstone.
@@ -896,6 +940,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
         materialProvider.destroy()
         assetLoader.destroy()
         resourceLoader.destroy()
+        iblToCube?.destroy(); iblSpecular?.destroy(); iblContext?.destroy()
         indirectLight?.let { engine.destroyIndirectLight(it) }
         reflections?.let { engine.destroyTexture(it) }
         envCubemap?.let { engine.destroyTexture(it) }
