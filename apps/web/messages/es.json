@@ -41,6 +41,7 @@
     "live": "Se actualiza solo cada 5 segundos.",
     "offline": "Sin conexión: los datos pueden estar desactualizados.",
     "notConfigured": "El panel no está configurado en este equipo. Ejecuta pnpm bootstrap y reinicia la web.",
+    "notStaff": "Este panel es solo para el equipo. Tu cuenta es de cliente: cierra sesión y entra con una cuenta del equipo.",
     "apiDown": "La API no respondió: {detail}",
     "forbidden": "Tu rol no tiene acceso a esta sección.",
     "noSections": "Tu rol no tiene secciones en este panel."

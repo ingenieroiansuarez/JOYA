@@ -41,6 +41,7 @@
     "live": "Refreshes by itself every 5 seconds.",
     "offline": "Offline: data may be out of date.",
     "notConfigured": "The panel is not configured on this machine. Run pnpm bootstrap and restart the web app.",
+    "notStaff": "This panel is for the team only. Your account is a customer account: sign out and sign in with a team account.",
     "apiDown": "The API did not respond: {detail}",
     "forbidden": "Your role has no access to this section.",
     "noSections": "Your role has no sections in this panel."

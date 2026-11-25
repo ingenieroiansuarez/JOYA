@@ -15,6 +15,15 @@ export default async function PanelLayout({ children }: { children: ReactNode })
   if ("notConfigured" in p) {
     return (<><h1>{p.t("panel.title")}</h1><p role="alert" className="notice notice-danger">{p.t("panel.notConfigured")}</p></>);
   }
+  if ("notStaff" in p) {
+    return (
+      <>
+        <h1>{p.t("panel.title")}</h1>
+        <p role="alert" className="notice notice-danger">{p.t("panel.notStaff")}</p>
+        <form method="post" action="/auth/logout"><button type="submit" className="button-quiet">{p.t("panel.logout")}</button></form>
+      </>
+    );
+  }
   if ("error" in p) {
     return (<><h1>{p.t("panel.title")}</h1><p role="alert" className="notice notice-danger">{p.t("panel.apiDown", { detail: p.error })}</p></>);
   }
