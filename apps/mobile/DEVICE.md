@@ -19,7 +19,7 @@ pnpm db:seed:demo                   # catálogo sintético (solo local/ci/demo)
 python -m venv services/geometry/.venv   # activar: services/geometry/.venv/Scripts/Activate.ps1 (Windows)
 pip install -r services/geometry/requirements.lock && pip install --no-deps -e services/geometry
 aurea-geometry-worker               # 127.0.0.1:3910; GET /healthz → {"status":"ok"}
-API_PORT=3900 pnpm api:start        # o el puerto libre que se quiera
+pnpm api:start                      # API_PORT=3900 de .env (pnpm bootstrap lo añade a un .env existente)
 
 adb reverse tcp:$KC_PORT tcp:$KC_PORT
 adb reverse tcp:3900 tcp:3900

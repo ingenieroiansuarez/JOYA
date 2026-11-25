@@ -75,3 +75,10 @@ test("license gate rejects copyleft and unknown licenses", async () => {
   assert.deepEqual(v("(MIT OR"), ["f@1.0.0: (MIT OR"]);
   assert.deepEqual(violations({ "MPL-2.0": [{ name: "lightningcss-x", versions: ["1.0.0"] }] }), ["lightningcss-x@1.0.0: MPL-2.0"]);
 });
+
+test("local env sets the API port and keeps AURA on the rules simulator", () => {
+  const env = parse(localEnv({ apiPort: 3999 }));
+  assert.equal(env.API_PORT, "3999");
+  assert.equal(env.AI_PROVIDER, "simulated");
+  assert.equal(parse(localEnv()).API_PORT, "3900");
+});

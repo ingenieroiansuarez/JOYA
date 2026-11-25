@@ -9,7 +9,7 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const ENV = `${ROOT}.env`;
 export const OIDC_REALM = "aurea-local";
 
-export function localEnv({ pgPort = 5432, valkeyPort = 6379, kcPort = 8080, workerPort = 3910, artifactDir = `${ROOT}.data/artifacts`,
+export function localEnv({ pgPort = 5432, valkeyPort = 6379, kcPort = 8080, workerPort = 3910, apiPort = 3900, artifactDir = `${ROOT}.data/artifacts`,
   random = () => randomBytes(24).toString("hex") } = {}) {
   const pg = random();
   const vk = random();
@@ -34,6 +34,9 @@ export function localEnv({ pgPort = 5432, valkeyPort = 6379, kcPort = 8080, work
     `GEOMETRY_WORKER_SECRET=${random()}`,
     `FILE_URL_SECRET=${random()}`,
     `ARTIFACT_DIR=${artifactDir}`,
+    // Hito 400: API port used by the phone through adb reverse, and AURA by rules (no paid AI service).
+    `API_PORT=${apiPort}`,
+    "AI_PROVIDER=simulated",
     "",
   ].join("\n");
 }
