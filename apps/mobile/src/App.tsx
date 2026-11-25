@@ -1,27 +1,21 @@
 import tokens from "@aurea/tokens";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
-import type { DiscoveryDocument } from "expo-auth-session";
+import { useEffect, useMemo, useReducer } from "react";
+import { BackHandler, Pressable, StatusBar as RNStatusBar, StyleSheet, Text, View } from "react-native";
 import { maybeCompleteAuthSession } from "expo-web-browser";
-import { discover, fetchMe, signIn, signOut, type Me } from "./auth";
-import { canPressSignIn, ensureDiscovery } from "./login";
 import { configFromBuild, ConfigError, type AppConfig } from "./config";
 import { deviceLocale, translator } from "./i18n";
+import { canGoBack, currentRoute, initialNav, navReducer, TABS, type Tab } from "./nav";
+import { CatalogScreen } from "./screens/CatalogScreen";
+import { FavoritesScreen } from "./screens/FavoritesScreen";
+import { ProductScreen } from "./screens/ProductScreen";
+import { ProfileScreen } from "./screens/ProfileScreen";
+import { SessionProvider, useSession } from "./session";
+import { c, s, styles, type } from "./ui";
 
 maybeCompleteAuthSession();
 
-const c = tokens.themes.dark;
-const s = tokens.space;
-
-type State =
-  | { kind: "signedOut" }
-  | { kind: "busy" }
-  | { kind: "failed" }
-  | { kind: "signedIn"; me: Me };
-
 export default function App() {
-  const t = useMemo(() => translator(deviceLocale()), []);
   const config = useMemo<AppConfig | ConfigError>(() => {
     try {
       return configFromBuild();
@@ -29,94 +23,71 @@ export default function App() {
       return e instanceof ConfigError ? e : new ConfigError("invalid configuration");
     }
   }, []);
-  const [discovery, setDiscovery] = useState<DiscoveryDocument | null>(null);
-  const [state, setState] = useState<State>({ kind: "signedOut" });
-
-  useEffect(() => {
-    if (config instanceof ConfigError) return;
-    discover(config).then(setDiscovery, () => setState({ kind: "failed" }));
-  }, [config]);
-
   if (config instanceof ConfigError) {
+    const t = translator(deviceLocale());
     return (
-      <Screen>
+      <View style={[styles.screen, styles.center, { paddingTop: RNStatusBar.currentHeight ?? 0 }]}>
+        <StatusBar style="light" />
         <Text accessibilityRole="alert" style={[styles.body, { color: c.danger }]}>{t("configError")}</Text>
-      </Screen>
+      </View>
     );
   }
-
-  // Discovery is fetched again here when the first attempt failed (offline at launch), so Retry recovers.
-  const login = async () => {
-    setState({ kind: "busy" });
-    try {
-      const doc = await ensureDiscovery(discovery, () => discover(config));
-      if (doc !== discovery) setDiscovery(doc);
-      const session = await signIn(doc);
-      setState(session ? { kind: "signedIn", me: await fetchMe(config, session) } : { kind: "signedOut" });
-    } catch {
-      setState({ kind: "failed" });
-    }
-  };
-
   return (
-    <Screen banner={config.env !== "production" ? t("envBanner", { env: config.env }) : undefined}>
-      <Text accessibilityRole="header" style={styles.title}>{t("welcome")}</Text>
-      {state.kind === "busy" && (
-        <View accessibilityLiveRegion="polite" style={styles.row}>
-          <ActivityIndicator color={c.accent} />
-          <Text style={styles.body}>{t("signingIn")}</Text>
-        </View>
-      )}
-      {state.kind === "failed" && <Text accessibilityRole="alert" style={[styles.body, { color: c.danger }]}>{t("signInFailed")}</Text>}
-      {state.kind === "signedIn" ? (
-        <>
-          <Text style={styles.body}>{t("signedInAs")}</Text>
-          <Text style={styles.muted}>{t("roles", { roles: state.me.roles.join(", ") })}</Text>
-          <Button label={t("signOut")} onPress={async () => { if (discovery) await signOut(discovery); setState({ kind: "signedOut" }); }} />
-        </>
-      ) : (
-        <Button
-          label={state.kind === "failed" ? t("retry") : t("signIn")}
-          disabled={!canPressSignIn(discovery, state)}
-          onPress={login}
-        />
-      )}
-    </Screen>
+    <SessionProvider config={config}>
+      <Shell />
+    </SessionProvider>
   );
 }
 
-function Screen({ children, banner }: { children: React.ReactNode; banner?: string }) {
+const TAB_LABEL = { boutique: "tabBoutique", favorites: "tabFavorites", profile: "tabProfile" } as const;
+
+function Shell() {
+  const { t, config } = useSession();
+  const [nav, dispatch] = useReducer(navReducer, initialNav);
+  const route = currentRoute(nav);
+
+  // Android back: pop inside the app while there is somewhere to go; otherwise let the system close it.
+  useEffect(() => {
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (!canGoBack(nav)) return false;
+      dispatch({ type: "back" });
+      return true;
+    });
+    return () => sub.remove();
+  }, [nav]);
+
+  const open = (id: string) => dispatch({ type: "push", route: { name: "product", id } });
+  const back = () => dispatch({ type: "back" });
+
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { paddingTop: RNStatusBar.currentHeight ?? 0 }]}>
       <StatusBar style="light" />
-      {banner && <Text accessibilityRole="text" style={styles.banner}>{banner}</Text>}
-      <View style={styles.content}>{children}</View>
+      {config.env !== "production" && <Text style={styles.banner}>{t("envBanner", { env: config.env })}</Text>}
+      <View style={{ flex: 1 }}>
+        {route.name === "catalog" && <CatalogScreen onOpen={open} />}
+        {route.name === "favorites" && <FavoritesScreen onOpen={open} onExplore={() => dispatch({ type: "tab", tab: "boutique" })} />}
+        {route.name === "profile" && <ProfileScreen />}
+        {route.name === "product" && <ProductScreen key={route.id} id={route.id} onBack={back} />}
+      </View>
+      <View accessibilityRole="tablist" style={bar.root}>
+        {TABS.map((tab: Tab) => {
+          const selected = nav.tab === tab;
+          return (
+            <Pressable key={tab} accessibilityRole="tab" accessibilityState={{ selected }} accessibilityLabel={t(TAB_LABEL[tab])}
+              onPress={() => dispatch({ type: "tab", tab })} style={bar.tab}>
+              <View style={[bar.mark, selected && { backgroundColor: c.accent }]} />
+              <Text style={[bar.label, selected && { color: c.accent, fontWeight: "600" }]}>{t(TAB_LABEL[tab])}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
 
-function Button({ label, onPress, disabled }: { label: string; onPress: () => void; disabled?: boolean }) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ disabled: !!disabled }}
-      disabled={disabled}
-      onPress={onPress}
-      style={({ pressed }) => [styles.button, (disabled || pressed) && { opacity: 0.6 }]}
-    >
-      <Text style={styles.buttonText}>{label}</Text>
-    </Pressable>
-  );
-}
-
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: c.background },
-  banner: { backgroundColor: c.surface, color: c.warning, paddingHorizontal: s[3], paddingVertical: s[1], paddingTop: s[6] },
-  content: { flex: 1, padding: s[4], gap: s[3], justifyContent: "center" },
-  title: { color: c.text, fontSize: tokens.typography.scale[5], fontWeight: "600" },
-  body: { color: c.text, fontSize: tokens.typography.scale[2] },
-  muted: { color: c.textMuted, fontSize: tokens.typography.scale[2] },
-  row: { flexDirection: "row", gap: s[1], alignItems: "center" },
-  button: { minHeight: tokens.touchTargetDp, borderRadius: tokens.radius[0], backgroundColor: c.accent, alignItems: "center", justifyContent: "center", paddingHorizontal: s[4] },
-  buttonText: { color: c.onAccent, fontSize: tokens.typography.scale[2], fontWeight: "600" },
+const bar = StyleSheet.create({
+  root: { flexDirection: "row", borderTopWidth: StyleSheet.hairlineWidth, borderColor: c.inputBorder, backgroundColor: c.surface, paddingBottom: s[1] },
+  tab: { flex: 1, minHeight: tokens.touchTargetDp + s[2], alignItems: "center", justifyContent: "center", gap: s[0] },
+  mark: { width: 24, height: 3, borderRadius: 2, backgroundColor: "transparent" },
+  label: { color: c.textMuted, fontSize: type[1] },
 });

@@ -2,9 +2,11 @@ import {
   AuthRequest,
   CodeChallengeMethod,
   exchangeCodeAsync,
+  refreshAsync,
   fetchDiscoveryAsync,
   ResponseType,
   revokeAsync,
+  TokenError,
   TokenTypeHint,
   type DiscoveryDocument,
 } from "expo-auth-session";
@@ -33,7 +35,16 @@ export async function discover(config: AppConfig): Promise<DiscoveryDocument> {
 
 export interface Session {
   accessToken: string;
+  /** Epoch ms after which the access token must not be used (5 s early, for clock skew and latency). */
+  expiresAt: number;
 }
+
+function sessionFrom(tokens: { accessToken: string; expiresIn?: number; issuedAt?: number }, now = Date.now()): Session {
+  const lifetimeS = tokens.expiresIn ?? 60;
+  return { accessToken: tokens.accessToken, expiresAt: now + Math.max(0, lifetimeS - 5) * 1000 };
+}
+
+export const isFresh = (session: Session | null, now = Date.now()): session is Session => !!session && now < session.expiresAt;
 
 /**
  * Opens the system browser, then exchanges the code with the verifier. The access token stays in
@@ -47,7 +58,30 @@ export async function signIn(discovery: DiscoveryDocument, request = buildAuthRe
     discovery,
   );
   if (tokens.refreshToken) await SecureStore.setItemAsync(REFRESH_KEY, tokens.refreshToken);
-  return { accessToken: tokens.accessToken };
+  return sessionFrom(tokens);
+}
+
+/**
+ * A new access token from the stored refresh token (rotated by the realm, so the new one replaces it).
+ * Returns null when there is none or the IdP refuses it (expired, revoked): the app is a guest again.
+ * Network failures throw, so the caller can tell "offline" from "signed out".
+ */
+export async function refresh(discovery: DiscoveryDocument): Promise<Session | null> {
+  const stored = await SecureStore.getItemAsync(REFRESH_KEY);
+  if (!stored) return null;
+  let tokens;
+  try {
+    tokens = await refreshAsync({ clientId: CLIENT_ID, refreshToken: stored }, discovery);
+  } catch (err) {
+    // TokenError: the IdP answered with an OAuth error (invalid_grant…). Anything else is the network.
+    if (err instanceof TokenError) {
+      await SecureStore.deleteItemAsync(REFRESH_KEY);
+      return null;
+    }
+    throw err;
+  }
+  if (tokens.refreshToken) await SecureStore.setItemAsync(REFRESH_KEY, tokens.refreshToken);
+  return sessionFrom(tokens);
 }
 
 export async function signOut(discovery: DiscoveryDocument): Promise<void> {
