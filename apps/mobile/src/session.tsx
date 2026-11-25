@@ -60,6 +60,10 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
   // One refresh at a time: the realm rotates refresh tokens with no reuse, so two concurrent refreshes
   // with the same stored token would get one of them refused and sign the customer out.
   const refreshing = useRef<Promise<Session | null> | null>(null);
+  // Whether profile and favorites have been loaded for the current token holder. After a launch
+  // without connection a token can come back before /me answers; until it does, every request retries.
+  const established = useRef(false);
+  const establishing = useRef<Promise<void> | null>(null);
 
   const getDiscovery = useCallback(async () => {
     discovery.current = await ensureDiscovery(discovery.current, () => discover(config));
@@ -73,6 +77,7 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
 
   const becomeGuest = useCallback(() => {
     session.current = null;
+    established.current = false;
     hydrated.current = false;
     setMe(null);
     setOfflineSubject(null);
@@ -96,6 +101,7 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
   const establish = useCallback(async (s: Session) => {
     session.current = s;
     const who = await fetchMe(config, s);
+    established.current = true;
     setMe(who);
     setOfflineSubject(null);
     setStatus("signedIn");
@@ -142,19 +148,24 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
     if (doc) await revoke(doc).catch(() => undefined);
   }, [becomeGuest]);
 
+  // Launched offline and the connection is back: finish signing in (profile, favorites). A failure
+  // here (the API not reachable yet) is retried by the next request instead of leaving a guest.
+  const finishSignIn = useCallback((s: Session) => {
+    if (established.current || establishing.current) return;
+    establishing.current = establish(s).catch(() => undefined).finally(() => { establishing.current = null; });
+  }, [establish]);
+
   const token = useCallback(async (): Promise<string> => {
-    if (isFresh(session.current)) return session.current.accessToken;
+    if (isFresh(session.current)) { finishSignIn(session.current); return session.current.accessToken; }
     const s = await refreshOnce().catch(() => { throw new ApiError("offline"); });
     if (!s) {
       becomeGuest();
       throw new ApiError("unauthenticated");
     }
-    const restoring = !session.current;
     session.current = s;
-    // Launched offline and the connection is back: finish signing in (profile, favorites).
-    if (restoring) establish(s).catch(() => undefined);
+    finishSignIn(s);
     return s.accessToken;
-  }, [refreshOnce, becomeGuest, establish]);
+  }, [refreshOnce, becomeGuest, finishSignIn]);
 
   const withToken = useCallback(async <T,>(fn: (token: string) => Promise<T>): Promise<T> => {
     try {
