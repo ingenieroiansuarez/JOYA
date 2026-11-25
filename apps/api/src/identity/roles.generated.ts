@@ -42,6 +42,7 @@ export const ROLE_GRANTS: Readonly<Record<string, readonly string[]>> = {
     "identity.self",
     "notification.read",
     "order.read",
+    "pricing.internal",
     "project.edit",
     "project.read",
     "quote.issue",
@@ -96,7 +97,8 @@ export const ROLE_GRANTS: Readonly<Record<string, readonly string[]>> = {
     "identity.self",
     "notification.read",
     "payment.read",
-    "payment.refund"
+    "payment.refund",
+    "pricing.internal"
   ],
   "buyer": [
     "identity.self",
@@ -133,7 +135,8 @@ export const ROLE_GRANTS: Readonly<Record<string, readonly string[]>> = {
     "finance.read",
     "identity.self",
     "notification.read",
-    "organization.admin"
+    "organization.admin",
+    "pricing.internal"
   ],
   "auditor": [
     "audit.read",
@@ -187,7 +190,8 @@ export const SCOPES: Readonly<Record<string, Readonly<Record<string, string>>>> 
     "document.read": "assigned",
     "project.edit": "shared",
     "notification.read": "own",
-    "identity.self": "self"
+    "identity.self": "self",
+    "pricing.internal": "assigned"
   },
   "designer": {
     "project.read": "assigned",
@@ -238,7 +242,8 @@ export const SCOPES: Readonly<Record<string, Readonly<Record<string, string>>>> 
     "payment.read": "organization",
     "payment.refund": "organization",
     "notification.read": "own",
-    "identity.self": "self"
+    "identity.self": "self",
+    "pricing.internal": "organization"
   },
   "buyer": {
     "procurement.write": "organization",
@@ -275,7 +280,8 @@ export const SCOPES: Readonly<Record<string, Readonly<Record<string, string>>>> 
     "finance.read": "organization",
     "organization.admin": "organization",
     "notification.read": "own",
-    "identity.self": "self"
+    "identity.self": "self",
+    "pricing.internal": "organization"
   },
   "auditor": {
     "audit.read": "organization",

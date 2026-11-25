@@ -67,3 +67,19 @@ test("seed is idempotent and exact", { skip }, async () => {
   const [draft] = await query("SELECT published_at FROM aurea.product WHERE sku='AUR-RNG-099'");
   assert.equal(draft.published_at, null);
 });
+
+test("demo stock is seeded once with its RECEIPT movement and is never reset", { skip }, async () => {
+  await seedDemo(url(), "ci");
+  const lots = await query("SELECT id, on_hand::text, reserved::text, demo FROM aurea.stock_lot ORDER BY id");
+  assert.equal(lots.length, 5);
+  assert.ok(lots.every((l) => l.demo && l.reserved === "0.000000"));
+  // A stockkeeper's adjustment survives a re-run of the seed.
+  const lot = "8b0f6a52-5c1e-5d0a-9a51-0d4c8a5e1001";
+  await query("UPDATE aurea.stock_lot SET on_hand = on_hand - 1 WHERE id = $1", [lot]);
+  await seedDemo(url(), "ci");
+  const [after] = await query("SELECT on_hand::text FROM aurea.stock_lot WHERE id = $1", [lot]);
+  assert.equal(after.on_hand, "29.000000");
+  const moves = await query("SELECT kind, quantity_delta::text, on_hand_after::text FROM aurea.stock_movement WHERE lot_id = $1", [lot]);
+  assert.deepEqual(moves, [{ kind: "RECEIPT", quantity_delta: "30.000000", on_hand_after: "30.000000" }]);
+  await assert.rejects(query("UPDATE aurea.stock_movement SET reason = 'x'"), /append-only/);
+});

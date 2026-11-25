@@ -47,7 +47,8 @@
       "document.read",
       "project.edit",
       "notification.read",
-      "identity.self"
+      "identity.self",
+      "pricing.internal"
     ],
     "designer": [
       "project.read",
@@ -98,7 +99,8 @@
       "payment.read",
       "payment.refund",
       "notification.read",
-      "identity.self"
+      "identity.self",
+      "pricing.internal"
     ],
     "buyer": [
       "procurement.write",
@@ -135,7 +137,8 @@
       "finance.read",
       "organization.admin",
       "notification.read",
-      "identity.self"
+      "identity.self",
+      "pricing.internal"
     ],
     "auditor": [
       "audit.read",
@@ -189,7 +192,8 @@
       "document.read": "assigned",
       "project.edit": "shared",
       "notification.read": "own",
-      "identity.self": "self"
+      "identity.self": "self",
+      "pricing.internal": "assigned"
     },
     "designer": {
       "project.read": "assigned",
@@ -240,7 +244,8 @@
       "payment.read": "organization",
       "payment.refund": "organization",
       "notification.read": "own",
-      "identity.self": "self"
+      "identity.self": "self",
+      "pricing.internal": "organization"
     },
     "buyer": {
       "procurement.write": "organization",
@@ -277,7 +282,8 @@
       "finance.read": "organization",
       "organization.admin": "organization",
       "notification.read": "own",
-      "identity.self": "self"
+      "identity.self": "self",
+      "pricing.internal": "organization"
     },
     "auditor": {
       "audit.read": "organization",

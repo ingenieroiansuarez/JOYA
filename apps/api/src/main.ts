@@ -5,6 +5,7 @@ import { createVerifier } from "./identity/verifier";
 import { createPool } from "./database";
 import { loadDesignConfig } from "./design/config";
 import { loadAiConfig } from "./ai/config";
+import { loadCommerceConfig } from "./commerce/config";
 import { SimulatedAdapter } from "./ai/simulator";
 import { JobRunner } from "./design/jobs";
 import { ArtifactStore } from "./design/store";
@@ -16,6 +17,7 @@ async function main() {
     config = loadConfig();
     config.design = loadDesignConfig(process.env, config.env);
     config.ai = { config: loadAiConfig(process.env, config.env), adapter: new SimulatedAdapter() };
+    config.commerce = loadCommerceConfig(process.env, config.env);
   } catch (err) {
     if (err instanceof ConfigError) {
       console.error(`refusing to start: ${err.message}`);

@@ -3,6 +3,9 @@ import { APP_FILTER, APP_GUARD } from "@nestjs/core";
 import type { Pool } from "pg";
 import { AI_RUNTIME, AiController, type AiRuntime } from "./ai/ai.controller";
 import { CatalogController } from "./catalog/catalog.controller";
+import type { CommerceConfig } from "./commerce/config";
+import { InventoryController, OrdersController, PaymentsController } from "./commerce/orders.controller";
+import { COMMERCE_CONFIG, QuotesController } from "./commerce/quotes.controller";
 import { FavoritesController } from "./catalog/favorites.controller";
 import type { Config } from "./config";
 import { createPool, DATABASE } from "./database";
@@ -32,12 +35,14 @@ export class AppModule implements OnApplicationShutdown {
       module: AppModule,
       controllers: [
         HealthController, MeController, CatalogController, FavoritesController,
-        FamiliesController, ProjectsController, JobsController, FilesController, SyncController, AiController, ...extra,
+        FamiliesController, ProjectsController, JobsController, FilesController, SyncController, AiController,
+        QuotesController, OrdersController, PaymentsController, InventoryController, ...extra,
       ],
       providers: [
         { provide: "CONFIG", useValue: config },
         { provide: DESIGN_CONFIG, useValue: (config as Config & { design?: DesignConfig }).design ?? null },
         { provide: AI_RUNTIME, useValue: (config as Config & { ai?: AiRuntime }).ai ?? null },
+        { provide: COMMERCE_CONFIG, useValue: (config as Config & { commerce?: CommerceConfig }).commerce ?? null },
         { provide: DATABASE, useValue: pool ?? createPool(config) },
         { provide: PROBES, useValue: probes },
         { provide: TOKEN_VERIFIER, useValue: verifier },

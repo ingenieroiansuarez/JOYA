@@ -315,6 +315,69 @@
       "http": 409,
       "use": "error",
       "description": "La propuesta de AURA venció; hay que pedir propuestas de nuevo sobre la revisión actual."
+    },
+    {
+      "code": "GEOMETRY_REQUIRED",
+      "http": 422,
+      "use": "error",
+      "description": "La revisión no tiene geometría SUCCEEDED (vista previa o exportación de ese mismo diseño); hay que generarla antes de cotizar."
+    },
+    {
+      "code": "DFM_BLOCKED",
+      "http": 422,
+      "use": "error",
+      "description": "El DFM de la revisión es FAIL o BLOCK: no se cotiza."
+    },
+    {
+      "code": "PRICE_CHANGED",
+      "http": 409,
+      "use": "error",
+      "description": "Las reglas o tarifas cambiaron desde que el asesor revisó el borrador; el borrador se re-preció y hay que revisarlo de nuevo."
+    },
+    {
+      "code": "INSUFFICIENT_STOCK",
+      "http": 409,
+      "use": "error",
+      "description": "No hay material disponible suficiente en un lote (o el ajuste dejaría la existencia por debajo de lo reservado); no cambió nada."
+    },
+    {
+      "code": "PAYMENT_IN_PROGRESS",
+      "http": 409,
+      "use": "error",
+      "description": "El pedido ya tiene un anticipo pendiente o en proceso; no se crea otro."
+    },
+    {
+      "code": "ALREADY_PAID",
+      "http": 409,
+      "use": "error",
+      "description": "El anticipo del pedido ya está confirmado."
+    },
+    {
+      "code": "AMOUNT_MISMATCH",
+      "http": 422,
+      "use": "error",
+      "description": "El importe o la moneda no coinciden exactamente con lo que corresponde."
+    },
+    {
+      "code": "INVALID_SIGNATURE",
+      "http": 401,
+      "use": "error",
+      "description": "Webhook de proveedor sin firma válida o fuera de la ventana de tiempo."
+    },
+    {
+      "code": "UNPRICED_MATERIAL",
+      "use": "detail",
+      "description": "Las reglas de precio no tienen tarifa para la aleación del componente."
+    },
+    {
+      "code": "UNPRICED_FAMILY",
+      "use": "detail",
+      "description": "Las reglas de precio no tienen mano de obra para la familia del componente."
+    },
+    {
+      "code": "GEOMETRY_MISMATCH",
+      "use": "detail",
+      "description": "La evidencia de geometría no corresponde al componente (familia o aleación)."
     }
   ]
 }

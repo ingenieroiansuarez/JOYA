@@ -8,6 +8,7 @@ import { redact } from "./migrate.mjs";
 
 export const SEED_ENVIRONMENTS = ["local", "ci", "demo"];
 export const DEMO_CATALOG = fileURLToPath(new URL("../seed/demo-catalog.json", import.meta.url));
+export const DEMO_STOCK = fileURLToPath(new URL("../seed/demo-stock.json", import.meta.url));
 
 const DECIMAL_RE = /^\d+(\.\d{1,6})?$/;
 // Exact decimal strings only: a JS number (0.25) would be accepted by the regex after coercion.
@@ -37,12 +38,29 @@ export function validateCatalog(doc) {
   return doc.products;
 }
 
-export async function seedDemo(url, env, file = DEMO_CATALOG) {
+/** Demo stock (hito 500): one location and metal lots. Throws on the first problem. */
+export function validateStock(doc) {
+  if (doc?.synthetic !== true) throw new Error("stock file must declare synthetic: true");
+  if (!doc.location?.id || !doc.location?.name) throw new Error("stock file needs a location");
+  const seen = new Set();
+  for (const l of doc.lots ?? []) {
+    if (seen.has(l.id)) throw new Error(`lot ${l.id}: duplicate id`);
+    seen.add(l.id);
+    if (!["g", "ct", "ea"].includes(l.unit)) throw new Error(`lot ${l.id}: unit must be g, ct or ea`);
+    if (!DECIMAL.test(l.onHand)) throw new Error(`lot ${l.id}: onHand must be a decimal string`);
+    if (!l.itemKey || !l.label) throw new Error(`lot ${l.id}: itemKey and label are required`);
+  }
+  if (seen.size === 0) throw new Error("stock file has no lots");
+  return doc;
+}
+
+export async function seedDemo(url, env, file = DEMO_CATALOG, stockFile = DEMO_STOCK) {
   if (!SEED_ENVIRONMENTS.includes(env)) {
     throw new Error(`refusing to seed demo data with AUREA_ENV=${env ?? "<unset>"} (allowed: ${SEED_ENVIRONMENTS.join(", ")})`);
   }
   if (!url) throw new Error("DATABASE_URL is not set; refusing to guess a database");
   const products = validateCatalog(JSON.parse(readFileSync(file, "utf8")));
+  const stock = validateStock(JSON.parse(readFileSync(stockFile, "utf8")));
   const client = new pg.Client({ connectionString: url });
   await client.connect();
   try {
@@ -59,6 +77,22 @@ export async function seedDemo(url, env, file = DEMO_CATALOG) {
           p.price.currency, p.price.amount, p.available, p.customizable, p.published],
       );
     }
+    // Stock: a lot is created once with its RECEIPT movement (the ledger is append-only); a re-run
+    // never resets quantities that orders have since reserved or that a stockkeeper adjusted.
+    const loc = stock.location;
+    await client.query(
+      "INSERT INTO aurea.location(id, name, kind) VALUES ($1,$2,$3) ON CONFLICT (id) DO UPDATE SET name=$2, kind=$3",
+      [loc.id, loc.name, loc.kind]);
+    for (const l of stock.lots) {
+      const ins = await client.query(
+        `INSERT INTO aurea.stock_lot(id, location_id, item_key, unit, on_hand, label, demo) VALUES ($1,$2,$3,$4,$5,$6,true)
+         ON CONFLICT (id) DO NOTHING`, [l.id, loc.id, l.itemKey, l.unit, l.onHand, l.label]);
+      if (ins.rowCount) {
+        await client.query(
+          `INSERT INTO aurea.stock_movement(id, lot_id, quantity_delta, actor, reason, kind, on_hand_after)
+           VALUES (gen_random_uuid(), $1, $2, 'seed:demo', 'Existencia inicial sintética (demo)', 'RECEIPT', $2)`, [l.id, l.onHand]);
+      }
+    }
     await client.query("COMMIT");
     return products.length;
   } catch (err) {
@@ -73,7 +107,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const url = process.env.DATABASE_URL;
   try {
     const n = await seedDemo(url, process.env.AUREA_ENV);
-    console.log(`demo catalog: ${n} synthetic products upserted into ${redact(url)}`);
+    console.log(`demo catalog: ${n} synthetic products and the synthetic demo stock upserted into ${redact(url)}`);
   } catch (err) {
     console.error(`demo seed failed: ${err.message}`);
     process.exitCode = 1;

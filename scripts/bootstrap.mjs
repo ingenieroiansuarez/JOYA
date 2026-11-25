@@ -34,6 +34,12 @@ export function localEnv({ pgPort = 5432, valkeyPort = 6379, kcPort = 8080, work
     `GEOMETRY_WORKER_SECRET=${random()}`,
     `FILE_URL_SECRET=${random()}`,
     `ARTIFACT_DIR=${artifactDir}`,
+    // Hito 500: simulated payment provider (no money moves) and the web panel's OIDC client and staff user.
+    "PAYMENT_PROVIDER=simulated",
+    `PAYMENT_WEBHOOK_SECRET=${random()}`,
+    `KC_WEB_CLIENT_SECRET=${random()}`,
+    `KC_DEV_STAFF_PASSWORD=${random()}`,
+    `WEB_SESSION_SECRET=${random()}`,
     // Hito 400: API port used by the phone through adb reverse, and AURA by rules (no paid AI service).
     `API_PORT=${apiPort}`,
     "AI_PROVIDER=simulated",
