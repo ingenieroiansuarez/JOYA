@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectId": "00000000-0000-4000-8000-000000000002",
+  "revision": 1,
+  "units": "mm",
+  "components": [
+    {
+      "id": "pendant-base",
+      "family": "pendant.01",
+      "familyVersion": "0.1.0",
+      "materialId": "gold-18k-yellow",
+      "parameters": {
+        "width": 20,
+        "height": 25,
+        "thickness": 2
+      },
+      "transform": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationQuaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "dependsOn": []
+    }
+  ],
+  "operations": [],
+  "constraints": [
+    {
+      "type": "min_wall",
+      "target": "pendant-base",
+      "parameters": {
+        "minMm": 1.2
+      }
+    }
+  ]
+}

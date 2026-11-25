@@ -6,3 +6,7 @@
 *.tfstate*
 .terraform/
 node_modules/
+*.egg-info/
+.pytest_cache/
+.venv/
+services/geometry/out/

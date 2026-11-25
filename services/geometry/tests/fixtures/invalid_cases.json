@@ -1,0 +1,446 @@
+{
+  "out_of_range": {
+    "expectedCode": "OUT_OF_RANGE",
+    "document": {
+      "schemaVersion": "1.0.0",
+      "projectId": "00000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "units": "mm",
+      "components": [
+        {
+          "id": "ring-base",
+          "family": "ring.classic",
+          "familyVersion": "0.1.0",
+          "materialId": "gold-18k-yellow",
+          "parameters": {
+            "innerDiameter": 40,
+            "bandWidth": 4,
+            "radialThickness": 1.8
+          },
+          "transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationQuaternion": [
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "dependsOn": []
+        }
+      ],
+      "operations": [],
+      "constraints": [
+        {
+          "type": "min_wall",
+          "target": "ring-base",
+          "parameters": {
+            "minMm": 1.2
+          }
+        }
+      ]
+    }
+  },
+  "unknown_parameter": {
+    "expectedCode": "UNKNOWN_PARAMETER",
+    "document": {
+      "schemaVersion": "1.0.0",
+      "projectId": "00000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "units": "mm",
+      "components": [
+        {
+          "id": "ring-base",
+          "family": "ring.classic",
+          "familyVersion": "0.1.0",
+          "materialId": "gold-18k-yellow",
+          "parameters": {
+            "innerDiameter": 18,
+            "bandWidth": 4,
+            "radialThickness": 1.8,
+            "engraving": 1
+          },
+          "transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationQuaternion": [
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "dependsOn": []
+        }
+      ],
+      "operations": [],
+      "constraints": [
+        {
+          "type": "min_wall",
+          "target": "ring-base",
+          "parameters": {
+            "minMm": 1.2
+          }
+        }
+      ]
+    }
+  },
+  "unknown_family": {
+    "expectedCode": "UNKNOWN_FAMILY",
+    "document": {
+      "schemaVersion": "1.0.0",
+      "projectId": "00000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "units": "mm",
+      "components": [
+        {
+          "id": "ring-base",
+          "family": "ring.dragon",
+          "familyVersion": "0.1.0",
+          "materialId": "gold-18k-yellow",
+          "parameters": {
+            "innerDiameter": 18,
+            "bandWidth": 4,
+            "radialThickness": 1.8
+          },
+          "transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationQuaternion": [
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "dependsOn": []
+        }
+      ],
+      "operations": [],
+      "constraints": [
+        {
+          "type": "min_wall",
+          "target": "ring-base",
+          "parameters": {
+            "minMm": 1.2
+          }
+        }
+      ]
+    }
+  },
+  "string_parameter": {
+    "expectedCode": "NOT_A_NUMBER",
+    "document": {
+      "schemaVersion": "1.0.0",
+      "projectId": "00000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "units": "mm",
+      "components": [
+        {
+          "id": "ring-base",
+          "family": "ring.classic",
+          "familyVersion": "0.1.0",
+          "materialId": "gold-18k-yellow",
+          "parameters": {
+            "innerDiameter": 18,
+            "bandWidth": "4",
+            "radialThickness": 1.8
+          },
+          "transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationQuaternion": [
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "dependsOn": []
+        }
+      ],
+      "operations": [],
+      "constraints": [
+        {
+          "type": "min_wall",
+          "target": "ring-base",
+          "parameters": {
+            "minMm": 1.2
+          }
+        }
+      ]
+    }
+  },
+  "wrong_units": {
+    "expectedCode": "SCHEMA",
+    "document": {
+      "schemaVersion": "1.0.0",
+      "projectId": "00000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "units": "in",
+      "components": [
+        {
+          "id": "ring-base",
+          "family": "ring.classic",
+          "familyVersion": "0.1.0",
+          "materialId": "gold-18k-yellow",
+          "parameters": {
+            "innerDiameter": 18,
+            "bandWidth": 4,
+            "radialThickness": 1.8
+          },
+          "transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationQuaternion": [
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "dependsOn": []
+        }
+      ],
+      "operations": [],
+      "constraints": [
+        {
+          "type": "min_wall",
+          "target": "ring-base",
+          "parameters": {
+            "minMm": 1.2
+          }
+        }
+      ]
+    }
+  },
+  "dependency_cycle": {
+    "expectedCode": "DEPENDENCY_CYCLE",
+    "document": {
+      "schemaVersion": "1.0.0",
+      "projectId": "00000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "units": "mm",
+      "components": [
+        {
+          "id": "ring-base",
+          "family": "ring.classic",
+          "familyVersion": "0.1.0",
+          "materialId": "gold-18k-yellow",
+          "parameters": {
+            "innerDiameter": 18,
+            "bandWidth": 4,
+            "radialThickness": 1.8
+          },
+          "transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationQuaternion": [
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "dependsOn": [
+            "ring-b"
+          ]
+        },
+        {
+          "id": "ring-b",
+          "family": "ring.classic",
+          "familyVersion": "0.1.0",
+          "materialId": "gold-18k-yellow",
+          "parameters": {
+            "innerDiameter": 18,
+            "bandWidth": 4,
+            "radialThickness": 1.8
+          },
+          "transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationQuaternion": [
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "dependsOn": [
+            "ring-base"
+          ]
+        }
+      ],
+      "operations": [],
+      "constraints": [
+        {
+          "type": "min_wall",
+          "target": "ring-base",
+          "parameters": {
+            "minMm": 1.2
+          }
+        }
+      ]
+    }
+  },
+  "quaternion": {
+    "expectedCode": "QUATERNION_NOT_NORMALIZED",
+    "document": {
+      "schemaVersion": "1.0.0",
+      "projectId": "00000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "units": "mm",
+      "components": [
+        {
+          "id": "ring-base",
+          "family": "ring.classic",
+          "familyVersion": "0.1.0",
+          "materialId": "gold-18k-yellow",
+          "parameters": {
+            "innerDiameter": 18,
+            "bandWidth": 4,
+            "radialThickness": 1.8
+          },
+          "transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationQuaternion": [
+              0,
+              0,
+              0,
+              2
+            ]
+          },
+          "dependsOn": []
+        }
+      ],
+      "operations": [],
+      "constraints": [
+        {
+          "type": "min_wall",
+          "target": "ring-base",
+          "parameters": {
+            "minMm": 1.2
+          }
+        }
+      ]
+    }
+  },
+  "family_version": {
+    "expectedCode": "UNSUPPORTED_FAMILY_VERSION",
+    "document": {
+      "schemaVersion": "1.0.0",
+      "projectId": "00000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "units": "mm",
+      "components": [
+        {
+          "id": "ring-base",
+          "family": "ring.classic",
+          "familyVersion": "9.9.9",
+          "materialId": "gold-18k-yellow",
+          "parameters": {
+            "innerDiameter": 18,
+            "bandWidth": 4,
+            "radialThickness": 1.8
+          },
+          "transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationQuaternion": [
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "dependsOn": []
+        }
+      ],
+      "operations": [],
+      "constraints": [
+        {
+          "type": "min_wall",
+          "target": "ring-base",
+          "parameters": {
+            "minMm": 1.2
+          }
+        }
+      ]
+    }
+  },
+  "path_traversal_id": {
+    "expectedCode": "INVALID_ID",
+    "document": {
+      "schemaVersion": "1.0.0",
+      "projectId": "00000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "units": "mm",
+      "components": [
+        {
+          "id": "../../etc/x",
+          "family": "ring.classic",
+          "familyVersion": "0.1.0",
+          "materialId": "gold-18k-yellow",
+          "parameters": {
+            "innerDiameter": 18,
+            "bandWidth": 4,
+            "radialThickness": 1.8
+          },
+          "transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationQuaternion": [
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "dependsOn": []
+        }
+      ],
+      "operations": [],
+      "constraints": [
+        {
+          "type": "min_wall",
+          "target": "../../etc/x",
+          "parameters": {
+            "minMm": 1.2
+          }
+        }
+      ]
+    }
+  }
+}

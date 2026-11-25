@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectId": "00000000-0000-4000-8000-000000000001",
+  "revision": 1,
+  "units": "mm",
+  "components": [
+    {
+      "id": "ring-base",
+      "family": "ring.classic",
+      "familyVersion": "0.1.0",
+      "materialId": "gold-18k-yellow",
+      "parameters": {
+        "innerDiameter": 18,
+        "bandWidth": 4,
+        "radialThickness": 0.9
+      },
+      "transform": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationQuaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "dependsOn": []
+    }
+  ],
+  "operations": [],
+  "constraints": [
+    {
+      "type": "min_wall",
+      "target": "ring-base",
+      "parameters": {
+        "minMm": 1.2
+      }
+    }
+  ]
+}
