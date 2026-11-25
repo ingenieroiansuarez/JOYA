@@ -73,9 +73,10 @@ corepack enable            # pnpm 10.28.0 desde packageManager; Node 22.23.5 (.n
 pnpm install --frozen-lockfile
 pnpm bootstrap             # crea .env (ignorado por git) con contraseñas aleatorias; no las imprime
 docker compose up -d --wait   # PostgreSQL 16.15 y Valkey 8.1.4, fijados por digest, solo en 127.0.0.1
-set -a && . ./.env && set +a && pnpm db:migrate
+pnpm db:migrate             # lee .env
 TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # 5 pruebas
 ```
+- `pnpm db:migrate` carga `.env` si existe (`node --env-file-if-exists`); un `DATABASE_URL` exportado tiene prioridad.
 - Migraciones en `packages/db/migrations` (Drizzle migrator sobre SQL plano, esquema `aurea_migrations`). La prueba crea dos bases nuevas, aplica las migraciones a una y `05_DATABASE/core_reference.sql` a la otra, y exige el mismo catálogo: columnas, restricciones e índices. Una migración alterada hace fallar la prueba (verificado).
 - Migrar dos veces no hace nada. Sin `DATABASE_URL` falla cerrado.
 - Política: una migración que ya está en main no se edita, se añade otra (CI lo bloquea). Roll-forward: no hay down migrations; un cambio se corrige con una migración nueva compatible. Cada migración actualiza también `core_reference.sql`, del que leen los verificadores de contratos.

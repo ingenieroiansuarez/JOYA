@@ -5,7 +5,7 @@
   "type": "module",
   "description": "PostgreSQL migrations for AUREA (Drizzle migrator over plain SQL).",
   "scripts": {
-    "migrate": "node src/migrate.mjs",
+    "migrate": "node --env-file-if-exists=../../.env src/migrate.mjs",
     "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
