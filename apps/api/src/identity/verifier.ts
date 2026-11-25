@@ -16,7 +16,7 @@ export class VerifierUnavailable extends Error {}
 
 /** Reads jwks_uri from the issuer's discovery document, so the API is not tied to one IdP. */
 async function discoverJwksUri(issuer: string): Promise<URL> {
-  const res = await fetch(`${issuer}/.well-known/openid-configuration`, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+  const res = await fetch(`${issuer.replace(/\/$/, "")}/.well-known/openid-configuration`, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
   if (!res.ok) throw new VerifierUnavailable(`discovery answered ${res.status}`);
   const doc = (await res.json()) as { issuer?: string; jwks_uri?: string };
   if (doc.issuer !== issuer || !doc.jwks_uri) throw new VerifierUnavailable("discovery issuer mismatch or no jwks_uri");
