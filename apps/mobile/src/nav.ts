@@ -1,13 +1,17 @@
-// A small navigator: three tabs, each with its own stack. Pure reducer so back behaviour is testable;
+// A small navigator: four tabs, each with its own stack. Pure reducer so back behaviour is testable;
 // Android's back button pops the current tab's stack, then returns to the Boutique tab, then exits.
-export type Tab = "boutique" | "favorites" | "profile";
-export const TABS: Tab[] = ["boutique", "favorites", "profile"];
-export type Route = { name: "catalog" } | { name: "favorites" } | { name: "profile" } | { name: "product"; id: string };
+export type Tab = "boutique" | "design" | "favorites" | "profile";
+export const TABS: Tab[] = ["boutique", "design", "favorites", "profile"];
+export type Route =
+  | { name: "catalog" } | { name: "favorites" } | { name: "profile" } | { name: "product"; id: string }
+  | { name: "designs" } | { name: "newDesign" } | { name: "editor"; id: string };
 export interface NavState { tab: Tab; stacks: Record<Tab, Route[]> }
-export type NavAction = { type: "tab"; tab: Tab } | { type: "push"; route: Route } | { type: "back" };
+export type NavAction = { type: "tab"; tab: Tab } | { type: "push"; route: Route } | { type: "replace"; route: Route } | { type: "back" };
 
-const ROOT: Record<Tab, Route> = { boutique: { name: "catalog" }, favorites: { name: "favorites" }, profile: { name: "profile" } };
-export const initialNav: NavState = { tab: "boutique", stacks: { boutique: [ROOT.boutique], favorites: [ROOT.favorites], profile: [ROOT.profile] } };
+const ROOT: Record<Tab, Route> = { boutique: { name: "catalog" }, design: { name: "designs" }, favorites: { name: "favorites" }, profile: { name: "profile" } };
+export const initialNav: NavState = {
+  tab: "boutique", stacks: { boutique: [ROOT.boutique], design: [ROOT.design], favorites: [ROOT.favorites], profile: [ROOT.profile] },
+};
 
 export function navReducer(state: NavState, action: NavAction): NavState {
   switch (action.type) {
@@ -15,6 +19,8 @@ export function navReducer(state: NavState, action: NavAction): NavState {
       // Tapping the current tab again returns it to its root, as platform tab bars do.
       if (action.tab === state.tab) return { ...state, stacks: { ...state.stacks, [state.tab]: [ROOT[state.tab]] } };
       return { ...state, tab: action.tab };
+    case "replace": // e.g. the new-design form becomes the editor, so back does not reopen the form
+      return { ...state, stacks: { ...state.stacks, [state.tab]: [...state.stacks[state.tab].slice(0, -1), action.route] } };
     case "push":
       return { ...state, stacks: { ...state.stacks, [state.tab]: [...state.stacks[state.tab], action.route] } };
     case "back": {

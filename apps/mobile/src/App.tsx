@@ -7,8 +7,12 @@ import { maybeCompleteAuthSession } from "expo-web-browser";
 import { configFromBuild, ConfigError, type AppConfig } from "./config";
 import { deviceLocale, translator } from "./i18n";
 import { canGoBack, currentRoute, initialNav, navReducer, TABS, type Tab } from "./nav";
+import { DesignProvider } from "./design/DesignContext";
 import { CatalogScreen } from "./screens/CatalogScreen";
+import { DesignsScreen } from "./screens/DesignsScreen";
+import { EditorScreen } from "./screens/EditorScreen";
 import { FavoritesScreen } from "./screens/FavoritesScreen";
+import { NewDesignScreen } from "./screens/NewDesignScreen";
 import { ProductScreen } from "./screens/ProductScreen";
 import { ProfileScreen } from "./screens/ProfileScreen";
 import { SessionProvider, useSession } from "./session";
@@ -32,7 +36,9 @@ export default function App() {
         <ConfigErrorScreen />
       ) : (
         <SessionProvider config={config}>
-          <Shell />
+          <DesignProvider>
+            <Shell />
+          </DesignProvider>
         </SessionProvider>
       )}
     </SafeAreaProvider>
@@ -50,7 +56,7 @@ function ConfigErrorScreen() {
   );
 }
 
-const TAB_LABEL = { boutique: "tabBoutique", favorites: "tabFavorites", profile: "tabProfile" } as const;
+const TAB_LABEL = { boutique: "tabBoutique", design: "tabDesign", favorites: "tabFavorites", profile: "tabProfile" } as const;
 
 function Shell() {
   const { t, config } = useSession();
@@ -80,6 +86,14 @@ function Shell() {
         {route.name === "favorites" && <FavoritesScreen onOpen={open} onExplore={() => dispatch({ type: "tab", tab: "boutique" })} />}
         {route.name === "profile" && <ProfileScreen />}
         {route.name === "product" && <ProductScreen key={route.id} id={route.id} onBack={back} />}
+        {route.name === "designs" && (
+          <DesignsScreen onOpen={(id) => dispatch({ type: "push", route: { name: "editor", id } })}
+            onNew={() => dispatch({ type: "push", route: { name: "newDesign" } })} />
+        )}
+        {route.name === "newDesign" && (
+          <NewDesignScreen onBack={back} onCreated={(id) => dispatch({ type: "replace", route: { name: "editor", id } })} />
+        )}
+        {route.name === "editor" && <EditorScreen key={route.id} id={route.id} onBack={back} />}
       </View>
       <View accessibilityRole="tablist" style={[bar.root, { paddingBottom: insets.bottom + s[1] }]}>
         {TABS.map((tab: Tab) => {

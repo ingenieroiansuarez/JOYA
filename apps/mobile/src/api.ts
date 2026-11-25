@@ -16,10 +16,13 @@ export interface Product extends ProductSummary {
 }
 export interface ProductPage { items: ProductSummary[]; nextCursor: string | null }
 
-export type ApiErrorKind = "offline" | "unavailable" | "notFound" | "unauthenticated" | "forbidden" | "invalid" | "unexpected";
+export type ApiErrorKind =
+  | "offline" | "unavailable" | "notFound" | "unauthenticated" | "forbidden" | "invalid" | "conflict" | "rejected" | "unexpected";
+export interface ErrorDetail { code: string; pointer?: string; message: string }
 export class ApiError extends Error {
-  constructor(readonly kind: ApiErrorKind, readonly status?: number) {
-    super(`api ${kind}${status ? ` ${status}` : ""}`);
+  /** `code` and `details` come from the API's Error body (06_API_CONTRACTS/errors.json) when it sent one. */
+  constructor(readonly kind: ApiErrorKind, readonly status?: number, readonly code?: string, readonly details: ErrorDetail[] = []) {
+    super(`api ${kind}${status ? ` ${status}` : ""}${code ? ` ${code}` : ""}`);
   }
 }
 
@@ -28,6 +31,8 @@ export function kindFor(status: number): ApiErrorKind {
   if (status === 403) return "forbidden";
   if (status === 404) return "notFound";
   if (status === 400) return "invalid";
+  if (status === 409) return "conflict";
+  if (status === 422) return "rejected";
   if (status === 429 || status === 503 || status === 502 || status === 504) return "unavailable";
   return "unexpected";
 }
@@ -39,19 +44,33 @@ export class Api {
   constructor(private readonly config: AppConfig, private readonly locale: Locale, private readonly fetchImpl: Fetch = fetch) {}
 
   private async request<T>(method: string, path: string, token?: string): Promise<T | undefined> {
+    return this.send<T>(method, path, { token });
+  }
+
+  /** One JSON call. `idempotencyKey` is required by the API for creating calls; callers keep it to retry. */
+  async send<T>(method: string, path: string, opts: { token?: string; body?: unknown; idempotencyKey?: string } = {}): Promise<T | undefined> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
     const headers: Record<string, string> = { accept: "application/json", "accept-language": this.locale };
-    if (token) headers.authorization = `Bearer ${token}`;
+    if (opts.token) headers.authorization = `Bearer ${opts.token}`;
+    if (opts.idempotencyKey) headers["idempotency-key"] = opts.idempotencyKey;
+    if (opts.body !== undefined) headers["content-type"] = "application/json";
     let r: Response;
     try {
-      r = await this.fetchImpl(`${this.config.apiUrl}/v1${path}`, { method, headers, signal: controller.signal });
+      r = await this.fetchImpl(`${this.config.apiUrl}/v1${path}`, {
+        method, headers, signal: controller.signal, body: opts.body === undefined ? undefined : JSON.stringify(opts.body),
+      });
     } catch {
       throw new ApiError("offline"); // no network, DNS, refused or timed out
     } finally {
       clearTimeout(timer);
     }
-    if (!r.ok) throw new ApiError(kindFor(r.status), r.status);
+    if (!r.ok) {
+      const body = (await r.json().catch(() => null)) as { code?: unknown; details?: unknown } | null;
+      const code = typeof body?.code === "string" ? body.code : undefined;
+      const details = Array.isArray(body?.details) ? (body.details as ErrorDetail[]).filter((d) => d && typeof d.code === "string") : [];
+      throw new ApiError(kindFor(r.status), r.status, code, details);
+    }
     if (r.status === 204) return undefined;
     return (await r.json()) as T;
   }
