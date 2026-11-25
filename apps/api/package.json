@@ -1,0 +1,28 @@
+{
+  "name": "@aurea/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AUREA API (NestJS modular monolith, ADR-0001). Hito 100 skeleton: config, probes, deny-by-default, structured errors.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node --env-file-if-exists=../../.env dist/main.js",
+    "test": "tsc -p tsconfig.json && node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@nestjs/common": "12.6.1",
+    "@nestjs/core": "12.6.1",
+    "@nestjs/platform-express": "12.6.1",
+    "ioredis": "6.1.0",
+    "pg": "8.23.1",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.6",
+    "@types/pg": "8.23.1",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "typescript": "5.9.3",
+    "yaml": "2.9.1"
+  }
+}

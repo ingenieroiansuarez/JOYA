@@ -86,6 +86,12 @@
       "description": "Proveedor externo sin configuración real; en producción se falla cerrado."
     },
     {
+      "code": "INTERNAL_ERROR",
+      "http": 500,
+      "use": "error",
+      "description": "Fallo no previsto del servidor; el detalle queda solo en logs internos sin PII."
+    },
+    {
       "code": "INVALID_REQUEST",
       "http": 400,
       "use": "error",

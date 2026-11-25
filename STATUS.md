@@ -7,7 +7,7 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | Hito | Estado | Nota |
 |---|---|---|
 | 000 Feasibility | GO CONDICIONAL (ian, 2026-11-25) | CAD/DFM y render con evidencia; AR bloqueado y mesh IA solo simulada (`27_IMPLEMENTATION_ROADMAP/000_GO_NO_GO.md`) |
-| 100 Foundation | EN CURSO | Contratos 1.1–1.5 con verificación en CI; arranque local (pnpm, Compose, migraciones). Falta API, identidad, tokens, apps |
+| 100 Foundation | EN CURSO | Contratos 1.1–1.5 con verificación en CI; arranque local (pnpm, Compose, migraciones); esqueleto de API. Falta identidad, tokens, apps |
 | 200–1000 | NOT_STARTED | |
 
 ## Backlog 000
@@ -74,7 +74,7 @@ pnpm install --frozen-lockfile
 pnpm bootstrap             # crea .env (ignorado por git) con contraseñas aleatorias; no las imprime
 docker compose up -d --wait   # PostgreSQL 16.15 y Valkey 8.1.4, fijados por digest, solo en 127.0.0.1
 pnpm db:migrate             # lee .env
-TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # 5 pruebas
+TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # db 3, api 16, scripts 3
 ```
 - `pnpm db:migrate` carga `.env` si existe (`node --env-file-if-exists`); un `DATABASE_URL` exportado tiene prioridad.
 - Migraciones en `packages/db/migrations` (Drizzle migrator sobre SQL plano, esquema `aurea_migrations`). La prueba crea dos bases nuevas, aplica las migraciones a una y `05_DATABASE/core_reference.sql` a la otra, y exige el mismo catálogo: columnas, restricciones e índices. Una migración alterada hace fallar la prueba (verificado).
@@ -82,6 +82,8 @@ TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # 5 pruebas
 - Política: una migración que ya está en main no se edita, se añade otra (CI lo bloquea). Roll-forward: no hay down migrations; un cambio se corrige con una migración nueva compatible. Cada migración actualiza también `core_reference.sql`, del que leen los verificadores de contratos.
 - Valkey en lugar de Redis: Redis 7.4+ ya no es BSD (RSALv2/SSPL, AGPL en 8.x). Valkey es BSD-3-Clause, habla el mismo protocolo y BullMQ lo admite. Si se prefiere Redis, es una decisión de licencias.
 - `bootstrap` se niega a correr con `AUREA_ENV` distinto de local/ci; `compose.yaml` exige `.env` y falla sin él.
+- API (`apps/api`, NestJS 12.6.1 sobre Express, TypeScript 5.9.3): `GET /healthz` (vivo) y `GET /readyz` (PostgreSQL y Valkey con timeout de 2 s, 503 si alguno cae), fuera de `/v1` y sin datos. Todo lo demás se niega por defecto con 401 hasta conectar OIDC. Los errores siguen el `Error` de OpenAPI con códigos de `errors.json` y `x-correlation-id`, y un fallo no previsto responde `INTERNAL_ERROR` sin filtrar el mensaje. La configuración falla cerrada: faltan variables, entorno desconocido, credenciales ausentes en demo/producción o Valkey sin TLS en producción. `pnpm api:start` la levanta con el `.env` local.
+- Licencias: `pnpm license-check` falla si una dependencia npm no es MIT, Apache-2.0, BSD-2/3, ISC o 0BSD (122 paquetes, todos dentro). Falta generar el SBOM CycloneDX.
 - Probado localmente: compose arriba, migración aplicada, `state_checks.sql` sobre la base migrada OK, Valkey rechaza clientes sin contraseña (`NOAUTH`).
 
 ## Hallazgos del hito 000
