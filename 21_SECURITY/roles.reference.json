@@ -26,6 +26,7 @@
       "order.create",
       "payment.create",
       "payment.read",
+      "job.read",
       "sync.read",
       "sync.write",
       "cart.edit",
@@ -175,7 +176,8 @@
       "loyalty.read": "own",
       "identity.self": "self",
       "crm.contact": "assigned",
-      "order.cancel": "own"
+      "order.cancel": "own",
+      "job.read": "own"
     },
     "advisor": {
       "crm.read": "assigned",

@@ -276,6 +276,21 @@
       "http": null,
       "use": "detail",
       "description": "Operación no admitida."
+    },
+    {
+      "code": "UNKNOWN_MATERIAL",
+      "use": "detail",
+      "description": "La aleación no está en 09_JEWELRY_ENGINE/materials.json."
+    },
+    {
+      "code": "UNKNOWN_COMPONENT",
+      "use": "detail",
+      "description": "La operación apunta a un componente que no existe en la revisión base."
+    },
+    {
+      "code": "NO_CHANGE",
+      "use": "detail",
+      "description": "La operación deja el documento igual que la revisión base; no se crea revisión."
     }
   ]
 }

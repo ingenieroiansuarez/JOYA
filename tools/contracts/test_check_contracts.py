@@ -138,14 +138,16 @@ class OperationAndJobSchemaTest(unittest.TestCase):
     def test_job_with_artifacts(self):
         v = validator("Job")
         job = {"id": "00000000-0000-0000-0000-000000000001", "kind": "GEOMETRY", "state": "SUCCEEDED",
-               "revisionId": "00000000-0000-0000-0000-000000000002", "simulated": False, "errorCode": None,
+               "revisionId": "00000000-0000-0000-0000-000000000002", "projectId": "00000000-0000-0000-0000-000000000004",
+               "simulated": False, "errorCode": None, "summary": None,
                "artifacts": [{"id": "00000000-0000-0000-0000-000000000003", "kind": "STEP", "units": "mm",
-                              "sha256": SHA, "bytes": 1024}]}
+                              "name": "ring-base.step", "sha256": SHA, "bytes": 1024}]}
         v.validate(job)
         self.assertFalse(v.is_valid({**job, "artifacts": [{**job["artifacts"][0], "sha256": "ABC"}]}))
         self.assertFalse(v.is_valid({**job, "artifacts": [{**job["artifacts"][0], "url": "https://x"}]}))
         self.assertFalse(v.is_valid({k: x for k, x in job.items() if k != "simulated"}))
         self.assertFalse(v.is_valid({**job, "kind": "SHELL"}))
+        self.assertFalse(v.is_valid({**job, "artifacts": [{**job["artifacts"][0], "name": "../x.step"}]}))
 
 
 def body_validator(op_id):
@@ -384,7 +386,8 @@ class DesignDocumentTest(unittest.TestCase):
         doc = {"schemaVersion": "1.0.0", "projectId": "00000000-0000-0000-0000-000000000001", "revision": 1,
                "units": "mm", "components": [comp], "operations": [], "constraints": []}
         ok = {"id": "00000000-0000-0000-0000-000000000002", "projectId": doc["projectId"], "number": 1,
-              "digest": "a" * 64, "document": doc, "state": "DRAFT"}
+              "digest": "a" * 64, "document": doc, "state": "DRAFT", "parentId": None,
+              "createdAt": "2026-11-25T00:00:00Z"}
         v.validate(ok)
         for bad_doc in ({**doc, "components": []}, {**doc, "units": "in"},
                         {**doc, "components": [{**comp, "id": "../etc"}]},
