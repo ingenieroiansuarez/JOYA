@@ -133,8 +133,8 @@ describe("configuration fails closed", () => {
     AUREA_ENV: "local", DATABASE_URL: "postgresql://u:p@127.0.0.1/db", VALKEY_URL: "redis://:p@127.0.0.1:6379",
     OIDC_ISSUER: "http://127.0.0.1:8080/realms/aurea-local/", OIDC_AUDIENCE: "aurea-api",
   };
-  test("issuer is normalised without a trailing slash", () =>
-    assert.equal(loadConfig(ok).oidc.issuer, "http://127.0.0.1:8080/realms/aurea-local"));
+  test("issuer is kept verbatim, trailing slash included", () =>
+    assert.equal(loadConfig(ok).oidc.issuer, "http://127.0.0.1:8080/realms/aurea-local/"));
   test("valid local config", () => assert.equal(loadConfig(ok).env, "local"));
   for (const [name, env, re] of [
     ["missing database", { ...ok, DATABASE_URL: "" }, /missing configuration: DATABASE_URL/],

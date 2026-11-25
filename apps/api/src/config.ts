@@ -49,6 +49,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): Config {
     port,
     databaseUrl: source.DATABASE_URL!,
     valkeyUrl: source.VALKEY_URL!,
-    oidc: { issuer: source.OIDC_ISSUER!.replace(/\/$/, ""), audience: source.OIDC_AUDIENCE! },
+    // Verbatim: the issuer is an identifier compared exactly, and some IdPs end it with "/".
+    oidc: { issuer: source.OIDC_ISSUER!, audience: source.OIDC_AUDIENCE! },
   };
 }
