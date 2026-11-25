@@ -9,7 +9,7 @@ import { Button, c, errorKey, Header, JewelIllustration, Loading, Notice, s, sty
 type State = { phase: "loading" } | { phase: "error"; error: ApiError } | { phase: "ready"; product: Product };
 
 export function ProductScreen({ id, onBack }: { id: string; onBack: () => void }) {
-  const { t, locale, api, favorites, toggleFavorite, signIn, status } = useSession();
+  const { t, locale, api, favorites, setFavorite, ensureFavorites, signIn, status } = useSession();
   const [state, setState] = useState<State>({ phase: "loading" });
   const [favNotice, setFavNotice] = useState<"signIn" | "failed" | null>(null);
   const [busy, setBusy] = useState(false);
@@ -23,6 +23,7 @@ export function ProductScreen({ id, onBack }: { id: string; onBack: () => void }
     }
   }, [api, id]);
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => { if (status === "signedIn") void ensureFavorites(); }, [status, ensureFavorites]);
   // Signing in from the prompt below answers it.
   useEffect(() => { if (status === "signedIn" && favNotice === "signIn") setFavNotice(null); }, [status, favNotice]);
 
@@ -43,7 +44,7 @@ export function ProductScreen({ id, onBack }: { id: string; onBack: () => void }
   const saved = favorites.has(p.id);
   const onFavorite = async () => {
     setBusy(true);
-    const result = await toggleFavorite(p.id);
+    const result = await setFavorite(p.id, !saved);
     setBusy(false);
     setFavNotice(result === "needsSignIn" ? "signIn" : result === "failed" ? "failed" : null);
   };

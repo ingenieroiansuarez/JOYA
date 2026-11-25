@@ -1,8 +1,8 @@
 import { useCallback, useEffect } from "react";
-import { FlatList, View } from "react-native";
+import { ActivityIndicator, FlatList, RefreshControl, Text, View } from "react-native";
 import { usePaged } from "../paged";
 import { useSession } from "../session";
-import { Button, errorKey, Header, Loading, Notice, s, styles } from "../ui";
+import { Button, c, errorKey, Header, Loading, Notice, s, styles } from "../ui";
 import { ProductCard } from "./ProductCard";
 
 export function FavoritesScreen({ onOpen, onExplore }: { onOpen: (id: string) => void; onExplore: () => void }) {
@@ -24,9 +24,10 @@ export function FavoritesScreen({ onOpen, onExplore }: { onOpen: (id: string) =>
 }
 
 function SignedInFavorites({ onOpen, onExplore }: { onOpen: (id: string) => void; onExplore: () => void }) {
-  const { t, api, withToken, favoritesVersion } = useSession();
+  const { t, api, withToken, favoritesVersion, ensureFavorites } = useSession();
   const load = useCallback((cursor: string | null) => withToken((tok) => api.listFavorites(tok, cursor)), [api, withToken]);
-  const { state, reload, loadMore } = usePaged(load, "favorites");
+  const { state, reload, refresh, loadMore } = usePaged(load, "favorites");
+  useEffect(() => { void ensureFavorites(); }, [ensureFavorites]);
   // Saving or removing elsewhere bumps the version: reload so this list matches the server.
   useEffect(() => { if (favoritesVersion > 0) void reload(); }, [favoritesVersion]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -41,6 +42,20 @@ function SignedInFavorites({ onOpen, onExplore }: { onOpen: (id: string) => void
       contentContainerStyle={{ padding: s[2] }}
       renderItem={({ item }) => <ProductCard product={item} onOpen={() => onOpen(item.id)} />}
       onEndReached={() => { if (state.more === "idle") void loadMore(); }}
+      refreshControl={<RefreshControl refreshing={state.refreshing} onRefresh={refresh} tintColor={c.accent} colors={[c.accent]} />}
+      ListFooterComponent={
+        <View style={{ padding: s[3], gap: s[2] }}>
+          {state.more === "loading" && (
+            <View accessible accessibilityLiveRegion="polite" accessibilityLabel={t("loadingMore")}><ActivityIndicator color={c.accent} /></View>
+          )}
+          {state.more === "failed" && (
+            <>
+              <Text accessibilityRole="alert" style={[styles.muted, styles.centerText]}>{t("loadMoreFailed")}</Text>
+              <Button variant="secondary" label={t("retry")} onPress={() => void loadMore()} />
+            </>
+          )}
+        </View>
+      }
     />
   );
 }

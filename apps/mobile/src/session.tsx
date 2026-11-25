@@ -25,7 +25,10 @@ interface SessionValue {
   withToken<T>(fn: (token: string) => Promise<T>): Promise<T>;
   favorites: ReadonlySet<string>;
   favoritesVersion: number;
-  toggleFavorite(id: string): Promise<FavoriteResult>;
+  /** Loads the saved set again if the load after sign-in failed, so "Save"/"Remove" labels are right. */
+  ensureFavorites(): Promise<void>;
+  /** Saves (true) or removes (false) explicitly; PUT and DELETE are idempotent, so a stale label never inverts intent. */
+  setFavorite(id: string, saved: boolean): Promise<FavoriteResult>;
 }
 
 const Ctx = createContext<SessionValue | null>(null);
@@ -46,14 +49,24 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
   const [favoritesVersion, setFavoritesVersion] = useState(0);
   const discovery = useRef<DiscoveryDocument | null>(null);
   const session = useRef<Session | null>(null);
+  const hydrated = useRef(false);
+  // One refresh at a time: the realm rotates refresh tokens with no reuse, so two concurrent refreshes
+  // with the same stored token would get one of them refused and sign the customer out.
+  const refreshing = useRef<Promise<Session | null> | null>(null);
 
   const getDiscovery = useCallback(async () => {
     discovery.current = await ensureDiscovery(discovery.current, () => discover(config));
     return discovery.current;
   }, [config]);
 
+  const refreshOnce = useCallback((): Promise<Session | null> => {
+    refreshing.current ??= (async () => refresh(await getDiscovery()))().finally(() => { refreshing.current = null; });
+    return refreshing.current;
+  }, [getDiscovery]);
+
   const becomeGuest = useCallback(() => {
     session.current = null;
+    hydrated.current = false;
     setMe(null);
     setFavorites(new Set());
     setStatus("guest");
@@ -68,6 +81,7 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
       cursor = page.nextCursor;
     } while (cursor);
     setFavorites(ids);
+    hydrated.current = true;
     setFavoritesVersion((v) => v + 1);
   }, [api]);
 
@@ -84,7 +98,7 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
     let cancelled = false;
     (async () => {
       try {
-        const s = await refresh(await getDiscovery());
+        const s = await refreshOnce();
         if (cancelled) return;
         if (s) await establish(s);
         else becomeGuest();
@@ -93,7 +107,7 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
       }
     })();
     return () => { cancelled = true; };
-  }, [getDiscovery, establish, becomeGuest]);
+  }, [refreshOnce, establish, becomeGuest]);
 
   const signIn = useCallback(async () => {
     setStatus("signingIn");
@@ -114,14 +128,14 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
 
   const token = useCallback(async (): Promise<string> => {
     if (isFresh(session.current)) return session.current.accessToken;
-    const s = await refresh(await getDiscovery()).catch(() => { throw new ApiError("offline"); });
+    const s = await refreshOnce().catch(() => { throw new ApiError("offline"); });
     if (!s) {
       becomeGuest();
       throw new ApiError("unauthenticated");
     }
     session.current = s;
     return s.accessToken;
-  }, [getDiscovery, becomeGuest]);
+  }, [refreshOnce, becomeGuest]);
 
   const withToken = useCallback(async <T,>(fn: (token: string) => Promise<T>): Promise<T> => {
     try {
@@ -133,28 +147,33 @@ export function SessionProvider({ config, children, apiOverride }: { config: App
     }
   }, [token]);
 
-  const toggleFavorite = useCallback(async (id: string): Promise<FavoriteResult> => {
+  const ensureFavorites = useCallback(async () => {
+    if (!session.current || hydrated.current) return;
+    await withToken((tok) => loadFavorites(tok)).catch(() => undefined);
+  }, [withToken, loadFavorites]);
+
+  const setFavorite = useCallback(async (id: string, saved: boolean): Promise<FavoriteResult> => {
     if (!session.current) return "needsSignIn";
-    const saved = !favorites.has(id);
+    const was = favorites.has(id);
     const apply = (on: boolean) => setFavorites((prev) => {
       const next = new Set(prev);
       if (on) next.add(id); else next.delete(id);
       return next;
     });
-    apply(saved); // optimistic; rolled back on failure (PUT/DELETE are idempotent, so a retry is safe)
+    apply(saved); // optimistic; rolled back on failure
     try {
       await withToken((tok) => api.setFavorite(tok, id, saved));
       setFavoritesVersion((v) => v + 1);
       return saved ? "saved" : "removed";
     } catch (err) {
-      apply(!saved);
+      apply(was);
       return err instanceof ApiError && err.kind === "unauthenticated" ? "needsSignIn" : "failed";
     }
   }, [favorites, withToken, api]);
 
   const value = useMemo<SessionValue>(() => ({
-    config, locale, t, api, status, me, signIn, signOut, withToken, favorites, favoritesVersion, toggleFavorite,
-  }), [config, locale, t, api, status, me, signIn, signOut, withToken, favorites, favoritesVersion, toggleFavorite]);
+    config, locale, t, api, status, me, signIn, signOut, withToken, favorites, favoritesVersion, ensureFavorites, setFavorite,
+  }), [config, locale, t, api, status, me, signIn, signOut, withToken, favorites, favoritesVersion, ensureFavorites, setFavorite]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
