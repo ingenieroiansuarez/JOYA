@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: AUREA API V1 — contract baseline
-  version: 1.0.0
+  version: 1.1.0
   description: Contratos iniciales; extender por vertical slice. No API implementada.
 servers:
 - url: http://localhost:3000/v1
@@ -4175,6 +4175,81 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    DesignState:
+      description: Generado de 08_STATE_MACHINES/machines.json (Design). No editar a mano.
+      type: string
+      enum:
+      - DRAFT
+      - REVIEW
+      - APPROVED
+      - SUPERSEDED
+    QuoteState:
+      description: Generado de 08_STATE_MACHINES/machines.json (Quote). No editar a mano.
+      type: string
+      enum:
+      - DRAFT
+      - ISSUED
+      - ACCEPTED
+      - EXPIRED
+      - REJECTED
+      - SUPERSEDED
+    PaymentState:
+      description: Generado de 08_STATE_MACHINES/machines.json (Payment). No editar a mano.
+      type: string
+      enum:
+      - PENDING
+      - PROCESSING
+      - FAILED
+      - CONFIRMED
+      - PARTIAL_REFUND
+      - REFUNDED
+      - DISPUTED
+    ReservationState:
+      description: Generado de 08_STATE_MACHINES/machines.json (Reservation). No editar a mano.
+      type: string
+      enum:
+      - HELD
+      - ALLOCATED
+      - RELEASED
+      - CONSUMED
+    WorkOrderState:
+      description: Generado de 08_STATE_MACHINES/machines.json (WorkOrder). No editar a mano.
+      type: string
+      enum:
+      - PLANNED
+      - RELEASED
+      - IN_PROGRESS
+      - BLOCKED
+      - QA
+      - DONE
+      - CANCELLED
+    OrderState:
+      description: Generado de 08_STATE_MACHINES/machines.json (Order). No editar a mano.
+      type: string
+      enum:
+      - PENDING_PAYMENT
+      - CONFIRMED
+      - FULFILLING
+      - READY
+      - DELIVERED
+      - CANCELLED
+    JobState:
+      description: Generado de 08_STATE_MACHINES/machines.json (Job). No editar a mano.
+      type: string
+      enum:
+      - QUEUED
+      - RUNNING
+      - SUCCEEDED
+      - FAILED
+      - CANCELLED
+    CertificateState:
+      description: Generado de 08_STATE_MACHINES/machines.json (Certificate). No editar a mano.
+      type: string
+      enum:
+      - DRAFT
+      - ISSUED
+      - REVOKED
+      - SUPERSEDED
     Money:
       type: object
       properties:
@@ -4211,13 +4286,7 @@ components:
       properties:
         id: *id002
         state:
-          type: string
-          enum:
-          - QUEUED
-          - RUNNING
-          - SUCCEEDED
-          - FAILED
-          - CANCELLED
+          $ref: '#/components/schemas/JobState'
         revisionId: *id002
       required:
       - id
@@ -4243,12 +4312,15 @@ components:
         number: *id003
         digest: *id001
         document: *id005
+        state:
+          $ref: '#/components/schemas/DesignState'
       required:
       - id
       - projectId
       - number
       - digest
       - document
+      - state
       additionalProperties: false
     Quote:
       type: object
@@ -4256,14 +4328,7 @@ components:
         id: *id002
         revisionId: *id002
         state:
-          type: string
-          enum:
-          - DRAFT
-          - ISSUED
-          - ACCEPTED
-          - EXPIRED
-          - REJECTED
-          - SUPERSEDED
+          $ref: '#/components/schemas/QuoteState'
         total:
           $ref: '#/components/schemas/Money'
         expiresAt:
@@ -4311,7 +4376,8 @@ components:
         orderId: *id002
         amount:
           $ref: '#/components/schemas/Money'
-        state: *id001
+        state:
+          $ref: '#/components/schemas/PaymentState'
       required:
       - id
       - orderId
@@ -4323,7 +4389,8 @@ components:
       properties:
         id: *id002
         quoteId: *id002
-        state: *id001
+        state:
+          $ref: '#/components/schemas/OrderState'
       required:
       - id
       - quoteId
@@ -4335,7 +4402,8 @@ components:
         id: *id002
         lotId: *id002
         quantity: *id004
-        state: *id001
+        state:
+          $ref: '#/components/schemas/ReservationState'
       required:
       - id
       - lotId
@@ -4348,7 +4416,8 @@ components:
         id: *id002
         revisionId: *id002
         orderId: *id002
-        state: *id001
+        state:
+          $ref: '#/components/schemas/WorkOrderState'
       required:
       - id
       - revisionId
@@ -4359,7 +4428,8 @@ components:
       type: object
       properties:
         id: *id002
-        state: *id001
+        state:
+          $ref: '#/components/schemas/CertificateState'
         issuer: *id001
         publicSummary: *id005
       required:
