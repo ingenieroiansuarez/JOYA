@@ -22,6 +22,13 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Dependency licenses are on the allowlist
         run: pnpm license-check
+      - name: SBOM (CycloneDX 1.6) matches the locks
+        run: node scripts/sbom.mjs --check
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx
+          path: sbom/aurea.cdx.json
+          if-no-files-found: error
       - name: Keycloak realm and API role map follow roles.reference.json
         run: node scripts/identity-gen.mjs --check
       - name: Merged migrations are immutable

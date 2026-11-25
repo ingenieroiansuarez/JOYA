@@ -7,7 +7,7 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | Hito | Estado | Nota |
 |---|---|---|
 | 000 Feasibility | GO CONDICIONAL (ian, 2026-11-25) | CAD/DFM y render con evidencia; AR bloqueado y mesh IA solo simulada (`27_IMPLEMENTATION_ROADMAP/000_GO_NO_GO.md`) |
-| 100 Foundation | EN CURSO | Contratos 1.1–1.6 con verificación en CI; arranque local (pnpm, Compose, migraciones); API con OIDC y permisos por rol; Keycloak local con login PKCE probado. Faltan tokens de diseño, esqueletos de apps, SBOM |
+| 100 Foundation | EN CURSO | Contratos 1.1–1.6 con verificación en CI; arranque local (pnpm, Compose, migraciones); API con OIDC y permisos por rol; Keycloak local con login PKCE probado. Faltan tokens de diseño y esqueletos de apps |
 | 200–1000 | NOT_STARTED | |
 
 ## Backlog 000
@@ -83,7 +83,8 @@ TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # db 3, api 45 (5 contra Keycloak)
 - Valkey en lugar de Redis: Redis 7.4+ ya no es BSD (RSALv2/SSPL, AGPL en 8.x). Valkey es BSD-3-Clause, habla el mismo protocolo y BullMQ lo admite. Si se prefiere Redis, es una decisión de licencias.
 - `bootstrap` se niega a correr con `AUREA_ENV` distinto de local/ci; `compose.yaml` exige `.env` y falla sin él.
 - API (`apps/api`, NestJS 12.6.1 sobre Express, TypeScript 5.9.3): `GET /healthz` (vivo) y `GET /readyz` (PostgreSQL y Valkey con timeout de 2 s, 503 si alguno cae), fuera de `/v1` y sin datos. Todo lo demás exige token (ver Identidad). Los errores siguen el `Error` de OpenAPI con códigos de `errors.json` y `x-correlation-id`, y un fallo no previsto responde `INTERNAL_ERROR` sin filtrar el mensaje. La configuración falla cerrada: faltan variables, entorno desconocido, credenciales ausentes en demo/producción o Valkey sin TLS en producción. `pnpm api:start` la levanta con el `.env` local.
-- Licencias: `pnpm license-check` falla si una dependencia npm no es MIT, Apache-2.0, BSD-2/3, ISC o 0BSD (122 paquetes, todos dentro). Falta generar el SBOM CycloneDX.
+- Licencias: `pnpm license-check` falla si una dependencia npm no es MIT, Apache-2.0, BSD-2/3, ISC o 0BSD (122 paquetes, todos dentro).
+- SBOM: `pnpm sbom` escribe `sbom/aurea.cdx.json` (CycloneDX 1.6, determinista, sin fecha): 127 paquetes npm con hash SHA-512 del lockfile y licencia declarada, marcados `required` si se despliegan o `excluded` si son solo de desarrollo; 54 paquetes Python de `services/*/requirements.lock` (sin licencia: no está en el lock y no se adivina; las revisadas están en la tabla de licencias); 3 imágenes de Compose por digest. CI falla si está desfasado frente a los locks, lo valida contra el esquema oficial 1.6 (copiado en `tools/sbom/schema`) y lo publica como artefacto `sbom-cyclonedx`. No cubre aún `apps/render-bench-android` (Gradle, banco de pruebas, no se distribuye).
 - Identidad (contratos 1.6.0):
   - Keycloak 26.8.1 (Apache-2.0) en Compose, modo dev, **solo local/CI**. El realm `aurea-local` y el mapa rol→permiso de la API (`apps/api/src/identity/roles.generated.ts`) se generan desde `roles.reference.json` con `node scripts/identity-gen.mjs`; CI falla si están desfasados.
   - Clientes: `aurea-mobile` público, solo Authorization Code con PKCE S256 obligatorio, redirect `com.aurea.customer.dev:/oauthredirect`, sin password grant; `aurea-ci` confidencial, solo client credentials, rol `auditor`; `aurea-api` solo audiencia. Token de acceso de 5 min, refresh rotado.
