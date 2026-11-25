@@ -164,6 +164,18 @@
       "description": "El DesignDocument no es válido; cada problema va en `details`."
     },
     {
+      "code": "GEOMETRY_TIMEOUT",
+      "http": 504,
+      "use": "error",
+      "description": "La regeneración CAD superó el tiempo máximo del worker; el documento no se modificó. Reintentar o simplificar."
+    },
+    {
+      "code": "GEOMETRY_FAILED",
+      "http": 500,
+      "use": "error",
+      "description": "El núcleo CAD no pudo producir la geometría (límite de memoria o CPU, fallo interno). No se publica ningún artefacto."
+    },
+    {
       "code": "SCHEMA",
       "http": null,
       "use": "detail",

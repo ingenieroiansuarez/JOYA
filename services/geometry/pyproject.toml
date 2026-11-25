@@ -1,7 +1,7 @@
 [project]
 name = "aurea-geometry"
-version = "0.0.1"
-description = "AUREA geometry worker core (hito 000 PoC): parametric ring/pendant, DFM, exports. Not approved for manufacturing."
+version = "0.1.0"
+description = "AUREA geometry worker (hito 300): parametric ring/pendant families, DFM, exports, internal signed HTTP worker. Not approved for manufacturing."
 requires-python = ">=3.11,<3.14"
 license = { text = "UNLICENSED" }
 # Exact pins from the hito 000 environment (see STATUS.md). Do not float.
@@ -16,6 +16,7 @@ test = ["pytest==8.4.2"]
 
 [project.scripts]
 aurea-geometry = "aurea_geometry.cli:main"
+aurea-geometry-worker = "aurea_geometry.worker:main"
 
 [build-system]
 requires = ["setuptools==80.9.0"]

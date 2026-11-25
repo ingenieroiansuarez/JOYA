@@ -1,5 +1,10 @@
 # Contratos — changelog
 
+## 1.8.1 — 2026-11-25 (hito 300, worker de geometría)
+- `errors.json`: `GEOMETRY_TIMEOUT` (504) y `GEOMETRY_FAILED` (500), los fallos del worker CAD que la API pondrá en `Job.errorCode`. Sin cambios de esquema.
+- Familias `ring.02` (confort) y `pendant.02` (óvalo con agujero para argolla) implementadas en `services/geometry` con los parámetros y rangos de `families.json`.
+- Digest canónico: `09_JEWELRY_ENGINE/fixtures/digests.json` fija JSON canónico (subconjunto de RFC 8785) y SHA-256 que Python y TypeScript deben reproducir.
+
 ## 1.8.0 — 2026-11-25 (hito 200, Boutique)
 - Catálogo tipado: `listProducts` devuelve `ProductPage` (`items` de `ProductSummary`, `nextCursor`) en lugar del `Page` libre, con `limit` (1–50, 20 por defecto) y filtro `category`. `getProduct` devuelve `Product` con `sku`, `summary`, `description`, `collection`, `category` (`ProductCategory`), `metal` (`Metal`), `metalWeightGrams` (decimal exacto en gramos), `stones` (`ProductStone`: tipo, cantidad, `totalCarats` decimal exacto, origen) y precio `Money`. Nunca costos.
 - Idioma: parámetro común `AcceptLanguage` (es o en, es por defecto); la respuesta lo indica en `Content-Language`.
