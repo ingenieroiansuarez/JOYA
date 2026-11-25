@@ -79,7 +79,7 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
             Gltfio.init()  // loads gltfio-jni
         }
 
-        const val TOOL = "aurea-render-bench-android/0.1.3"
+        const val TOOL = "aurea-render-bench-android/0.1.4"
         const val FILAMENT_VERSION = "1.79.0"
         const val ASSET = "showcase.glb"
         const val SCENE_SECONDS = 15.0
@@ -788,7 +788,8 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
             append("última etapa=${diagPrefs.getString("stage", "?")}\n")
             append("dispositivo=${Build.MANUFACTURER} ${Build.MODEL} Android ${Build.VERSION.RELEASE}\n")
             diagPrefs.getString("javaCrash", null)?.let { append("\nJava:\n$it\n") }
-            if (info.reason == android.app.ApplicationExitInfo.REASON_CRASH_NATIVE && Build.VERSION.SDK_INT >= 31) {
+            // Some builds report a SIGSEGV as REASON_CRASH, so always try the tombstone.
+            if (Build.VERSION.SDK_INT >= 31) {
                 append("\nbacktrace:\n${nativeBacktrace(info)}\n")
             }
             append("\nlog:\n$log")
