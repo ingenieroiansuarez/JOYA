@@ -3,7 +3,7 @@
 100,Foundation,000,"Monorepo, Node/Expo/Next/Python pinned; compose; schema migrations; identity; tokens; CI; baseline contracts","Clean bootstrap, test and login; isolated env; no committed secrets",GATE_MET
 200,Boutique,100,"Guest navigation, catalog, product detail, profile, favorite, demo seed",APK dev browses catalog; accessible empty/error states,GATE_MET
 300,Jewelry Engine,"100,200",Core ring and pendant families; preview and CAD regeneration; revisions; offline sync; export,Parameter update real geometry; rejected invalid input; restart offline; STEP/STL roundtrip,GATE_MET
-400,AURA,300,"Gateway, tool allowlist, deterministic adapter, real optional providers, concepts/mesh jobs",Prompt → proposal → authorized revision; failure/quota tests,IN_PROGRESS
+400,AURA,300,"Gateway, tool allowlist, deterministic adapter, real optional providers, concepts/mesh jobs",Prompt → proposal → authorized revision; failure/quota tests,GATE_MET
 500,Commercial slice,"300,400","Pricing, quote, acceptance, order, simulated deposit, inventory and panel","E2E from Android to web, snapshot, duplicate payment and stock tests",NOT_STARTED
 600,Demo Edition,500,"Signed APK, synthetic dataset, presenter script, optional offline fixture, panel",Install physical device; full demo rehearsal; no production credentials,NOT_STARTED
 700,Professional operations,"500,600","CRM, workshop, inventory/custody, procurement, QA, finance and staff UI","Real transactional operations in staging; mass ledger, permission tests",NOT_STARTED
