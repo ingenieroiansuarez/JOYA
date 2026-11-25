@@ -75,7 +75,7 @@ export function toQuote(r: QuoteRow, locale: Locale, internal: boolean) {
     lines: s.lines.map((l) => line(l, r.currency, locale)),
     deposit: { rate: s.deposit.rate, amount: money(r.deposit_amount, r.currency) },
     bom: s.bom.map((b) => ({ componentId: b.componentId, materialId: b.materialId, massGrams: b.massGrams, densityStatus: b.densityStatus })),
-    pricing: { ruleVersion: s.ruleVersion, simulated: s.rulesStatus !== "APPROVED", ratesSource: s.rates.source, ratesDate: s.rates.date },
+    pricing: { ruleVersion: s.ruleVersion, termsVersion: s.termsVersion, simulated: s.rulesStatus !== "APPROVED", ratesSource: s.rates.source, ratesDate: s.rates.date },
     dfmState: s.geometry.dfmState,
     digest: r.digest, termsVersion: r.terms_version,
     expiresAt: new Date(r.expires_at).toISOString(), createdAt: new Date(r.created_at).toISOString(),

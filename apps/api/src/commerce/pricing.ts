@@ -64,6 +64,8 @@ export interface PricingSnapshot {
   schemaVersion: 1;
   ruleVersion: string;
   rulesStatus: PricingRules["status"];
+  /** Terms the quote will be issued under (rules' current terms); issuing checks them again. */
+  termsVersion: string;
   currency: string;
   rates: { source: string; date: string; fx: null; metalPerGram: Record<string, string> };
   revision: { id: string; number: number; digest: string };
@@ -141,6 +143,7 @@ export function priceRevision(
     schemaVersion: 1,
     ruleVersion: rules.ruleVersion,
     rulesStatus: rules.status,
+    termsVersion: rules.termsVersion,
     currency: rules.currency,
     rates: { source: rules.rates.source, date: rules.rates.date, fx: null, metalPerGram: Object.fromEntries(materials.map((id) => [id, rules.rates.metalPerGram[id]])) },
     revision: { id: rev.id, number: rev.number, digest: rev.digest },

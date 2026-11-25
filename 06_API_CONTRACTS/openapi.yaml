@@ -6572,6 +6572,9 @@ components:
           properties:
             ruleVersion:
               type: string
+            termsVersion:
+              type: string
+              description: Términos con los que se emitiría (issueQuote los exige).
             simulated:
               type: boolean
               description: true = reglas sintéticas de demo, no un precio real.
@@ -6582,6 +6585,7 @@ components:
               format: date
           required:
           - ruleVersion
+          - termsVersion
           - simulated
           - ratesSource
           - ratesDate
