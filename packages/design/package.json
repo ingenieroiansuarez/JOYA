@@ -4,9 +4,17 @@
   "private": true,
   "type": "module",
   "description": "AUREA design documents shared by the API and the app: implemented families and materials (generated from the handoff), canonical digest, operation apply/validate and offline rebase rules. Geometry itself is built by services/geometry.",
+  "main": "design.mjs",
+  "types": "design.d.ts",
   "exports": {
-    ".": { "types": "./design.d.ts", "default": "./design.mjs" },
-    "./catalog": { "types": "./catalog.d.ts", "default": "./catalog.mjs" }
+    ".": {
+      "types": "./design.d.ts",
+      "default": "./design.mjs"
+    },
+    "./catalog": {
+      "types": "./catalog.d.ts",
+      "default": "./catalog.mjs"
+    }
   },
   "scripts": {
     "build": "node build.mjs",
