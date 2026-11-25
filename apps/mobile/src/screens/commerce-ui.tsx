@@ -115,3 +115,38 @@ const j = StyleSheet.create({
   statusDot: { width: 8, height: 8, borderRadius: 4 },
   statusText: { color: c.text, fontSize: type[3], fontFamily: fonts.display, flex: 1 },
 });
+
+/** A change "from → to", the new value in gold; read as one sentence. */
+export function ChangeLine({ label, from, to }: { label: string; from: string; to: string }) {
+  return (
+    <View accessible accessibilityLabel={`${label}: ${from} → ${to}`} style={x.change}>
+      <Text style={[styles.muted, { flex: 1 }]}>{label}</Text>
+      <Text style={styles.muted}>{from}</Text>
+      <Text style={x.arrow}>→</Text>
+      <Text style={x.to}>{to}</Text>
+    </View>
+  );
+}
+
+/** Measured value as a tile: small caps label over a display-face number. */
+export function Tile({ k, v }: { k: string; v: string }) {
+  return (
+    <View accessible accessibilityLabel={`${k}: ${v}`} style={x.tile}>
+      <Text style={x.tileKey}>{k}</Text>
+      <Text style={x.tileValue}>{v}</Text>
+    </View>
+  );
+}
+export const tileGrid = StyleSheet.create({ grid: { flexDirection: "row", flexWrap: "wrap", gap: s[2] } }).grid;
+export const goldCard = StyleSheet.create({
+  card: { backgroundColor: c.surface, borderRadius: 12, padding: s[3], gap: s[2], borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(197,160,89,0.22)" },
+}).card;
+
+const x = StyleSheet.create({
+  change: { flexDirection: "row", alignItems: "baseline", gap: s[1] },
+  arrow: { color: c.accent, fontSize: type[1] },
+  to: { color: c.text, fontSize: type[2], fontWeight: "600" },
+  tile: { flexBasis: "47%", flexGrow: 1, backgroundColor: c.background, borderRadius: 8, padding: s[2], gap: 2 },
+  tileKey: { color: c.textMuted, fontSize: type[0], letterSpacing: 1.2, textTransform: "uppercase" },
+  tileValue: { color: c.text, fontSize: type[3], fontFamily: fonts.display, fontVariant: ["tabular-nums"] },
+});

@@ -206,7 +206,7 @@ describe("design editor", () => {
     await pressing;
     expect(await screen.findByRole("button", { name: en.accept }, slow)).toBeTruthy();
     expect(previewMeshServed).toBe(true);
-    expect(screen.getByText("Band width: 4 mm → 5 mm")).toBeTruthy();
+    expect(screen.getByLabelText("Band width: 4 mm → 5 mm")).toBeTruthy();
     expect(screen.getByLabelText("Solid volume: 481.795 mm³")).toBeTruthy();
     expect(screen.getByLabelText("Estimated weight: 7.468 g")).toBeTruthy();
     expect(screen.getByText(en.dfmReview)).toBeTruthy();
@@ -235,7 +235,7 @@ describe("AURA in the editor", () => {
     await fireEvent.changeText(screen.getByLabelText(en.auraInput), "a bit wider, ancho");
     await fireEvent.press(screen.getByRole("button", { name: en.auraAsk }));
     expect(await screen.findByText("Option 2 · Balanced")).toBeTruthy();
-    expect(screen.getByText("Band width: 4 mm → 4.5 mm")).toBeTruthy();
+    expect(screen.getByLabelText("Band width: 4 mm → 4.5 mm")).toBeTruthy();
     expect(screen.getByText(en.auraNothingChanges)).toBeTruthy();
     expect(server.head(p.id).number).toBe(1); // a proposal changes nothing
     const previews = screen.getAllByRole("button", { name: en.preview });
