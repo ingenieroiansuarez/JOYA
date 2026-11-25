@@ -80,12 +80,27 @@ describe("api skeleton", () => {
     assertError(await r.json(), "NOT_FOUND", 404);
   });
 
-  test("unhandled errors do not leak messages", async () => {
-    const r = await fetch(s.url("/v1/boom"));
-    assert.equal(r.status, 500);
-    const text = await r.text();
+  test("unhandled errors are logged without PII and do not leak to the client", async () => {
+    const logged = [];
+    const write = process.stderr.write;
+    const writeOut = process.stdout.write;
+    process.stderr.write = (chunk, ...rest) => { logged.push(String(chunk)); return true; };
+    process.stdout.write = (chunk, ...rest) => { logged.push(String(chunk)); return writeOut.call(process.stdout, chunk, ...rest); };
+    let text;
+    try {
+      const r = await fetch(s.url("/v1/boom"));
+      assert.equal(r.status, 500);
+      text = await r.text();
+    } finally {
+      process.stderr.write = write;
+      process.stdout.write = writeOut;
+    }
     assert.doesNotMatch(text, /hunter2|example\.com/);
-    assertError(JSON.parse(text), "INTERNAL_ERROR", 500);
+    const body = JSON.parse(text);
+    assertError(body, "INTERNAL_ERROR", 500);
+    const log = logged.join("");
+    assert.match(log, new RegExp(`unhandled Error status=500 correlationId=${body.correlationId}`));
+    assert.doesNotMatch(log, /hunter2|example\.com/);
   });
 
   test("correlation id is echoed when it is a UUID and replaced otherwise", async () => {
@@ -125,6 +140,43 @@ describe("configuration fails closed", () => {
   test("errors name the variable, never its value", () => {
     assert.throws(() => loadConfig({ ...ok, DATABASE_URL: "secretvalue" }), (e) => !e.message.includes("secretvalue"));
   });
+});
+
+// Minimal PostgreSQL server: completes the startup handshake, then never answers a query.
+async function hungPostgres() {
+  const net = await import("node:net");
+  const server = net.createServer((sock) => {
+    let started = false;
+    sock.on("data", () => {
+      if (started) return; // swallow every query
+      started = true;
+      const authOk = Buffer.from([0x52, 0, 0, 0, 8, 0, 0, 0, 0]); // 'R' AuthenticationOk
+      const ready = Buffer.from([0x5a, 0, 0, 0, 5, 0x49]); // 'Z' ReadyForQuery (idle)
+      sock.write(Buffer.concat([authOk, ready]));
+    });
+    sock.on("error", () => {});
+  });
+  await new Promise((r) => server.listen(0, "127.0.0.1", r));
+  return server;
+}
+
+test("a database that hangs on queries is reported down and leaves no open sockets", async () => {
+  const server = await hungPostgres();
+  const { port } = server.address();
+  const probes = createProbes({ ...CONFIG, databaseUrl: `postgresql://u:p@127.0.0.1:${port}/db` });
+  try {
+    for (let i = 0; i < 3; i++) {
+      const t0 = Date.now();
+      assert.equal((await probes.check()).database, "down");
+      assert.ok(Date.now() - t0 < 4000, "probe exceeded its timeout");
+    }
+    await new Promise((r) => setTimeout(r, 300));
+    const open = await new Promise((r) => server.getConnections((_, n) => r(n)));
+    assert.equal(open, 0, "probe connections left open after timeouts");
+  } finally {
+    await probes.close();
+    server.close();
+  }
 });
 
 const DB = process.env.TEST_DATABASE_URL;

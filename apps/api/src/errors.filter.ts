@@ -43,13 +43,14 @@ export class ErrorsFilter implements ExceptionFilter {
     const req = http.getRequest<Request>();
     const res = http.getResponse<Response>();
     let status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-    if (!BY_STATUS[status]) {
-      // Unknown failures never leak internals; log the class only (no message: it may carry PII).
-      this.log.error(`unhandled ${exception instanceof Error ? exception.constructor.name : typeof exception}`);
-      status = HttpStatus.INTERNAL_SERVER_ERROR;
-    }
-    const code = BY_STATUS[status];
     const id = correlationId(req);
+    if (!(exception instanceof HttpException)) {
+      // Never leak internals to the client; log class and correlation id only (messages may carry PII).
+      const kind = exception instanceof Error ? exception.constructor.name : typeof exception;
+      this.log.error(`unhandled ${kind} status=${status} correlationId=${id}`);
+    }
+    if (!BY_STATUS[status]) status = HttpStatus.INTERNAL_SERVER_ERROR;
+    const code = BY_STATUS[status];
     res.setHeader("x-correlation-id", id);
     res.status(status).json({ code, message: MESSAGES[code], correlationId: id, details: [] });
   }

@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import { Pool } from "pg";
+import { Client } from "pg";
 import type { Config } from "./config";
 
 export const PROBES = Symbol("PROBES");
@@ -17,8 +17,25 @@ function withTimeout<T>(p: Promise<T>): Promise<T> {
 }
 
 export function createProbes(config: Config): Probes {
-  const pool = new Pool({ connectionString: config.databaseUrl, max: 2, connectionTimeoutMillis: TIMEOUT_MS });
-  pool.on("error", () => undefined); // idle client errors surface through check()
+  // One short-lived client per check: a hung server can never hold probe connections.
+  // statement_timeout makes PostgreSQL cancel the query itself; on any failure the socket is destroyed.
+  const pingDatabase = async () => {
+    const client = new Client({
+      connectionString: config.databaseUrl,
+      connectionTimeoutMillis: TIMEOUT_MS,
+      query_timeout: TIMEOUT_MS,
+      statement_timeout: TIMEOUT_MS,
+    });
+    client.on("error", () => undefined);
+    try {
+      await client.connect();
+      await client.query("SELECT 1");
+      await client.end();
+    } catch (err) {
+      (client as unknown as { connection?: { stream?: { destroy(): void } } }).connection?.stream?.destroy();
+      throw err;
+    }
+  };
   const valkey = new Redis(config.valkeyUrl, { lazyConnect: true, maxRetriesPerRequest: 1, enableOfflineQueue: false });
   valkey.on("error", () => undefined);
   const run = async (fn: () => Promise<unknown>): Promise<CheckResult> => {
@@ -32,7 +49,7 @@ export function createProbes(config: Config): Probes {
   return {
     async check() {
       const [database, vk] = await Promise.all([
-        run(() => pool.query("SELECT 1")),
+        run(pingDatabase),
         run(async () => {
           if (valkey.status === "wait" || valkey.status === "end") await valkey.connect();
           if ((await valkey.ping()) !== "PONG") throw new Error("bad ping");
@@ -42,7 +59,6 @@ export function createProbes(config: Config): Probes {
     },
     async close() {
       valkey.disconnect();
-      await pool.end();
     },
   };
 }
