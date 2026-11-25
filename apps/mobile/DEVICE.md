@@ -15,6 +15,10 @@ docker compose up -d --wait
 # cargar .env en el entorno (PowerShell: Get-Content .env | % { if ($_ -match '^([^#=]+)=(.*)$') { Set-Item "env:$($matches[1])" $matches[2] } })
 pnpm db:migrate
 pnpm db:seed:demo                   # catálogo sintético (solo local/ci/demo)
+# Worker de geometría (hito 300), Python 3.13, con las mismas variables de .env cargadas:
+python -m venv services/geometry/.venv   # activar: services/geometry/.venv/Scripts/Activate.ps1 (Windows)
+pip install -r services/geometry/requirements.lock && pip install --no-deps -e services/geometry
+aurea-geometry-worker               # 127.0.0.1:3910; GET /healthz → {"status":"ok"}
 API_PORT=3900 pnpm api:start        # o el puerto libre que se quiera
 
 adb reverse tcp:$KC_PORT tcp:$KC_PORT
@@ -29,6 +33,8 @@ EXPO_NO_TELEMETRY=1 \
 pnpm exec expo run:android --variant debug
 ```
 Resultado esperado (hito 200): la app abre en la pestaña Boutique sin pedir cuenta, con 10 piezas sintéticas en COP, filtros por categoría y detalle de cada pieza (metal, peso en g, piedras en ct). Guardar en favoritos como invitado pide iniciar sesión. Usuario `dev.cliente`; la contraseña es el valor de `KC_DEV_USER_PASSWORD` en `.env`. Con sesión, el corazón guarda la pieza y aparece en Favoritos; Perfil muestra "Roles: customer".
+
+Hito 300 (Diseño): `pnpm install` genera el visor 3D (`src/design/viewer/viewer.generated.ts`, git-ignored); si falta, `pnpm --filter @aurea/mobile viewer`. La app trae módulos nativos nuevos (expo-sqlite, react-native-webview): tras actualizar desde un build anterior hace falta compilar de nuevo (`expo run:android`), no basta Metro. Recorrido del gate: Diseñar → Nuevo diseño → anillo en oro; la primera vista 3D tarda (~20 s en Windows, "Generando la vista 3D…"); Diámetro interior 40 → "Fuera de rango: 14–24 mm" sin ajustarlo; 19,5 → Previsualizar (volumen, peso estimado, medidas, pared mínima, DFM en revisión) → Aceptar → Revisión 2; detener solo la API, cambiar el ancho → Guardar sin conexión, cerrar la app desde recientes y abrirla: el cambio sigue pendiente; encender la API: se envía solo (o "Enviar ahora") → Revisión 3.
 
 Estados a revisar: con la API apagada, la Boutique muestra "El servicio no responde…" o "Sin conexión…" con Reintentar (nunca una lista vacía). El estado vacío de categoría no aparece con el seed actual (todas tienen piezas) y se cubre en `test/screens.test.tsx`. Con TalkBack, cada tarjeta se lee como "nombre, metal, precio, disponibilidad".
 

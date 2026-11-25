@@ -4,6 +4,7 @@ import hashlib
 import http.client
 import json
 import threading
+import sys
 import time
 
 import pytest
@@ -148,6 +149,9 @@ def test_default_memory_limit_still_builds():
         srv.server_close()
 
 
+# The memory cap uses resource.setrlimit (POSIX). On Windows only the wall-clock timeout applies,
+# as the README says, so there is nothing to test there; production workers run on Linux.
+@pytest.mark.skipif(sys.platform == "win32", reason="no RLIMIT_AS on Windows; only the timeout applies")
 def test_job_that_exceeds_memory_fails_without_details():
     srv = WorkerServer(settings(memory_mb=64))
     threading.Thread(target=srv.serve_forever, daemon=True).start()

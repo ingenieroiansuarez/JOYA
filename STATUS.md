@@ -1,6 +1,6 @@
 # STATUS — AUREA
 
-Hito activo: **300 — Jewelry Engine**. Actualizado: 2026-11-25.
+Hito activo: **400** (300 — Jewelry Engine aceptado). Actualizado: 2026-11-25.
 Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5YS
 
 ## Hitos
@@ -9,7 +9,8 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | 000 Feasibility | GO CONDICIONAL (ian, 2026-11-25) | CAD/DFM y render con evidencia; AR bloqueado y mesh IA solo simulada (`27_IMPLEMENTATION_ROADMAP/000_GO_NO_GO.md`) |
 | 100 Foundation | ACEPTADO (ian, 2026-11-25, PR #25) | Gate "arranque limpio, pruebas y login; entorno aislado; sin secretos": CI verde en main, login PKCE real en el Z Flip 7 (debug y release), `.env` fuera de git y `No secrets tracked` en CI. Contratos 1.1–1.7 con verificación en CI; arranque local (pnpm, Compose, migraciones); API con OIDC y permisos por rol; Keycloak local con login PKCE probado. Tokens de diseño con contraste AA verificado. Esqueletos web (Next) y móvil (Expo, login PKCE). Login PKCE real probado en el Z Flip 7 (2026-11-25) |
 | 200 Boutique | ACEPTADO (ian, 2026-11-25, PR #30) | Gate "APK dev navega el catálogo; estados vacío/error accesibles": APK debug en el Z Flip 7 navega catálogo, detalle y favoritos contra la API; error "Sin conexión" con Reintentar visto con la API apagada (2026-11-25). Contratos 1.8.0, migración 0001, seed demo, API (PR #26), app (PR #27–#29). Pendiente: recorrido con TalkBack |
-| 300–1000 | NOT_STARTED | |
+| 300 Jewelry Engine | ACEPTADO (ian, 2026-11-25, PR #35) | Gate "parámetro con geometría real; entrada inválida rechazada; reinicio sin conexión; roundtrip STEP/STL": probado en el Z Flip 7 contra API y worker reales (2026-11-25, 12:34–12:50). PR #31–#34 y la de cierre |
+| 400–1000 | NOT_STARTED | |
 
 ## Backlog 000
 | ID | Tarea | Estado | Evidencia |
@@ -98,6 +99,21 @@ TEST_DATABASE_URL="$DATABASE_URL" pnpm test   # db 3, api 45 (5 contra Keycloak)
   - Probado: 9 formas de token malo (sin cabecera, no JWT, vencido, emisor y audiencia ajenos, otra clave, `alg: none`, HS256 con la clave pública, payload alterado) → 401; contra Keycloak real, client credentials → `/v1/me` como auditor, login PKCE de `dev.cliente` → customer, el código no se canjea sin `code_verifier` ni con uno falso, la petición sin `code_challenge` se rechaza y el ID token no sirve contra la API.
   - Pendiente: MFA para personal y step-up (exige pantallas de login de staff, hito 200+), alcance por recurso y ubicación (lo aplica cada módulo cuando exista), revocación/introspección, y desplegar el IdP de producción (Keycloak autogestionado, ADR-0008, decidido el 2026-11-25).
 - Probado localmente: compose arriba, migración aplicada, `state_checks.sql` sobre la base migrada OK, Valkey rechaza clientes sin contraseña (`NOAUTH`).
+
+## Hito 300 — Jewelry Engine
+Gate: "Parameter update real geometry; rejected invalid input; restart offline; STEP/STL roundtrip".
+- Piezas: geometría (familias ring.02 y pendant.02, digest canónico, worker HTTP firmado; PR #31), contratos 1.9.0 + migración 0002 + `packages/design` (PR #32), API de proyectos, vista previa, revisiones, exportación y sync (PR #33), editor móvil con visor WebView + Three.js y cola sin conexión en SQLite (PR #34).
+- Prueba en dispositivo (2026-11-25, Z Flip 7 SM-F766B, Android 17, build debug desde main 4bda505 por USB con `adb reverse`; Windows con worker en Python 3.13.6, API y Keycloak locales). Horas locales (UTC−5):
+  1. 12:34 — `dev.cliente` crea "Mi diseño" (anillo Clásico, oro 18k): revisión 1 y vista 3D del anillo. El primer trabajo de geometría tardó ~23 s (captura de ian, `step1-after-signin_123458.png`).
+  2. 12:35 — Diámetro interior 40: "Fuera de rango: 14–24 mm. No se ajusta solo."; no se puede previsualizar ni guardar (captura de ian).
+  3. 12:36 — 19,5 → Previsualizar: volumen 481,795 mm³, peso estimado 7,468 g (densidad nominal sin confirmar), 23,107 × 23,1 × 4,007 mm, pared mínima 1,8 mm, DFM "requiere revisión humana" (captura de ian). Aceptar → revisión 2 (12:36:23, source PREVIEW); el job PREVIEW tardó 4 s.
+  4. 12:37 — API detenida (solo el proceso de :3900). Ancho 4 → 4,1 → Guardar sin conexión; app cerrada desde recientes y abierta de nuevo: "Revisión 2 · 1 cambio sin enviar", aviso sin conexión y "Ancho → 4,1 mm · pendiente" (capturas de ian y `step5-before-prende_124818.png`).
+  5. 12:48 — API encendida: la app envió el cambio sola → revisión 3 (12:49:03, source SYNC, padre la 2). En la base: una sola `sync_operation` APPLIED, sin CONFLICT/REJECTED, revisiones 1–3 sin duplicados; todos los jobs con 1 intento y `simulated=false`.
+  6. 12:50 — Roundtrip de la revisión 3 por la API real (login PKCE de `dev.cliente`): `POST /v1/geometry/jobs` SUCCEEDED; 5 artefactos descargados por URL firmada con SHA-256 igual al de la API y al manifiesto (STEP 9.692 B, STL 50.484 B, GLB, manifiesto, DFM). STEP reimportado con cadquery: 1 sólido válido, volumen 493,8395 mm³ = manifiesto (diferencia relativa 2,2e-14; analítico π/4·(23,1²−19,5²)·4,1 ≈ 493,84), caja 23,1 × 23,1 × 4,1 mm. STL: 1.008 triángulos, cerrado (watertight) y con orientación consistente, volumen 493,635 mm³ (−0,041 % por teselado). Resumen: masa estimada 7,655 g (NOMINAL_UNCONFIRMED), DFM REVIEW, `POC_ONLY_NOT_APPROVED_FOR_MANUFACTURING`, aprobación humana requerida.
+  Capturas y archivos en `.data/gate-300/` del portátil de ian (fuera de git).
+- Arreglos tras la prueba (PR de cierre): aviso "Generando la vista 3D…" en lugar de "aparece cuando hay conexión" mientras se calcula; `postinstall` genera el visor (el primer bundle falló con `Unable to resolve "./viewer.generated"`); chips de la Boutique que se cortaban en horizontal; el test del límite de memoria del worker se omite en Windows (solo aplica el tiempo; `resource` es POSIX).
+- Notas: la caja del manifiesto (23,107 × 23,1 × 4,107) incluye ~0,004 mm de tolerancia de OCC; la reimportación da 23,1 × 23,1 × 4,1. Peso y DFM no autorizan fabricar: densidades nominales sin confirmar y DFM en REVIEW hasta que haya reglas del taller.
+- Pendiente: recorrido con TalkBack del editor; prueba en un Android de gama media; settings y gemas (fuera del alcance de 300).
 
 ## Hito 200 — Boutique
 Gate: "APK dev navega el catálogo; estados vacío/error accesibles".

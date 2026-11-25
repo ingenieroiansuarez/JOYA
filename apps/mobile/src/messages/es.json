@@ -100,6 +100,8 @@
   "viewerLoading": "Preparando la vista 3D…",
   "viewerEmpty": "La vista 3D aparece cuando hay conexión.",
   "viewerError": "No se pudo mostrar la vista 3D.",
+  "viewerBuilding": "Generando la vista 3D en el servidor…",
+  "viewerBuildFailed": "No se pudo generar la vista 3D. Tu diseño sigue guardado.",
   "previewNote": "Vista previa: no es el sólido técnico (STEP/STL) ni una aprobación para fabricar.",
   "parameters": "Medidas",
   "range": "{min}–{max} mm",

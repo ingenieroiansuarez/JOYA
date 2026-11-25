@@ -100,6 +100,8 @@
   "viewerLoading": "Preparing the 3D view…",
   "viewerEmpty": "The 3D view appears when you are online.",
   "viewerError": "The 3D view could not be shown.",
+  "viewerBuilding": "Building the 3D view on the server…",
+  "viewerBuildFailed": "The 3D view could not be built. Your design is still saved.",
   "previewNote": "Preview: not the technical solid (STEP/STL) nor an approval to manufacture.",
   "parameters": "Measurements",
   "range": "{min}–{max} mm",
