@@ -1,0 +1,263 @@
+{
+  "$comment": "Stable error codes. `use: error` = Error.code with its HTTP status; `use: detail` = ErrorDetail.code inside Error.details. tools/contracts/check_contracts.py fails CI if a code raised in services/ is missing here, or if a code is not UPPER_SNAKE or repeated. Messages are for people and carry no PII; clients branch on code only.",
+  "codes": [
+    {
+      "code": "VALIDATION_FAILED",
+      "http": 400,
+      "use": "error",
+      "description": "El cuerpo o los parámetros no cumplen el esquema; `details` dice dónde."
+    },
+    {
+      "code": "UNAUTHENTICATED",
+      "http": 401,
+      "use": "error",
+      "description": "Falta token o no es válido (issuer, audience, expiración)."
+    },
+    {
+      "code": "FORBIDDEN",
+      "http": 403,
+      "use": "error",
+      "description": "El rol o el alcance no permiten la acción sobre este recurso."
+    },
+    {
+      "code": "NOT_FOUND",
+      "http": 404,
+      "use": "error",
+      "description": "El recurso no existe o el actor no puede verlo (no se distingue)."
+    },
+    {
+      "code": "VERSION_CONFLICT",
+      "http": 409,
+      "use": "error",
+      "description": "La versión o revisión base esperada ya no es la actual."
+    },
+    {
+      "code": "DIGEST_MISMATCH",
+      "http": 409,
+      "use": "error",
+      "description": "El digest enviado no coincide con la versión que se decide (cotización o revisión)."
+    },
+    {
+      "code": "IDEMPOTENCY_CONFLICT",
+      "http": 409,
+      "use": "error",
+      "description": "Misma Idempotency-Key con otro cuerpo."
+    },
+    {
+      "code": "INVALID_TRANSITION",
+      "http": 409,
+      "use": "error",
+      "description": "La máquina de estados no admite la acción desde el estado actual."
+    },
+    {
+      "code": "INVARIANT_VIOLATED",
+      "http": 422,
+      "use": "error",
+      "description": "Regla de negocio incumplida (saldo, stock, DFM, segregación); `details` la nombra."
+    },
+    {
+      "code": "SEGREGATION_REQUIRED",
+      "http": 422,
+      "use": "error",
+      "description": "Quien aprueba no puede ser quien inició (aprobación de diseño, liberación, reembolso, revocación)."
+    },
+    {
+      "code": "QUOTE_EXPIRED",
+      "http": 422,
+      "use": "error",
+      "description": "La cotización venció."
+    },
+    {
+      "code": "RATE_LIMITED",
+      "http": 429,
+      "use": "error",
+      "description": "Demasiadas solicitudes; reintentar después de Retry-After."
+    },
+    {
+      "code": "SERVICE_UNAVAILABLE",
+      "http": 503,
+      "use": "error",
+      "description": "Dependencia caída o en mantenimiento; reintentar con backoff."
+    },
+    {
+      "code": "PROVIDER_NOT_CONFIGURED",
+      "http": 503,
+      "use": "error",
+      "description": "Proveedor externo sin configuración real; en producción se falla cerrado."
+    },
+    {
+      "code": "INVALID_REQUEST",
+      "http": 400,
+      "use": "error",
+      "description": "Solicitud inválida a un adaptador (mesh)."
+    },
+    {
+      "code": "UNKNOWN_JOB",
+      "http": 404,
+      "use": "error",
+      "description": "Trabajo inexistente en el adaptador."
+    },
+    {
+      "code": "RESULT_NOT_READY",
+      "http": 409,
+      "use": "error",
+      "description": "El trabajo aún no tiene resultado."
+    },
+    {
+      "code": "MESH_ERROR",
+      "http": 422,
+      "use": "error",
+      "description": "Error genérico del adaptador de malla."
+    },
+    {
+      "code": "MESH_IMPORT_FAILED",
+      "http": 422,
+      "use": "error",
+      "description": "No se pudo leer la malla."
+    },
+    {
+      "code": "MESH_FORMAT_UNSUPPORTED",
+      "http": 422,
+      "use": "error",
+      "description": "Formato de malla no admitido (solo GLB)."
+    },
+    {
+      "code": "MESH_EMPTY",
+      "http": 422,
+      "use": "error",
+      "description": "La malla no tiene triángulos, o no quedan tras reparar."
+    },
+    {
+      "code": "MESH_INVALID",
+      "http": 422,
+      "use": "error",
+      "description": "Coordenadas no finitas."
+    },
+    {
+      "code": "MESH_TOO_LARGE",
+      "http": 422,
+      "use": "error",
+      "description": "Supera el tamaño o el número de triángulos permitido."
+    },
+    {
+      "code": "SCALE_REQUIRED",
+      "http": 422,
+      "use": "error",
+      "description": "La escala debe confirmarla una persona."
+    },
+    {
+      "code": "SCALE_INVALID",
+      "http": 422,
+      "use": "error",
+      "description": "Escala fuera de rango o eje inválido."
+    },
+    {
+      "code": "INVALID_DOCUMENT",
+      "http": 422,
+      "use": "error",
+      "description": "El DesignDocument no es válido; cada problema va en `details`."
+    },
+    {
+      "code": "SCHEMA",
+      "http": null,
+      "use": "detail",
+      "description": "No cumple el JSON Schema del documento."
+    },
+    {
+      "code": "EMPTY_DESIGN",
+      "http": null,
+      "use": "detail",
+      "description": "Sin componentes."
+    },
+    {
+      "code": "DUPLICATE_ID",
+      "http": null,
+      "use": "detail",
+      "description": "Id repetido."
+    },
+    {
+      "code": "INVALID_ID",
+      "http": null,
+      "use": "detail",
+      "description": "Id con caracteres no permitidos."
+    },
+    {
+      "code": "UNKNOWN_FAMILY",
+      "http": null,
+      "use": "detail",
+      "description": "Familia inexistente."
+    },
+    {
+      "code": "UNSUPPORTED_FAMILY_VERSION",
+      "http": null,
+      "use": "detail",
+      "description": "Versión de familia no admitida."
+    },
+    {
+      "code": "UNKNOWN_PARAMETER",
+      "http": null,
+      "use": "detail",
+      "description": "Parámetro que la familia no define."
+    },
+    {
+      "code": "MISSING_PARAMETER",
+      "http": null,
+      "use": "detail",
+      "description": "Falta un parámetro requerido."
+    },
+    {
+      "code": "NOT_A_NUMBER",
+      "http": null,
+      "use": "detail",
+      "description": "Se esperaba un número."
+    },
+    {
+      "code": "NOT_FINITE",
+      "http": null,
+      "use": "detail",
+      "description": "Número no finito."
+    },
+    {
+      "code": "OUT_OF_RANGE",
+      "http": null,
+      "use": "detail",
+      "description": "Fuera del rango de la familia."
+    },
+    {
+      "code": "QUATERNION_NOT_NORMALIZED",
+      "http": null,
+      "use": "detail",
+      "description": "Rotación no normalizada."
+    },
+    {
+      "code": "DANGLING_DEPENDENCY",
+      "http": null,
+      "use": "detail",
+      "description": "Dependencia a un componente inexistente."
+    },
+    {
+      "code": "DANGLING_TARGET",
+      "http": null,
+      "use": "detail",
+      "description": "Restricción a un componente inexistente."
+    },
+    {
+      "code": "DEPENDENCY_CYCLE",
+      "http": null,
+      "use": "detail",
+      "description": "Dependencias en ciclo."
+    },
+    {
+      "code": "INVALID_CONSTRAINT",
+      "http": null,
+      "use": "detail",
+      "description": "Restricción inválida."
+    },
+    {
+      "code": "UNSUPPORTED_OPERATION",
+      "http": null,
+      "use": "detail",
+      "description": "Operación no admitida."
+    }
+  ]
+}

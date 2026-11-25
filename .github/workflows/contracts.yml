@@ -12,6 +12,7 @@ on:
       - "11_3D_ASSET_LIBRARY/families.json"
       - "19_SCREEN_INVENTORY/**"
       - "21_SECURITY/**"
+      - "services/*/aurea_*/**"
       - ".github/workflows/contracts.yml"
 permissions:
   contents: read

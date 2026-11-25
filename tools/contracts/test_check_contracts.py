@@ -276,5 +276,85 @@ class EventEnvelopeTest(unittest.TestCase):
             self.assertFalse(v.is_valid(bad), bad)
 
 
+class ErrorsTest(unittest.TestCase):
+    def setUp(self):
+        self.catalog = json.loads(cc.ERRORS.read_text())
+        self.api = yaml.safe_load(cc.OPENAPI.read_text())
+        self.used = cc.service_error_codes()
+
+    def test_catalog_covers_services(self):
+        self.assertIn("SCALE_REQUIRED", self.used)          # mesh, keyword
+        self.assertIn("PROVIDER_NOT_CONFIGURED", self.used)  # mesh, class attribute
+        self.assertIn("OUT_OF_RANGE", self.used)             # geometry, ValidationIssue
+        self.assertEqual(cc.check_errors(self.catalog, self.api, self.used), [])
+
+    def test_unknown_service_code_is_detected(self):
+        used = {**self.used, "MESH_ON_FIRE": "services/mesh/aurea_mesh/x.py"}
+        self.assertEqual(cc.check_errors(self.catalog, self.api, used),
+                         ["services/mesh/aurea_mesh/x.py: error code MESH_ON_FIRE is not in 06_API_CONTRACTS/errors.json"])
+
+    def test_bad_catalog_entries(self):
+        cat = copy.deepcopy(self.catalog)
+        cat["codes"] += [{"code": "not-snake", "http": 400, "use": "error", "description": ""},
+                         {"code": "FORBIDDEN", "http": 403, "use": "error", "description": ""},
+                         {"code": "NO_STATUS", "http": None, "use": "error", "description": ""},
+                         {"code": "DETAIL_WITH_STATUS", "http": 400, "use": "detail", "description": ""}]
+        errs = "\n".join(cc.check_errors(cat, self.api, self.used))
+        for needle in ("'not-snake' is not UPPER_SNAKE", "FORBIDDEN repeated", "NO_STATUS needs an HTTP status",
+                       "detail code DETAIL_WITH_STATUS"):
+            self.assertIn(needle, errs)
+
+    def test_free_details_rejected(self):
+        api = copy.deepcopy(self.api)
+        api["components"]["schemas"]["Error"]["properties"]["details"] = {"type": "object"}
+        self.assertIn("OpenAPI Error.details must be an array of ErrorDetail",
+                      cc.check_errors(self.catalog, api, self.used))
+
+    def test_error_validation(self):
+        v = validator("Error")
+        ok = {"code": "INVALID_DOCUMENT", "message": "El diseño no es válido",
+              "correlationId": "00000000-0000-0000-0000-000000000001",
+              "details": [{"code": "OUT_OF_RANGE", "pointer": "/components/0/parameters/innerDiameter",
+                           "message": "fuera de 14-24 mm"}]}
+        v.validate(ok)
+        for bad in ({**ok, "code": "invalid document"}, {**ok, "details": {"x": 1}},
+                    {**ok, "details": [{"code": "OUT_OF_RANGE", "pointer": "components", "message": "m"}]},
+                    {**ok, "details": [{"code": "OUT_OF_RANGE", "message": "m", "stack": "trace"}]}):
+            self.assertFalse(v.is_valid(bad), bad)
+
+
+class SyncTest(unittest.TestCase):
+    OP = {"id": "00000000-0000-0000-0000-000000000001", "projectId": "00000000-0000-0000-0000-000000000002",
+          "branchId": "00000000-0000-0000-0000-000000000003", "baseRevisionId": "00000000-0000-0000-0000-000000000004",
+          "sequence": 1, "createdAt": "2026-11-25T10:00:00Z", "operation": RING}
+
+    def test_operation_is_an_allowlisted_design_operation(self):
+        v = validator("SyncOperation")
+        v.validate(self.OP)
+        for bad in ({**self.OP, "operation": {"type": "run_python", "code": "x"}},
+                    {**self.OP, "operation": {**RING, "innerDiameter": 30}},
+                    {**self.OP, "payload": {}}, {**self.OP, "sequence": 0},
+                    {k: x for k, x in self.OP.items() if k != "baseRevisionId"}):
+            self.assertFalse(v.is_valid(bad), bad)
+
+    def test_push_body(self):
+        v = body_validator("syncPush")
+        v.validate({"deviceId": self.OP["id"], "operations": [self.OP]})
+        self.assertFalse(v.is_valid({"deviceId": self.OP["id"], "operations": []}))
+
+    def test_results(self):
+        v = validator("SyncResult")
+        ok = {"cursor": "c1", "results": [
+            {"operationId": self.OP["id"], "status": "APPLIED", "revisionId": self.OP["baseRevisionId"]},
+            {"operationId": self.OP["id"], "status": "CONFLICT", "serverRevisionId": self.OP["baseRevisionId"],
+             "error": {"code": "VERSION_CONFLICT", "message": "base desactualizada"}},
+            {"operationId": self.OP["id"], "status": "REJECTED", "error": {"code": "FORBIDDEN", "message": "sin permiso"}}]}
+        v.validate(ok)
+        for bad in ({"operationId": self.OP["id"], "status": "APPLIED"},
+                    {"operationId": self.OP["id"], "status": "CONFLICT", "error": {"code": "X", "message": "m"}},
+                    {"operationId": self.OP["id"], "status": "LAST_WRITE_WINS"}):
+            self.assertFalse(v.is_valid({"cursor": "c", "results": [bad]}), bad)
+
+
 if __name__ == "__main__":
     unittest.main()
