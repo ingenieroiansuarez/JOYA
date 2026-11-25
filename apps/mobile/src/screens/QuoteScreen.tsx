@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { ApiError } from "../api";
 import { CommerceClient, type Quote } from "../commerce/client";
+import { FamilyArt } from "../design/art";
 import { useDesign } from "../design/DesignContext";
+import { familyName } from "../design/describe";
 import { waitForJob } from "../design/glb";
 import { formatMoney } from "../format";
 import { useSession } from "../session";
-import { Button, c, errorKey, Header, Loading, Notice, s, styles, type } from "../ui";
+import { Button, c, errorKey, Header, Loading, Notice, styles } from "../ui";
+import { Card, Journey, qs, quoteStep, Row, Status, Total } from "./commerce-ui";
 
 // The pilot's only enabled currency (pricing rules are COP); the API refuses any other.
 const CURRENCY = "COP";
@@ -25,7 +28,7 @@ type State =
  */
 export function QuoteScreen({ revisionId, onBack, onOrder, pollMs = 5_000 }: { revisionId: string; onBack: () => void; onOrder: (orderId: string) => void; pollMs?: number }) {
   const { t, locale, api, withToken } = useSession();
-  const { client, newId, saw } = useDesign();
+  const { client, newId, saw, store } = useDesign();
   const commerce = useMemo(() => new CommerceClient(api, withToken), [api, withToken]);
   const [state, setState] = useState<State>({ phase: "requesting" });
   const [accepting, setAccepting] = useState<"idle" | "busy" | ApiError>("idle");
@@ -59,6 +62,16 @@ export function QuoteScreen({ revisionId, onBack, onOrder, pollMs = 5_000 }: { r
     }
   }, [commerce, client, revisionId, newId, saw]);
   useEffect(() => { void request(); }, [request]);
+
+  // The design's family and alloy from what the phone already has, for the picture at the top.
+  const projectId = state.phase === "quote" ? state.quote.projectId : null;
+  const [piece, setPiece] = useState<{ familyId: string; materialId: string } | null>(null);
+  useEffect(() => {
+    if (!projectId || !store) return;
+    void store.project(projectId).then((p) => {
+      if (p && !alive.current.aborted) setPiece({ familyId: p.project.familyId, materialId: p.head.document.components[0]?.materialId ?? "" });
+    }).catch(() => undefined);
+  }, [projectId, store]);
 
   // While the advisor reviews (DRAFT), look again every few seconds; stop once there is an answer.
   const quoteId = state.phase === "quote" ? state.quote.id : null;
@@ -101,19 +114,31 @@ export function QuoteScreen({ revisionId, onBack, onOrder, pollMs = 5_000 }: { r
   const q = state.quote;
   const m = (x: { amount: string; currency: string }) => formatMoney(x.amount, x.currency, locale);
   const acceptError = accepting instanceof ApiError ? accepting : null;
+  const step = quoteStep(q.state);
+  const tone = q.state === "ISSUED" ? "success" : q.state === "DRAFT" || q.state === "ACCEPTED" ? "accent" : "warning";
   return (
     <View style={styles.screen}>
-      <Header title={t("quoteTitle")} subtitle={`${q.projectTitle} · ${t("revisionLine", { number: String(q.revisionNumber) })}`} onBack={onBack} backLabel={t("back")} />
+      <Header overline={t("quoteTitle")} title={q.projectTitle} subtitle={t("revisionLine", { number: String(q.revisionNumber) })} onBack={onBack} backLabel={t("back")} />
       <ScrollView contentContainerStyle={qs.content}>
-        <Text accessibilityLiveRegion="polite" style={[styles.body, { fontWeight: "600" }]}>{t(`quoteState_${q.state}`)}</Text>
+        {piece && (
+          <View style={qs.hero}>
+            <FamilyArt familyId={piece.familyId} materialId={piece.materialId} label="" style={qs.heroArt} />
+            <View style={qs.heroBody}>
+              <Text style={styles.muted}>{familyName(piece.familyId, locale)}</Text>
+              <Status text={t(`quoteState_${q.state}`)} tone={tone} />
+            </View>
+          </View>
+        )}
+        {!piece && <Status text={t(`quoteState_${q.state}`)} tone={tone} />}
+        {step !== null && <Journey current={step} t={t} />}
         {q.pricing.simulated && <Text style={[styles.muted, { color: c.warning }]}>{t("quoteSimulated")}</Text>}
-        <View style={qs.card}>
+        <Card title={t("quoteBreakdown")}>
           {q.lines.map((l) => <Row key={l.code} k={l.label} v={m(l.amount)} />)}
           <Row k={t("quoteSubtotal")} v={m(q.subtotal)} />
           <Row k={t("quoteTax", { rate: pct(q.tax.rate) })} v={m(q.tax.amount)} />
-          <Row k={t("quoteTotal")} v={m(q.total)} strong />
+          <Total k={t("quoteTotal")} v={m(q.total)} />
           <Row k={t("quoteDeposit", { rate: pct(q.deposit.rate) })} v={m(q.deposit.amount)} />
-        </View>
+        </Card>
         {q.state === "DRAFT" && <Text style={styles.muted}>{t("quoteDraftNote")}</Text>}
         {q.state === "ISSUED" && (
           <>
@@ -140,20 +165,3 @@ export function QuoteScreen({ revisionId, onBack, onOrder, pollMs = 5_000 }: { r
 const pct = (rate: string) => `${(Number(rate) * 100).toFixed(0)} %`; // display of a configured rate, not money
 const day = (iso: string, locale: string) =>
   new Intl.DateTimeFormat(locale === "en" ? "en-US" : "es-CO", { dateStyle: "long", timeZone: "America/Bogota" }).format(new Date(iso));
-
-export function Row({ k, v, strong }: { k: string; v: string; strong?: boolean }) {
-  return (
-    <View style={qs.row} accessible accessibilityLabel={`${k}: ${v}`}>
-      <Text style={[styles.body, { flex: 1 }, strong && { fontWeight: "700" }]}>{k}</Text>
-      <Text style={[styles.body, strong && { fontWeight: "700" }]}>{v}</Text>
-    </View>
-  );
-}
-
-export const qs = StyleSheet.create({
-  // Room under the last button so it scrolls clear of the tab bar and the system navigation.
-  content: { padding: s[4], gap: s[3], paddingBottom: s[4] * 4 },
-  card: { backgroundColor: c.surface, borderRadius: 12, padding: s[3], gap: s[2] },
-  row: { flexDirection: "row", justifyContent: "space-between", gap: s[3] },
-  h: { color: c.text, fontSize: type[3], fontWeight: "600" },
-});

@@ -6,7 +6,7 @@ import { useDesign } from "../design/DesignContext";
 import { formatDecimal, formatMoney } from "../format";
 import { useSession } from "../session";
 import { Button, c, errorKey, Header, Loading, Notice, styles } from "../ui";
-import { qs, Row } from "./QuoteScreen";
+import { Card, Journey, orderStep, qs, Row, Status, Total } from "./commerce-ui";
 
 
 
@@ -61,30 +61,29 @@ export function OrderScreen({ id, onBack, pollMs = 5_000 }: { id: string; onBack
   const m = (x: { amount: string; currency: string }) => formatMoney(x.amount, x.currency, locale);
   const review = order.payments.find((p) => p.reviewReason);
   const payError = paying instanceof ApiError ? paying : null;
+  const step = orderStep(order.state);
+  const tone = order.state === "CONFIRMED" || order.state === "READY" || order.state === "DELIVERED" ? "success" : order.state === "CANCELLED" ? "danger" : "accent";
+  const held = order.reservations.filter((v) => v.state !== "RELEASED");
   return (
     <View style={styles.screen}>
-      <Header title={t("orderTitle")} subtitle={`${order.projectTitle} · ${t("revisionLine", { number: String(order.revisionNumber) })}`} onBack={onBack} backLabel={t("back")} />
+      <Header overline={t("orderTitle")} title={order.projectTitle} subtitle={t("revisionLine", { number: String(order.revisionNumber) })} onBack={onBack} backLabel={t("back")} />
       <ScrollView contentContainerStyle={qs.content}>
-        <Text accessibilityLiveRegion="polite" style={[styles.body, { fontWeight: "600", color: order.state === "CONFIRMED" ? c.success : order.state === "CANCELLED" ? c.danger : c.text }]}>
-          {t(`orderState_${order.state}`)}
-        </Text>
-        <View style={qs.card}>
-          <Row k={t("quoteTotal")} v={m(order.total)} strong />
+        <Status text={t(`orderState_${order.state}`)} tone={tone} />
+        {step !== null && <Journey current={step} t={t} />}
+        <Card title={t("orderPayments")}>
+          <Total k={t("quoteTotal")} v={m(order.total)} />
           <Row k={t("orderDepositRequired")} v={m(order.deposit.required)} />
           <Row k={t("orderDepositPaid")} v={m(order.deposit.paid)} />
           <Row k={t("orderOutstanding")} v={m(order.deposit.outstanding)} />
           <Row k={t("orderBalance")} v={m(order.balance)} />
-        </View>
-        <View style={qs.card}>
-          <Text accessibilityRole="header" style={qs.h}>{t("orderMetal")}</Text>
-          {order.reservations.filter((v) => v.state !== "RELEASED").length === 0
+        </Card>
+        <Card title={t("orderMetal")}>
+          {held.length === 0
             ? <Text style={styles.muted}>{t("orderNoMetal")}</Text>
-            : order.reservations.filter((v) => v.state !== "RELEASED").map((v) => (
-              <Text key={v.id} style={styles.body}>
-                {`${v.lotLabel}: ${formatDecimal(v.quantity, v.unit, locale)} · ${t(v.state === "ALLOCATED" ? "orderMetalAllocated" : "orderMetalHeld")}`}
-              </Text>
+            : held.map((v) => (
+              <Row key={v.id} k={v.lotLabel} v={`${formatDecimal(v.quantity, v.unit, locale)} · ${t(v.state === "ALLOCATED" ? "orderMetalAllocated" : "orderMetalHeld")}`} />
             ))}
-        </View>
+        </Card>
         {order.state === "PENDING_PAYMENT" && !review && (
           <>
             <Text style={[styles.muted, { color: c.warning }]}>{t("orderSimulatedNote")}</Text>
