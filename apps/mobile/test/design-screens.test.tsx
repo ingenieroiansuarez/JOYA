@@ -33,6 +33,7 @@ jest.mock("expo-crypto", () => ({
 }));
 import { DesignProvider } from "../src/design/DesignContext";
 import { SqliteDesignStore } from "../src/design/store";
+import { DesignSync } from "../src/design/sync";
 import { SessionProvider } from "../src/session";
 import { DesignsScreen } from "../src/screens/DesignsScreen";
 import { EditorScreen } from "../src/screens/EditorScreen";
@@ -329,5 +330,30 @@ describe("design thumbnails", () => {
     await app(server, file, <DesignsScreen onOpen={() => undefined} onNew={() => undefined} />);
     await screen.findAllByText(/Ring|Anillo/);
     expect(screen.queryByTestId("design-thumb")).toBeNull();
+  });
+
+  it("does not keep a picture of a pending offline change of alloy as the head's", async () => {
+    const server = new FakeDesignServer();
+    const file = join(dir, `${uuid()}.db`);
+    const p = await stored(server, file);
+    const head = server.head(p.id);
+    const seedDb = sqlite(file);
+    const seed = await SqliteDesignStore.open(seedDb, OWNER);
+    await seed.putGlb(head.digest, "Z2xURg==");
+    server.online = false;
+    const comp = head.document.components[0];
+    const other = comp.materialId === "silver-925" ? "gold-18k-rose" : "silver-925";
+    expect((await new DesignSync(seed, server.client(), uuid).saveOffline(p.id, { type: "change_material", componentId: comp.id, materialId: other })).ok).toBe(true);
+    seedDb.close();
+
+    const editor = await app(server, file, <EditorScreen id={p.id} onBack={() => undefined} />);
+    await screen.findByText("Revision 1", { exact: false });
+    await act(async () => { fromPage({ type: "ready" }); });
+    const show = posted.map((d) => JSON.parse(d)).find((m) => m.type === "show");
+    expect(show).toMatchObject({ glb: "Z2xURg==", snap: true });
+    await act(async () => { fromPage({ type: "shown" }); fromPage({ type: "snapshot", seq: show.seq, data: JPEG }); });
+    expect(await (await SqliteDesignStore.open(editor.db, OWNER)).thumb(p.id)).toBeNull();
+    await editor.unmount();
+    editor.db.close();
   });
 });

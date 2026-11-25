@@ -21,10 +21,10 @@ export const validSnapshot = (d: unknown): d is string =>
 
 export function Viewer({ glb, color, label, height = 300, emptyText, errorText, loadingText, onSnapshot }: {
   glb: string | null; color: string; label: string; height?: number; emptyText: string; errorText: string; loadingText: string;
-  /** Called with a picture of `glb` once it is shown (the mesh it was taken of, and the JPEG data URL). */
-  onSnapshot?: (glb: string, jpeg: string) => void;
+  /** Called with a picture once a mesh is shown: the mesh and colour it was taken with, and the JPEG data URL. */
+  onSnapshot?: (shown: { glb: string; color: string }, jpeg: string) => void;
 }) {
-  const shown = useRef<{ glb: string; seq: number } | null>(null);
+  const shown = useRef<{ glb: string; color: string; seq: number } | null>(null);
   const snap = useRef(onSnapshot);
   snap.current = onSnapshot;
   const ref = useRef<WebViewHandle>(null);
@@ -36,7 +36,7 @@ export function Viewer({ glb, color, label, height = 300, emptyText, errorText, 
     if (!glb) { setState("empty"); return; }
     setState("loading");
     const seq = (shown.current?.seq ?? 0) + 1;
-    shown.current = { glb, seq };
+    shown.current = { glb, color, seq };
     ref.current?.postMessage(JSON.stringify({ type: "show", glb, color, snap: !!snap.current, seq }));
   }, [ready, glb, color]);
 
@@ -47,7 +47,7 @@ export function Viewer({ glb, color, label, height = 300, emptyText, errorText, 
     else if (msg.type === "shown") setState("shown");
     else if (msg.type === "error") setState("error");
     // Only the picture of the mesh shown now: one of an earlier mesh (seq behind) is dropped.
-    else if (msg.type === "snapshot" && shown.current && msg.seq === shown.current.seq && validSnapshot(msg.data)) snap.current?.(shown.current.glb, msg.data);
+    else if (msg.type === "snapshot" && shown.current && msg.seq === shown.current.seq && validSnapshot(msg.data)) snap.current?.({ glb: shown.current.glb, color: shown.current.color }, msg.data);
   };
 
   const overlay = state === "error" ? errorText : state === "empty" ? emptyText : state === "shown" ? null : loadingText;

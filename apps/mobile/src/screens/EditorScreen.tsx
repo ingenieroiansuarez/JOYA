@@ -222,8 +222,13 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
       <ScrollView contentContainerStyle={ed.content} keyboardShouldPersistTaps="handled">
         <Viewer glb={glb} color={studioColor(comp.materialId)} label={t("viewerLabel", { name: title })}
           onSnapshot={(shown, jpeg) => {
+            // Only a picture of the head as saved: its mesh and its alloy (a pending offline change of
+            // material recolours the same mesh, and that is not the head yet).
             const head = headMesh.current;
-            if (store && head && shown === head.glb) void store.putThumb(id, head.revisionId, jpeg).catch(() => undefined);
+            const headMaterial = local.local.head.document.components[0]?.materialId ?? "";
+            if (store && head && head.revisionId === local.local.head.id && shown.glb === head.glb && shown.color === studioColor(headMaterial)) {
+              void store.putThumb(id, head.revisionId, jpeg).catch(() => undefined);
+            }
           }}
           emptyText={t(mesh === "building" ? "viewerBuilding" : mesh === "offline" ? "viewerEmpty" : "viewerBuildFailed")} errorText={t("viewerError")} loadingText={t("viewerLoading")} />
         <Text style={styles.muted}>{t("previewNote")}</Text>
