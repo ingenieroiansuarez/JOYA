@@ -1,6 +1,6 @@
 # STATUS — AUREA
 
-Hito activo: **500 Commercial slice**, gate cumplido y pendiente de la aceptación de ian (400 — AURA aceptado). Actualizado: 2026-11-25.
+Hito activo: **600 Demo Edition** (500 — Commercial slice aceptado). Actualizado: 2026-11-25.
 Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5YS
 
 ## Hitos
@@ -11,7 +11,7 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | 200 Boutique | ACEPTADO (ian, 2026-11-25, PR #30) | Gate "APK dev navega el catálogo; estados vacío/error accesibles": APK debug en el Z Flip 7 navega catálogo, detalle y favoritos contra la API; error "Sin conexión" con Reintentar visto con la API apagada (2026-11-25). Contratos 1.8.0, migración 0001, seed demo, API (PR #26), app (PR #27–#29). Pendiente: recorrido con TalkBack |
 | 300 Jewelry Engine | ACEPTADO (ian, 2026-11-25, PR #35) | Gate "parámetro con geometría real; entrada inválida rechazada; reinicio sin conexión; roundtrip STEP/STL": probado en el Z Flip 7 contra API y worker reales (2026-11-25, 12:34–12:50). PR #31–#34 y la de cierre |
 | 400 AURA | ACEPTADO (ian, 2026-11-25, PR #37) | Gate "Prompt → proposal → authorized revision; failure/quota tests": probado en el Z Flip 7 (2026-11-25, 14:15–14:17) con el adaptador simulado `aura-sim`; API, panel y golden set (PR #36). Sin modelo de IA real por decisión de ian (sin presupuesto); concepto/malla con IA no se hacen |
-| 500 Commercial slice | GATE_MET, pendiente de aceptación de ian | Gate "E2E de Android a web, snapshot, pago duplicado y stock": flujo completo en el Z Flip 7 + panel web (2026-11-25, 15:22–15:25); snapshot, pago duplicado y stock con pruebas automáticas. API, panel y app (PR #39), arreglos de la prueba (PR #40). Precios, impuesto y pagos simulados |
+| 500 Commercial slice | ACEPTADO (ian, 2026-11-25, PR #40) | Gate "E2E de Android a web, snapshot, pago duplicado y stock": flujo completo en el Z Flip 7 + panel web (2026-11-25, 15:22–15:25); snapshot, pago duplicado y stock con pruebas automáticas. API, panel y app (PR #39), arreglos de la prueba (PR #40). Precios, impuesto y pagos simulados |
 | 600–1000 | NOT_STARTED | |
 
 ## Backlog 000
