@@ -1,6 +1,6 @@
 # STATUS — AUREA
 
-Hito activo: **300 — Jewelry Engine**. Actualizado: 2026-11-25.
+Hito activo: **400** (300 — Jewelry Engine aceptado). Actualizado: 2026-11-25.
 Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5YS
 
 ## Hitos
@@ -9,7 +9,7 @@ Revisión completa del handoff: https://claude.ai/artifact/MdsS2iw3KGWmf2U3tHW5Y
 | 000 Feasibility | GO CONDICIONAL (ian, 2026-11-25) | CAD/DFM y render con evidencia; AR bloqueado y mesh IA solo simulada (`27_IMPLEMENTATION_ROADMAP/000_GO_NO_GO.md`) |
 | 100 Foundation | ACEPTADO (ian, 2026-11-25, PR #25) | Gate "arranque limpio, pruebas y login; entorno aislado; sin secretos": CI verde en main, login PKCE real en el Z Flip 7 (debug y release), `.env` fuera de git y `No secrets tracked` en CI. Contratos 1.1–1.7 con verificación en CI; arranque local (pnpm, Compose, migraciones); API con OIDC y permisos por rol; Keycloak local con login PKCE probado. Tokens de diseño con contraste AA verificado. Esqueletos web (Next) y móvil (Expo, login PKCE). Login PKCE real probado en el Z Flip 7 (2026-11-25) |
 | 200 Boutique | ACEPTADO (ian, 2026-11-25, PR #30) | Gate "APK dev navega el catálogo; estados vacío/error accesibles": APK debug en el Z Flip 7 navega catálogo, detalle y favoritos contra la API; error "Sin conexión" con Reintentar visto con la API apagada (2026-11-25). Contratos 1.8.0, migración 0001, seed demo, API (PR #26), app (PR #27–#29). Pendiente: recorrido con TalkBack |
-| 300 Jewelry Engine | GATE_MET, pendiente de aceptación de ian | Gate "parámetro con geometría real; entrada inválida rechazada; reinicio sin conexión; roundtrip STEP/STL": probado en el Z Flip 7 contra API y worker reales (2026-11-25, 12:34–12:50). PR #31–#34 y la de cierre |
+| 300 Jewelry Engine | ACEPTADO (ian, 2026-11-25, PR #35) | Gate "parámetro con geometría real; entrada inválida rechazada; reinicio sin conexión; roundtrip STEP/STL": probado en el Z Flip 7 contra API y worker reales (2026-11-25, 12:34–12:50). PR #31–#34 y la de cierre |
 | 400–1000 | NOT_STARTED | |
 
 ## Backlog 000
