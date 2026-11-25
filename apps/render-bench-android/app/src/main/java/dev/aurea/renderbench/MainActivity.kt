@@ -402,7 +402,9 @@ class MainActivity : Activity(), Choreographer.FrameCallback {
     /** Same motion as the web bench: rotation.y = t/2400 (t in ms), rotation.x = 0.35 (XYZ order). */
     private fun spin(frameTimeNanos: Long) {
         val tm = engine.transformManager
-        val ry = Math.toDegrees((frameTimeNanos / 1e6) / 2400.0).toFloat()
+        // Relative to app start and reduced mod 360 in double precision, so the Float angle keeps
+        // full resolution whatever the device uptime is.
+        val ry = (Math.toDegrees(((frameTimeNanos - t0) / 1e6) / 2400.0) % 360.0).toFloat()
         val rx = Math.toDegrees(0.35).toFloat()
         for (i in spinRoots.indices) {
             android.opengl.Matrix.setIdentityM(matrix, 0)
