@@ -49,6 +49,16 @@ def canonical_digest(document: dict) -> str:
     return hashlib.sha256(data.encode("utf-8")).hexdigest()
 
 
+def _schema_code(err: jsonschema.ValidationError) -> str:
+    """Keep the specific codes for rules the schema now also states (empty design, unsafe id)."""
+    path = list(err.path)
+    if err.validator == "minItems" and path == ["components"]:
+        return "EMPTY_DESIGN"
+    if err.validator == "pattern" and len(path) == 3 and path[0] == "components" and path[2] == "id":
+        return "INVALID_ID"
+    return "SCHEMA"
+
+
 def _load_schema(schema_path: Path | None) -> dict:
     return json.loads((schema_path or SCHEMA_PATH).read_text(encoding="utf-8"))
 
@@ -58,7 +68,7 @@ def validate_document(document: dict, schema_path: Path | None = None) -> None:
     validator = jsonschema.Draft202012Validator(_load_schema(schema_path))
     for err in sorted(validator.iter_errors(document), key=lambda e: list(e.path)):
         issues.append(
-            ValidationIssue("SCHEMA", "/" + "/".join(map(str, err.path)), err.message)
+            ValidationIssue(_schema_code(err), "/" + "/".join(map(str, err.path)), err.message)
         )
     if issues:
         raise InvalidDocument(issues)

@@ -1,6 +1,7 @@
 """Fail when SQL or OpenAPI state values drift from 08_STATE_MACHINES/machines.json,
 or when a machine action has no trigger in 08_STATE_MACHINES/transitions.json,
 or when OpenAPI Event / SQL outbox drift from 07_DOMAIN_MODELS/event.schema.json,
+or when OpenAPI DesignDocument / Revision.document drift from 09_JEWELRY_ENGINE/design.schema.json,
 or when an error code used by services/ or OpenAPI is not in 06_API_CONTRACTS/errors.json.
 
     python tools/contracts/check_contracts.py            # check, exit 1 on drift
@@ -29,6 +30,7 @@ TOOLS = ROOT / "13_AI_PROMPTS_AND_TOOLS/tools.json"
 FAMILIES = ROOT / "11_3D_ASSET_LIBRARY/families.json"
 TRANSITIONS = ROOT / "08_STATE_MACHINES/transitions.json"
 EVENT = ROOT / "07_DOMAIN_MODELS/event.schema.json"
+DESIGN = ROOT / "09_JEWELRY_ENGINE/design.schema.json"
 ERRORS = ROOT / "06_API_CONTRACTS/errors.json"
 SERVICES = ROOT / "services"
 CODE = re.compile(r"[A-Z][A-Z0-9]*(_[A-Z0-9]+)*")
@@ -284,6 +286,28 @@ def emit_event(envelope: dict) -> str:
     return "".join("    " + line + "\n" for line in body.splitlines())
 
 
+def design_schema(design: dict) -> dict:
+    """OpenAPI `DesignDocument`: the design schema without its JSON Schema header."""
+    return {k: v for k, v in design.items() if k not in ("$schema", "title")}
+
+
+def emit_design(design: dict) -> str:
+    body = yaml.safe_dump({"DesignDocument": design_schema(design)}, sort_keys=False, allow_unicode=True, width=1000)
+    return "".join("    " + line + "\n" for line in body.splitlines())
+
+
+def check_design(design: dict, openapi: dict) -> list[str]:
+    """Revision.document is the DesignDocument the geometry service validates, not a free object."""
+    schemas = openapi["components"]["schemas"]
+    errs = []
+    if schemas.get("DesignDocument") != design_schema(design):
+        errs.append("OpenAPI DesignDocument differs from 09_JEWELRY_ENGINE/design.schema.json (--emit prints it)")
+    doc = schemas.get("Revision", {}).get("properties", {}).get("document")
+    if doc != {"$ref": "#/components/schemas/DesignDocument"}:
+        errs.append("OpenAPI Revision.document must $ref DesignDocument")
+    return errs
+
+
 def outbox_columns(sql: str) -> dict[str, str] | None:
     """outbox column -> its definition text, or None when the table is missing."""
     m = re.search(r"CREATE TABLE outbox\((.*?)\);\s*\n", sql, re.S)
@@ -424,7 +448,8 @@ def main(argv: list[str] | None = None) -> int:
     bindings = json.loads(BINDINGS.read_text())
     tools = json.loads(TOOLS.read_text())
     if args.emit:
-        print(emit(machines, bindings) + emit_operations(tools) + emit_event(json.loads(EVENT.read_text())), end="")
+        print(emit(machines, bindings) + emit_operations(tools) + emit_event(json.loads(EVENT.read_text()))
+              + emit_design(json.loads(DESIGN.read_text())), end="")
         return 0
     api = yaml.safe_load(OPENAPI.read_text())
     families = json.loads(FAMILIES.read_text())
@@ -435,6 +460,7 @@ def main(argv: list[str] | None = None) -> int:
             + check_create_ring_ranges(tools, families)
             + check_transitions(machines, bindings, transitions, api) + check_digest_bound(api)
             + check_events(json.loads(EVENT.read_text()), api, sql)
+            + check_design(json.loads(DESIGN.read_text()), api)
             + check_errors(json.loads(ERRORS.read_text()), api, service_error_codes()))
     if not re.search(r"CREATE TABLE quote\([^;]*\bdigest char\(64\) NOT NULL", sql):
         errs.append("SQL quote has no `digest char(64) NOT NULL`")

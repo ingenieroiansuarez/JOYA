@@ -1,5 +1,12 @@
 # Contratos — changelog
 
+## 1.7.0 — 2026-11-25 (hito 100, documento de diseño)
+- `Revision.document` deja de ser un objeto libre: referencia `DesignDocument`, generado de `09_JEWELRY_ENGINE/design.schema.json` (`check_contracts.py --emit`). `check_contracts.py` falla si divergen o si `Revision.document` no lo referencia.
+- `design.schema.json` declara ahora reglas que antes solo aplicaba `services/geometry`: al menos un componente, ids de componente con `^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$` (también son nombres de archivo) y `dependsOn` con ids válidos y sin repetir. El servicio de geometría mantiene sus códigos `EMPTY_DESIGN` e `INVALID_ID` para esos casos.
+- `schemaVersion` del documento sigue en `1.0.0`: los documentos válidos antes siguen siéndolo salvo los que el servicio ya rechazaba.
+
+Sigue libre: `payload` de cada tipo de evento (se define con su primer productor/consumidor, para no inventar eventos sin uso), `Page.items`, `Product.publicSummary` y `Customer.consent`.
+
 ## 1.6.0 — 2026-11-25 (hito 100, identidad)
 - `GET /me` (`getMe`, `x-permission: identity.self`): sujeto, roles y permisos efectivos del llamante tal como los ve la API.
 - `Role`: enum con los 16 roles, en el orden de `roles.reference.json`. `check_permissions.py` falla si divergen.

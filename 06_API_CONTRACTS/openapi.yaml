@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: AUREA API V1 — contract baseline
-  version: 1.6.0
+  version: 1.7.0
   description: Contratos iniciales; extender por vertical slice. No API implementada.
 servers:
 - url: http://localhost:3000/v1
@@ -5188,6 +5188,132 @@ components:
       - title
       - headRevisionId
       additionalProperties: false
+    DesignDocument:
+      description: 'Documento de diseño de una revisión (Revision.document en OpenAPI se genera de este archivo: tools/contracts/check_contracts.py --emit). Unidades en mm. La validación semántica (rangos, familias, dependencias) la hace services/geometry.'
+      type: object
+      properties:
+        schemaVersion:
+          const: 1.0.0
+        projectId:
+          type: string
+          format: uuid
+        revision:
+          type: integer
+          minimum: 0
+        units:
+          const: mm
+        components:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                pattern: ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$
+                description: 'También es nombre de archivo de artefacto: sin rutas.'
+              family:
+                type: string
+              familyVersion:
+                type: string
+              materialId:
+                type: string
+              parameters:
+                type: object
+                additionalProperties:
+                  type:
+                  - number
+                  - string
+                  - boolean
+              transform:
+                type: object
+                properties:
+                  translation:
+                    type: array
+                    items:
+                      type: number
+                    minItems: 3
+                    maxItems: 3
+                  rotationQuaternion:
+                    type: array
+                    items:
+                      type: number
+                    minItems: 4
+                    maxItems: 4
+                required:
+                - translation
+                - rotationQuaternion
+                additionalProperties: false
+              dependsOn:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$
+                uniqueItems: true
+            required:
+            - id
+            - family
+            - familyVersion
+            - materialId
+            - parameters
+            - transform
+            - dependsOn
+            additionalProperties: false
+          minItems: 1
+        operations:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              type:
+                type: string
+              target:
+                type: string
+              parameters:
+                type: object
+                additionalProperties:
+                  type:
+                  - number
+                  - string
+                  - boolean
+            required:
+            - id
+            - type
+            - target
+            - parameters
+            additionalProperties: false
+        constraints:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              target:
+                type: string
+              parameters:
+                type: object
+                additionalProperties:
+                  type:
+                  - number
+                  - string
+                  - boolean
+            required:
+            - type
+            - target
+            - parameters
+            additionalProperties: false
+      required:
+      - schemaVersion
+      - projectId
+      - revision
+      - units
+      - components
+      - operations
+      - constraints
+      additionalProperties: false
     Revision:
       type: object
       properties:
@@ -5195,8 +5321,8 @@ components:
         projectId: *id002
         number: *id003
         digest: *id001
-        document: &id005
-          type: object
+        document:
+          $ref: '#/components/schemas/DesignDocument'
         state:
           $ref: '#/components/schemas/DesignState'
       required:
@@ -5316,7 +5442,8 @@ components:
         state:
           $ref: '#/components/schemas/CertificateState'
         issuer: *id001
-        publicSummary: *id005
+        publicSummary: &id005
+          type: object
       required:
       - id
       - state
