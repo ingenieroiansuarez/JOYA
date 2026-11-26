@@ -24,9 +24,9 @@ export function ProductCard({ product, onOpen }: { product: ProductSummary; onOp
         {saved && <View style={card.fav}><Image source={HEART} style={card.favIcon} importantForAccessibility="no" accessibilityIgnoresInvertColors /></View>}
         {!product.available && <Text style={card.soldOut}>{t("soldOut")}</Text>}
         <View style={card.text}>
-          <Text style={card.meta} numberOfLines={1}>{metal}</Text>
+          <Text style={card.meta} numberOfLines={1} maxFontSizeMultiplier={1.15}>{metal}</Text>
           <Text style={card.name} numberOfLines={2}>{product.name}</Text>
-          <Text style={card.price}>{price}</Text>
+          <Text style={card.price} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={1.2}>{price}</Text>
         </View>
       </View>
     </Pressable>
@@ -40,7 +40,7 @@ const card = StyleSheet.create({
   },
   pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
   text: { paddingHorizontal: s[2], paddingTop: s[2], paddingBottom: s[3], gap: 2 },
-  meta: { color: c.textMuted, fontSize: type[0], letterSpacing: 1.2, textTransform: "uppercase" },
+  meta: { color: c.textMuted, fontSize: type[0], letterSpacing: 0.8, textTransform: "uppercase" },
   name: { color: c.text, fontSize: type[3], fontFamily: fonts.display, fontVariant: LINING, lineHeight: type[3] * 1.2 },
   price: { color: c.accent, fontSize: type[2], fontFamily: fonts.displayStrong, fontVariant: ["lining-nums"], marginTop: s[0], letterSpacing: 0.3 },
   fav: {

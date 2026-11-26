@@ -1,7 +1,7 @@
 import tokens from "@aurea/tokens";
 import { applyOperation, family as familyOf, MATERIALS, type Issue } from "@aurea/design";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, type ScrollViewInstance } from "react-native";
 import { ApiError } from "../api";
 import { useDesign } from "../design/DesignContext";
 import { AlloySwatch, studioColor } from "../design/art";
@@ -10,7 +10,7 @@ import { GlbIntegrityError, loadGlb, waitForJob } from "../design/glb";
 import type { Draft } from "../design/sync";
 import type { AiProposal, AiProposalOption, DesignOperation, Job } from "../design/types";
 import { Viewer } from "../design/viewer/Viewer";
-import { formatDecimal } from "../format";
+import { formatDecimal, formatRounded } from "../format";
 import { useSession } from "../session";
 import { Button, c, Header, Loading, Notice, s, styles, type } from "../ui";
 import { AuraPanel } from "./AuraPanel";
@@ -54,6 +54,12 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
   const [replaced, setReplaced] = useState<DesignOperation | null>(null);
   const alive = useRef({ aborted: false });
   useEffect(() => () => { alive.current.aborted = true; }, []);
+  // A preview (a manual change or an AURA option) is about the 3D piece: bring the viewer into view
+  // as soon as one starts, so the customer sees the jewel change instead of a spinner far below it.
+  const scroller = useRef<ScrollViewInstance>(null);
+  useEffect(() => {
+    if (preview.phase === "computing") scroller.current?.scrollTo({ y: 0, animated: true });
+  }, [preview.phase]);
 
   const reload = useCallback(async () => {
     if (!sync) return;
@@ -208,6 +214,15 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
     }
   };
 
+  const discard = () => {
+    setPreview({ phase: "none" });
+    setAuraOption(null);
+    setOp(null);
+    setReplaced(null);
+    setTexts(Object.fromEntries(Object.entries(comp.parameters).map(([k, v]) => [k, formatDecimal(String(v), "", locale).trim()])));
+    void store?.glb(local.local.head.digest).then(setGlb);
+  };
+
   const saveOffline = async () => {
     if (!op) return;
     const r = await sync.saveOffline(id, op);
@@ -236,18 +251,26 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
     <View style={styles.screen}>
       <Header overline={familyName(fam.id, locale)} title={title} subtitle={revLine} onBack={onBack} backLabel={t("back")} />
       {offline && <Text accessibilityRole="alert" style={styles.banner}>{t("offlineBanner")}</Text>}
-      <ScrollView contentContainerStyle={ed.content} keyboardShouldPersistTaps="handled">
-        <Viewer glb={glb} color={studioColor(shownMaterial)} label={t("viewerLabel", { name: title })} height={340}
-          onSnapshot={(shown, jpeg) => {
-            // Only a picture of the head as saved: its mesh and its alloy (a pending offline change of
-            // material recolours the same mesh, and that is not the head yet).
-            const head = headMesh.current;
-            const headMaterial = local.local.head.document.components[0]?.materialId ?? "";
-            if (store && head && head.revisionId === local.local.head.id && shown.glb === head.glb && shown.color === studioColor(headMaterial)) {
-              void store.putThumb(id, head.revisionId, jpeg).catch(() => undefined);
-            }
-          }}
-          emptyText={t(mesh === "building" ? "viewerBuilding" : mesh === "offline" ? "viewerEmpty" : "viewerBuildFailed")} errorText={t("viewerError")} loadingText={t("viewerLoading")} />
+      <ScrollView ref={scroller} contentContainerStyle={ed.content} keyboardShouldPersistTaps="handled">
+        <View>
+          <Viewer glb={glb} color={studioColor(shownMaterial)} label={t("viewerLabel", { name: title })} height={340}
+            onSnapshot={(shown, jpeg) => {
+              // Only a picture of the head as saved: its mesh and its alloy (a pending offline change of
+              // material recolours the same mesh, and that is not the head yet).
+              const head = headMesh.current;
+              const headMaterial = local.local.head.document.components[0]?.materialId ?? "";
+              if (store && head && head.revisionId === local.local.head.id && shown.glb === head.glb && shown.color === studioColor(headMaterial)) {
+                void store.putThumb(id, head.revisionId, jpeg).catch(() => undefined);
+              }
+            }}
+            emptyText={t(mesh === "building" ? "viewerBuilding" : mesh === "offline" ? "viewerEmpty" : "viewerBuildFailed")} errorText={t("viewerError")} loadingText={t("viewerLoading")} />
+          {/* Says what the 3D view is showing: the saved piece, or a change not saved yet. */}
+          {(preview.phase === "computing" || summary) && (
+            <View style={ed.badge} pointerEvents="none" accessibilityLiveRegion="polite">
+              <Text style={ed.badgeText}>{preview.phase === "computing" ? t("previewing") : t("previewBadge")}</Text>
+            </View>
+          )}
+        </View>
         <Text style={styles.muted}>{t("previewNote")}</Text>
 
         {onQuote && preview.phase === "none" && !blocked && !offline && (
@@ -381,34 +404,54 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
               ? <ChangeLine key={ch.name} label={t("material")} from={alloyName(String(ch.from), locale)} to={alloyName(String(ch.to), locale)} />
               : <ChangeLine key={ch.name} label={paramLabel(fam.id, ch.name, locale)} from={mm(Number(ch.from), locale)} to={mm(Number(ch.to), locale)} />))}
             <View style={tileGrid}>
-              <Tile k={t("metricVolume")} v={formatDecimal(metrics.volumeMm3, "mm³", locale)} />
-              <Tile k={t("metricMass")} v={formatDecimal(metrics.massGramsEstimate, "g", locale)} />
-              <Tile k={t("metricSize")} v={metrics.boundingBoxMm.map((x) => formatDecimal(String(x), "", locale).trim()).join(" × ") + " mm"} />
+              <Tile k={t("metricVolume")} v={formatRounded(metrics.volumeMm3, 0, "mm³", locale)} />
+              <Tile k={t("metricMass")} v={formatRounded(metrics.massGramsEstimate, 2, "g", locale)} />
+              <Tile k={t("metricSize")} v={metrics.boundingBoxMm.map((x) => formatRounded(x, 1, "", locale)).join(" × ") + " mm"} />
               <Tile k={t("metricWall")} v={mm(metrics.minWallMm, locale)} />
             </View>
             <Text style={styles.muted}>{t("metricMassNote")}</Text>
             <Text style={[styles.body, { color: c.warning }]}>{t("dfmReview")}</Text>
-            <Button label={preview.phase === "accepting" ? t("accepting") : t("accept")} disabled={preview.phase === "accepting"} onPress={accept} />
             {auraOption !== null && <Text style={styles.muted}>{t("auraFromOption", { n: String(auraOption + 1) })}</Text>}
-            <Button variant="secondary" label={t("discardPreview")} disabled={preview.phase === "accepting"} onPress={() => {
-              setPreview({ phase: "none" });
-              setAuraOption(null);
-              setOp(null);
-              setReplaced(null);
-              setTexts(Object.fromEntries(Object.entries(comp.parameters).map(([k, v]) => [k, formatDecimal(String(v), "", locale).trim()])));
-              void store?.glb(local.local.head.digest).then(setGlb);
-            }} />
-            {preview.phase === "acceptFailed" && (
-              <Text accessibilityRole="alert" style={[styles.body, { color: c.danger }]}>{t(preview.conflict ? "acceptConflict" : "acceptFailed")}</Text>
-            )}
           </View>
         )}
       </ScrollView>
+      {/* The decision on a preview stays in reach while the customer looks at the piece and its
+          measures: one change, Accept or Discard, pinned above the tab bar. */}
+      {summary && (
+        <View style={ed.decision}>
+          <Text style={styles.muted} numberOfLines={2}>
+            {summary.changes.map((ch) => (ch.name === "materialId"
+              ? `${t("material")}: ${alloyName(String(ch.to), locale)}`
+              : `${paramLabel(fam.id, ch.name, locale)}: ${mm(Number(ch.to), locale)}`)).join(" · ")}
+          </Text>
+                {preview.phase === "acceptFailed" && (
+                  <Text accessibilityRole="alert" style={[styles.body, { color: c.danger }]}>{t(preview.conflict ? "acceptConflict" : "acceptFailed")}</Text>
+                )}
+          <View style={ed.decisionRow}>
+            <View style={{ flex: 1 }}>
+              <Button variant="secondary" label={t("discardPreview")} disabled={preview.phase === "accepting"} onPress={discard} />
+            </View>
+            <View style={{ flex: 2 }}>
+              <Button label={preview.phase === "accepting" ? t("accepting") : t("accept")} disabled={preview.phase === "accepting"} onPress={accept} />
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
 
 const ed = StyleSheet.create({
+  badge: {
+    position: "absolute", top: s[2], left: s[2], paddingHorizontal: s[2], paddingVertical: s[0], borderRadius: 999,
+    backgroundColor: "rgba(12,12,13,0.78)", borderWidth: StyleSheet.hairlineWidth, borderColor: c.accent,
+  },
+  badgeText: { color: c.accent, fontSize: type[0], letterSpacing: 0.6 },
+  decision: {
+    paddingHorizontal: s[4], paddingTop: s[2], paddingBottom: s[2], gap: s[2], backgroundColor: c.background,
+    borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: "rgba(197,160,89,0.35)",
+  },
+  decisionRow: { flexDirection: "row", gap: s[2] },
   content: { padding: s[4], gap: s[3], paddingBottom: s[6] },
   h: { color: c.accent, fontSize: type[0], fontWeight: "600", letterSpacing: 2, textTransform: "uppercase", marginTop: s[2] },
   card: goldCard,

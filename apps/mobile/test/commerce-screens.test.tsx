@@ -146,7 +146,7 @@ describe("quote", () => {
     api.dropNextAccept = true;
     await show(api, <QuoteScreen revisionId={REV} onBack={() => undefined} onOrder={onOrder} pollMs={30} />);
     fireEvent.press(await screen.findByText("Accept and reserve the metal"));
-    expect(await screen.findByText("You're offline. Check your connection and try again.")).toBeTruthy();
+    expect(await screen.findByText("We couldn't reach AUREA. Check your connection and try again.")).toBeTruthy();
     // The screen still shows the version the customer accepted; pressing again replays it.
     api.quote = { ...api.quote, state: "ISSUED" };
     fireEvent.press(screen.getByText("Accept and reserve the metal"));
@@ -175,7 +175,7 @@ describe("quote", () => {
   it("offline: says so and retries on request", async () => {
     api.online = false;
     await show(api, <QuoteScreen revisionId={REV} onBack={() => undefined} onOrder={() => undefined} pollMs={30} />);
-    expect(await screen.findByText("You're offline. Check your connection and try again.")).toBeTruthy();
+    expect(await screen.findByText("We couldn't reach AUREA. Check your connection and try again.")).toBeTruthy();
     api.online = true;
     api.hasGeometry = true;
     fireEvent.press(screen.getByText("Retry"));

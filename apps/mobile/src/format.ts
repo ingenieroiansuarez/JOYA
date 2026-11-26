@@ -21,6 +21,16 @@ export function formatMoney(amount: string, currency: string, locale: Locale): s
 }
 
 /** "4.200" g → "4,2 g" (es) / "4.2 g" (en). Explicit unit, never rounded. */
+/**
+ * A measured value for display, rounded to `digits` decimals (trailing zeros dropped). Presentation
+ * only: the stored and contracted values keep their full precision.
+ */
+export function formatRounded(value: string | number, digits: number, unit: string, locale: Locale): string {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return `${value} ${unit}`.trim();
+  return formatDecimal(n.toFixed(digits), unit, locale).trim();
+}
+
 export function formatDecimal(value: string, unit: string, locale: Locale): string {
   const m = /^(\d+)(?:\.(\d+))?$/.exec(value);
   if (!m) return `${value} ${unit}`;
