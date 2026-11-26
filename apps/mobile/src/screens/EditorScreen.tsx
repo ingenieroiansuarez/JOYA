@@ -10,7 +10,7 @@ import { GlbIntegrityError, loadGlb, waitForJob } from "../design/glb";
 import type { Draft } from "../design/sync";
 import type { AiProposal, AiProposalOption, DesignOperation, Job } from "../design/types";
 import { Viewer } from "../design/viewer/Viewer";
-import { formatDecimal } from "../format";
+import { formatDecimal, formatRounded } from "../format";
 import { useSession } from "../session";
 import { Button, c, Header, Loading, Notice, s, styles, type } from "../ui";
 import { AuraPanel } from "./AuraPanel";
@@ -381,9 +381,9 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
               ? <ChangeLine key={ch.name} label={t("material")} from={alloyName(String(ch.from), locale)} to={alloyName(String(ch.to), locale)} />
               : <ChangeLine key={ch.name} label={paramLabel(fam.id, ch.name, locale)} from={mm(Number(ch.from), locale)} to={mm(Number(ch.to), locale)} />))}
             <View style={tileGrid}>
-              <Tile k={t("metricVolume")} v={formatDecimal(metrics.volumeMm3, "mm³", locale)} />
-              <Tile k={t("metricMass")} v={formatDecimal(metrics.massGramsEstimate, "g", locale)} />
-              <Tile k={t("metricSize")} v={metrics.boundingBoxMm.map((x) => formatDecimal(String(x), "", locale).trim()).join(" × ") + " mm"} />
+              <Tile k={t("metricVolume")} v={formatRounded(metrics.volumeMm3, 0, "mm³", locale)} />
+              <Tile k={t("metricMass")} v={formatRounded(metrics.massGramsEstimate, 2, "g", locale)} />
+              <Tile k={t("metricSize")} v={metrics.boundingBoxMm.map((x) => formatRounded(x, 1, "", locale)).join(" × ") + " mm"} />
               <Tile k={t("metricWall")} v={mm(metrics.minWallMm, locale)} />
             </View>
             <Text style={styles.muted}>{t("metricMassNote")}</Text>

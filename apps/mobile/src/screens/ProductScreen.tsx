@@ -69,7 +69,7 @@ export function ProductScreen({ id, onBack }: { id: string; onBack: () => void }
         <Text style={detail.price}>{formatMoney(p.price.amount, p.price.currency, locale)}</Text>
         <View style={detail.badges}>
           <Text style={[detail.badge, { color: p.available ? c.success : c.warning }]}>{p.available ? t("available") : t("soldOut")}</Text>
-          {p.customizable && <Text style={[detail.badge, { color: c.info }]}>{t("customizable")}</Text>}
+          {p.customizable && <Text style={[detail.badge, { color: c.accent }]}>{t("customizable")}</Text>}
         </View>
         <Text style={styles.body}>{p.summary}</Text>
         <View style={detail.specs}>

@@ -58,8 +58,8 @@ export function Card({ title, children }: { title?: string; children: ReactNode 
 export function Row({ k, v, strong }: { k: string; v: string; strong?: boolean }) {
   return (
     <View style={j.row} accessible accessibilityLabel={`${k}: ${v}`}>
-      <Text style={[styles.muted, { flex: 1 }]}>{k}</Text>
-      <Text style={[styles.body, { fontVariant: ["tabular-nums"] }]}>{v}</Text>
+      <Text style={[styles.muted, { flex: 1, minWidth: "40%" }]}>{k}</Text>
+      <Text style={[styles.body, { fontVariant: ["tabular-nums"], flexShrink: 1, textAlign: "right" }]}>{v}</Text>
     </View>
   );
 }

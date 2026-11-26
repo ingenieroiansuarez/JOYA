@@ -240,8 +240,8 @@ describe("design editor", () => {
     expect(await screen.findByRole("button", { name: en.accept }, slow)).toBeTruthy();
     expect(previewMeshServed).toBe(true);
     expect(screen.getByLabelText("Band width: 4 mm → 5 mm")).toBeTruthy();
-    expect(screen.getByLabelText("Solid volume: 481.795 mm³")).toBeTruthy();
-    expect(screen.getByLabelText("Estimated weight: 7.468 g")).toBeTruthy();
+    expect(screen.getByLabelText("Solid volume: 482 mm³")).toBeTruthy();
+    expect(screen.getByLabelText("Estimated weight: 7.47 g")).toBeTruthy();
     expect(screen.getByText(en.dfmReview)).toBeTruthy();
     expect(server.head(p.id).number).toBe(1); // a preview never moves the head
     await fireEvent.press(screen.getByRole("button", { name: en.accept }));

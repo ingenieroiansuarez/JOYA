@@ -69,12 +69,13 @@ export function OrderScreen({ id, onBack, pollMs = 5_000 }: { id: string; onBack
       <Header overline={t("orderTitle")} title={order.projectTitle} subtitle={t("revisionLine", { number: String(order.revisionNumber) })} onBack={onBack} backLabel={t("back")} />
       <ScrollView contentContainerStyle={qs.content}>
         <Status text={t(`orderState_${order.state}`)} tone={tone} />
+        {order.state === "CONFIRMED" && <Text style={styles.body}>{t("orderConfirmedNote")}</Text>}
         {step !== null && <Journey current={step} t={t} />}
         <Card title={t("orderPayments")}>
           <Total k={t("quoteTotal")} v={m(order.total)} />
           <Row k={t("orderDepositRequired")} v={m(order.deposit.required)} />
           <Row k={t("orderDepositPaid")} v={m(order.deposit.paid)} />
-          <Row k={t("orderOutstanding")} v={m(order.deposit.outstanding)} />
+          {Number(order.deposit.outstanding.amount) > 0 && <Row k={t("orderOutstanding")} v={m(order.deposit.outstanding)} />}
           <Row k={t("orderBalance")} v={m(order.balance)} />
         </Card>
         <Card title={t("orderMetal")}>
@@ -96,7 +97,6 @@ export function OrderScreen({ id, onBack, pollMs = 5_000 }: { id: string; onBack
             {payError.kind === "offline" ? t("errorOffline") : payError.code === "ALREADY_PAID" ? t("orderAlreadyPaid") : t("orderPayFailed")}
           </Text>
         )}
-        {order.state === "CONFIRMED" && <Text style={styles.body}>{t("orderConfirmedNote")}</Text>}
       </ScrollView>
     </View>
   );

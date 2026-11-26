@@ -105,7 +105,10 @@ function Shell() {
   return (
     <View style={[styles.screen, { paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }]}>
       <StatusBar style="light" />
-      {config.env !== "production" && <Text style={[styles.banner, shell.banner]}>{t("envBanner", { env: config.env })}</Text>}
+      {config.env !== "production" && (
+        <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85} maxFontSizeMultiplier={1}
+          style={[styles.banner, shell.banner]}>{t("envBanner", { env: config.env })}</Text>
+      )}
       {/* While the welcome covers the app, screen readers must not find the boutique behind it. */}
       <View style={{ flex: 1 }} importantForAccessibility={welcome ? "no-hide-descendants" : "auto"} accessibilityElementsHidden={welcome}>
         {route.name === "catalog" && <CatalogScreen onOpen={open} />}
@@ -138,7 +141,8 @@ function Shell() {
               onPress={() => dispatch({ type: "tab", tab })} style={bar.tab}>
               <View style={[bar.mark, selected && { backgroundColor: c.accent }]} />
               <Image source={TAB_ICON[tab]} style={[bar.icon, { tintColor: selected ? c.accent : c.textMuted }]} importantForAccessibility="no" accessibilityIgnoresInvertColors />
-              <Text style={[bar.label, selected && { color: c.accent, fontWeight: "600" }]}>{t(TAB_LABEL[tab])}</Text>
+              <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={1.2}
+                style={[bar.label, selected && { color: c.accent, fontWeight: "600" }]}>{t(TAB_LABEL[tab])}</Text>
             </Pressable>
           );
         })}
@@ -149,7 +153,8 @@ function Shell() {
 }
 
 const shell = StyleSheet.create({
-  banner: { textAlign: "center", fontSize: type[0], letterSpacing: 1, textTransform: "uppercase" },
+  // One quiet line: it labels the build, it should not take a slice of every screen.
+  banner: { textAlign: "center", fontSize: type[0], letterSpacing: 0.6, paddingVertical: 2 },
 });
 
 const bar = StyleSheet.create({
@@ -157,5 +162,5 @@ const bar = StyleSheet.create({
   tab: { flex: 1, minHeight: tokens.touchTargetDp + s[2], alignItems: "center", justifyContent: "center", gap: s[0] },
   mark: { position: "absolute", top: 0, width: 28, height: 2, borderRadius: 1, backgroundColor: "transparent" },
   icon: { width: 24, height: 24 },
-  label: { color: c.textMuted, fontSize: type[0], letterSpacing: 1, textTransform: "uppercase" },
+  label: { color: c.textMuted, fontSize: type[0], letterSpacing: 0.6, textTransform: "uppercase", paddingHorizontal: 2 },
 });

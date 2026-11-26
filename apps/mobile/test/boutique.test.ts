@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 import { Api, ApiError, kindFor } from "../src/api";
-import { formatDecimal, formatMoney } from "../src/format";
+import { formatDecimal, formatRounded, formatMoney } from "../src/format";
 import { canGoBack, currentRoute, initialNav, navReducer } from "../src/nav";
 import { mergePage } from "../src/paged";
 import en from "../src/messages/en.json";
@@ -92,4 +92,16 @@ it("Spanish and English have the same keys and placeholders", () => {
   expect(Object.keys(en).sort()).toEqual(Object.keys(es).sort());
   const vars = (m: string) => (m.match(/\{\w+\}/g) ?? []).sort();
   for (const k of Object.keys(es) as (keyof typeof es)[]) expect(vars(en[k])).toEqual(vars(es[k]));
+});
+
+describe("formatRounded (display only)", () => {
+  it("rounds measures for reading and drops trailing zeros", () => {
+    expect(formatRounded("600.337", 0, "mm³", "es")).toBe("600 mm³");
+    expect(formatRounded("7.4681", 2, "g", "es")).toBe("7,47 g");
+    expect(formatRounded(21.6, 1, "", "en")).toBe("21.6");
+    expect(formatRounded("6.007", 1, "mm", "es")).toBe("6 mm");
+  });
+  it("leaves a non-number as given", () => {
+    expect(formatRounded("n/a", 1, "mm", "es")).toBe("n/a mm");
+  });
 });

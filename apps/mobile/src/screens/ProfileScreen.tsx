@@ -22,7 +22,6 @@ export function ProfileScreen() {
         {status === "signedIn" && me && (
           <Card title={t("profileAccount")}>
             <Text style={styles.body}>{t("profileSignedIn")}</Text>
-            <Text style={styles.muted}>{t("roles", { roles: me.roles.join(", ") })}</Text>
             <Button variant="secondary" label={t("signOut")} onPress={signOut} />
           </Card>
         )}
