@@ -240,6 +240,9 @@ describe("design editor", () => {
     expect(await screen.findByRole("button", { name: en.accept }, slow)).toBeTruthy();
     expect(previewMeshServed).toBe(true);
     expect(screen.getByLabelText("Band width: 4 mm → 5 mm")).toBeTruthy();
+    // The 3D view says it is showing an unsaved change, and the decision bar names it.
+    expect(screen.getByText(en.previewBadge)).toBeTruthy();
+    expect(screen.getByText("Band width: 5 mm")).toBeTruthy();
     expect(screen.getByLabelText("Solid volume: 482 mm³")).toBeTruthy();
     expect(screen.getByLabelText("Estimated weight: 7.47 g")).toBeTruthy();
     expect(screen.getByText(en.dfmReview)).toBeTruthy();

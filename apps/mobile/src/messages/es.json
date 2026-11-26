@@ -116,6 +116,7 @@
   "preview": "Ver vista previa",
   "previewing": "Calculando la geometría…",
   "previewFailed": "No se pudo calcular la geometría ({code}). Tu diseño no cambió.",
+  "previewBadge": "Vista previa · sin guardar",
   "previewTitle": "Vista previa del cambio",
   "metricVolume": "Volumen del sólido",
   "metricMass": "Peso estimado",

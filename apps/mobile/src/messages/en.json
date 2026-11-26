@@ -116,6 +116,7 @@
   "preview": "Preview",
   "previewing": "Computing the geometry…",
   "previewFailed": "The geometry could not be computed ({code}). Your design did not change.",
+  "previewBadge": "Preview · not saved",
   "previewTitle": "Preview of the change",
   "metricVolume": "Solid volume",
   "metricMass": "Estimated weight",
