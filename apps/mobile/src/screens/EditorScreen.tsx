@@ -428,10 +428,10 @@ export function EditorScreen({ id, onBack, onQuote }: { id: string; onBack: () =
                   <Text accessibilityRole="alert" style={[styles.body, { color: c.danger }]}>{t(preview.conflict ? "acceptConflict" : "acceptFailed")}</Text>
                 )}
           <View style={ed.decisionRow}>
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, minWidth: 112 }}>
               <Button variant="secondary" label={t("discardPreview")} disabled={preview.phase === "accepting"} onPress={discard} />
             </View>
-            <View style={{ flex: 2 }}>
+            <View style={{ flex: 1.5 }}>
               <Button label={preview.phase === "accepting" ? t("accepting") : t("accept")} disabled={preview.phase === "accepting"} onPress={accept} />
             </View>
           </View>
