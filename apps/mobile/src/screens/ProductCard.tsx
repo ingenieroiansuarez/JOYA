@@ -5,8 +5,9 @@ import { formatMoney } from "../format";
 import { useSession } from "../session";
 import { c, fonts, LINING, JewelArt, s, type } from "../ui";
 
-// The saved mark is the tab bar's own line-art heart in gold: a "♥" character turns into a red emoji on many phones.
-const HEART: number = require("../../assets/icons/tab-favorites.png");
+// The saved mark is the tab bar's heart, drawn filled and tinted gold: a "♥" character turns into a red
+// emoji on many phones, and an outline read as "not saved".
+const HEART: number = require("../../assets/icons/tab-favorites-filled.png");
 
 export function ProductCard({ product, onOpen }: { product: ProductSummary; onOpen: () => void }) {
   const { t, locale, favorites } = useSession();

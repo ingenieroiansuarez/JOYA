@@ -1,6 +1,6 @@
 import tokens from "@aurea/tokens";
 import { useCallback, useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ApiError, type Product } from "../api";
 import { formatDecimal, formatMoney } from "../format";
 import { useSession } from "../session";
@@ -72,20 +72,6 @@ export function ProductScreen({ id, onBack }: { id: string; onBack: () => void }
           {p.customizable && <Text style={[detail.badge, { color: c.info }]}>{t("customizable")}</Text>}
         </View>
         <Text style={styles.body}>{p.summary}</Text>
-        <Button
-          label={saved ? t("removeFavorite") : t("saveFavorite")}
-          variant={saved ? "secondary" : "primary"}
-          selected={saved}
-          disabled={busy}
-          onPress={onFavorite}
-        />
-        {favNotice === "signIn" && (
-          <View style={detail.prompt}>
-            <Text accessibilityRole="alert" style={styles.body}>{t("signInToSave")}</Text>
-            <Button label={t("signIn")} onPress={signIn} disabled={status === "signingIn"} />
-          </View>
-        )}
-        {favNotice === "failed" && <Text accessibilityRole="alert" style={[styles.body, { color: c.danger }]}>{t("favoriteFailed")}</Text>}
         <View style={detail.specs}>
           {specs.map(([k, v]) => (
             <View key={k} style={detail.specRow} accessible accessibilityLabel={`${k}: ${v}`}>
@@ -98,11 +84,43 @@ export function ProductScreen({ id, onBack }: { id: string; onBack: () => void }
         {hasCatalogArt(p.sku) && <Text style={styles.muted}>{t("illustration3dNote")}</Text>}
         </View>
       </ScrollView>
+      {/* The page's one action stays in the thumb zone while the details scroll above it. */}
+      <View style={[detail.actionBar, { paddingBottom: s[2] }]}>
+          {favNotice === "signIn" && (
+            <View style={detail.prompt}>
+              <Text accessibilityRole="alert" style={styles.body}>{t("signInToSave")}</Text>
+              <Button label={t("signIn")} onPress={signIn} disabled={status === "signingIn"} />
+            </View>
+          )}
+          {favNotice === "failed" && <Text accessibilityRole="alert" style={[styles.body, { color: c.danger }]}>{t("favoriteFailed")}</Text>}
+        <Pressable accessibilityRole="button" accessibilityLabel={saved ? t("removeFavorite") : t("saveFavorite")}
+          accessibilityState={{ selected: saved, disabled: busy }} disabled={busy} onPress={onFavorite}
+          style={({ pressed }) => [detail.favButton, saved ? detail.favSaved : detail.favIdle, (busy || pressed) && { opacity: 0.6 }]}>
+          <Image source={saved ? HEART_FILLED : HEART} style={[detail.favIcon, { tintColor: saved ? c.accent : c.onAccent }]}
+            importantForAccessibility="no" accessibilityIgnoresInvertColors />
+          <Text style={[detail.favText, { color: saved ? c.accent : c.onAccent }]}>{saved ? t("removeFavorite") : t("saveFavorite")}</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
 
+const HEART: number = require("../../assets/icons/tab-favorites.png");
+const HEART_FILLED: number = require("../../assets/icons/tab-favorites-filled.png");
+
 const detail = StyleSheet.create({
+  actionBar: {
+    paddingHorizontal: s[4], paddingTop: s[2], gap: s[2], backgroundColor: c.background,
+    borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: "rgba(197,160,89,0.22)",
+  },
+  favButton: {
+    minHeight: tokens.touchTargetDp, borderRadius: tokens.radius[0], flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: s[2], paddingHorizontal: s[4],
+  },
+  favIdle: { backgroundColor: c.accent },
+  favSaved: { borderWidth: 1, borderColor: c.accent },
+  favIcon: { width: 20, height: 20 },
+  favText: { fontSize: type[2], fontWeight: "600" },
   scroll: { paddingBottom: s[6] },
   content: { padding: s[4], gap: s[3] },
   name: { color: c.text, fontSize: type[6], fontFamily: fonts.display, fontVariant: LINING, lineHeight: type[6] * 1.1 },
