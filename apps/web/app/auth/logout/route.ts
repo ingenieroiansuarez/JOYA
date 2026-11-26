@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { webConfig } from "../../../lib/server/config";
 import { discovery } from "../../../lib/server/oidc";
+import { logoutQuery } from "../../../lib/server/logout";
 import { endSession } from "../../../lib/server/session";
 
 export const dynamic = "force-dynamic";
@@ -9,12 +10,12 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   const cfg = webConfig();
   if (req.headers.get("origin") !== cfg.origin) return new NextResponse(null, { status: 403 });
-  await endSession(cfg);
+  const ended = await endSession(cfg);
   try {
     const d = await discovery(cfg);
     if (d.end_session_endpoint) {
       const u = new URL(d.end_session_endpoint);
-      u.search = new URLSearchParams({ client_id: cfg.clientId, post_logout_redirect_uri: `${cfg.origin}/` }).toString();
+      u.search = logoutQuery(cfg.clientId, cfg.origin, ended?.idToken).toString();
       return NextResponse.redirect(u.toString(), 303);
     }
   } catch {
