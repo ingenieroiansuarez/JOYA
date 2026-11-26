@@ -1,10 +1,11 @@
 import tokens from "@aurea/tokens";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useMemo, useReducer } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import { BackHandler, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { maybeCompleteAuthSession } from "expo-web-browser";
 import { configFromBuild, ConfigError, type AppConfig } from "./config";
+import { Cover, holdNativeSplash } from "./Cover";
 import { deviceLocale, translator } from "./i18n";
 import { canGoBack, currentRoute, initialNav, navReducer, TABS, type Tab } from "./nav";
 import { DesignProvider } from "./design/DesignContext";
@@ -21,6 +22,7 @@ import { SessionProvider, useSession } from "./session";
 import { c, s, styles, type } from "./ui";
 
 maybeCompleteAuthSession();
+holdNativeSplash();
 
 export default function App() {
   const config = useMemo<AppConfig | ConfigError>(() => {
@@ -30,6 +32,7 @@ export default function App() {
       return e instanceof ConfigError ? e : new ConfigError("invalid configuration");
     }
   }, []);
+  const [covered, setCovered] = useState(true);
   return (
     // Android draws edge to edge: every screen keeps clear of the status bar and the system navigation
     // (3-button or gesture bar) through the insets, never fixed paddings.
@@ -43,6 +46,8 @@ export default function App() {
           </DesignProvider>
         </SessionProvider>
       )}
+      {/* Over the app, not instead of it: the session restores and the first screen loads underneath. */}
+      {covered && <Cover tagline={translator(deviceLocale())("coverTagline")} onDone={() => setCovered(false)} />}
     </SafeAreaProvider>
   );
 }
