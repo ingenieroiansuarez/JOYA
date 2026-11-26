@@ -1,6 +1,6 @@
 import tokens from "@aurea/tokens";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { BackHandler, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { maybeCompleteAuthSession } from "expo-web-browser";
@@ -18,6 +18,8 @@ import { OrderScreen } from "./screens/OrderScreen";
 import { QuoteScreen } from "./screens/QuoteScreen";
 import { ProductScreen } from "./screens/ProductScreen";
 import { ProfileScreen } from "./screens/ProfileScreen";
+import { WelcomeScreen, type WelcomeChoice } from "./screens/WelcomeScreen";
+import { markWelcomed, shouldWelcome } from "./firstRun";
 import { SessionProvider, useSession } from "./session";
 import { c, s, styles, type } from "./ui";
 
@@ -73,10 +75,19 @@ const TAB_ICON: Record<Tab, number> = {
 };
 
 function Shell() {
-  const { t, config } = useSession();
+  const { t, config, signIn } = useSession();
   const [nav, dispatch] = useReducer(navReducer, initialNav);
   const route = currentRoute(nav);
   const insets = useSafeAreaInsets();
+  // First run only: decided once at launch, under the cover, so the welcome never flashes in late.
+  const [welcome, setWelcome] = useState(false);
+  useEffect(() => { let live = true; shouldWelcome().then((show) => { if (live) setWelcome(show); }); return () => { live = false; }; }, []);
+  const chooseWelcome = useCallback((choice: WelcomeChoice) => {
+    setWelcome(false);
+    void markWelcomed();
+    if (choice === "create") dispatch({ type: "tab", tab: "design" });
+    if (choice === "signIn") void signIn();
+  }, [signIn]);
 
   // Android back: pop inside the app while there is somewhere to go; otherwise let the system close it.
   useEffect(() => {
@@ -130,6 +141,7 @@ function Shell() {
           );
         })}
       </View>
+      {welcome && <WelcomeScreen onChoose={chooseWelcome} />}
     </View>
   );
 }

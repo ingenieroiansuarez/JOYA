@@ -17,6 +17,8 @@ export const ICONS = {
   // A ring with its set stone: what the customer designs.
   design: `<circle cx="12" cy="14.5" r="6"/><path d="M12 3.5l2.2 2.6L12 8.5 9.8 6.1z"/>`,
   favorites: `<path d="M12 20s-7.5-4.6-9-9.6A4.6 4.6 0 0 1 12 7.2a4.6 4.6 0 0 1 9 3.2C19.5 15.4 12 20 12 20z"/>`,
+  // A quote: a folded sheet with its lines and the total underlined (welcome screen; not a tab).
+  quote: `<path d="M6.5 3.5h8l4 4v13h-12z"/><path d="M14.5 3.5v4h4M9.5 11h6M9.5 14h6M12.5 17.5h3"/>`,
   profile: `<circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>`,
 };
 
