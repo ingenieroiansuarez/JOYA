@@ -62,7 +62,7 @@ export function ProductScreen({ id, onBack }: { id: string; onBack: () => void }
     <View style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={detail.scroll}>
-        <JewelArt sku={p.sku} metal={p.metal} stone={p.stones[0]?.type} label={t(hasCatalogArt(p.sku) ? "illustration3d" : "illustration", { name: p.name })} />
+        <JewelArt sku={p.sku} metal={p.metal} stone={p.stones[0]?.type} label={t(hasCatalogArt(p.sku) ? "illustration3d" : "illustration", { name: p.name })} style={detail.hero} />
         <View style={detail.content}>
         <Text style={styles.overline}>{[p.collection, t(`metal_${p.metal}`)].filter(Boolean).join(" · ")}</Text>
         <Text accessibilityRole="header" style={detail.name}>{p.name}</Text>
@@ -122,6 +122,8 @@ const detail = StyleSheet.create({
   favIcon: { width: 20, height: 20 },
   favText: { fontSize: type[2], fontWeight: "600" },
   scroll: { paddingBottom: s[6] },
+  // Not square: name and price stay above the fixed favourite bar on a phone, not cut under it.
+  hero: { aspectRatio: 1.3 },
   content: { padding: s[4], gap: s[3] },
   name: { color: c.text, fontSize: type[6], fontFamily: fonts.display, fontVariant: LINING, lineHeight: type[6] * 1.1 },
   price: { color: c.accent, fontSize: type[4], fontFamily: fonts.displayStrong, fontVariant: ["lining-nums"], letterSpacing: 0.3 },

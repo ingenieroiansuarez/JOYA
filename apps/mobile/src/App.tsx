@@ -106,7 +106,8 @@ function Shell() {
     <View style={[styles.screen, { paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }]}>
       <StatusBar style="light" />
       {config.env !== "production" && <Text style={[styles.banner, shell.banner]}>{t("envBanner", { env: config.env })}</Text>}
-      <View style={{ flex: 1 }}>
+      {/* While the welcome covers the app, screen readers must not find the boutique behind it. */}
+      <View style={{ flex: 1 }} importantForAccessibility={welcome ? "no-hide-descendants" : "auto"} accessibilityElementsHidden={welcome}>
         {route.name === "catalog" && <CatalogScreen onOpen={open} />}
         {route.name === "favorites" && <FavoritesScreen onOpen={open} onExplore={() => dispatch({ type: "tab", tab: "boutique" })} />}
         {route.name === "profile" && <ProfileScreen />}
@@ -128,7 +129,8 @@ function Shell() {
         )}
         {route.name === "order" && <OrderScreen key={route.id} id={route.id} onBack={back} />}
       </View>
-      <View accessibilityRole="tablist" style={[bar.root, { paddingBottom: insets.bottom + s[1] }]}>
+      <View accessibilityRole="tablist" importantForAccessibility={welcome ? "no-hide-descendants" : "auto"} accessibilityElementsHidden={welcome}
+        style={[bar.root, { paddingBottom: insets.bottom + s[1] }]}>
         {TABS.map((tab: Tab) => {
           const selected = nav.tab === tab;
           return (

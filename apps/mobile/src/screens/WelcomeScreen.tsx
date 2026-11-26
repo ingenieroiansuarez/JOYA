@@ -31,7 +31,9 @@ export function WelcomeScreen({ onChoose }: { onChoose: (choice: WelcomeChoice) 
 
   return (
     <View style={[StyleSheet.absoluteFill, w.root]}>
-      <ScrollView contentContainerStyle={{ paddingBottom: s[4] }} bounces={false}>
+      {/* One scroll for everything: on a tall phone the actions sit at the bottom (thumb zone); on a
+          short one the page scrolls and nothing hides behind them. */}
+      <ScrollView contentContainerStyle={w.scroll} bounces={false}>
         <View accessible accessibilityRole="image" accessibilityLabel={t("welcomeArtLabel")} style={w.hero}>
           <Image source={CATALOG_ART["AUR-RNG-001"]} style={w.heroImage} resizeMode="cover" />
           <View style={w.fade} pointerEvents="none">
@@ -52,26 +54,28 @@ export function WelcomeScreen({ onChoose }: { onChoose: (choice: WelcomeChoice) 
             ))}
           </View>
         </View>
+        <View style={[w.actions, { paddingBottom: insets.bottom + s[3], paddingLeft: s[4] + insets.left, paddingRight: s[4] + insets.right }]}>
+          <Button label={t("welcomeExplore")} onPress={() => onChoose("explore")} />
+          <Button label={t("welcomeCreate")} variant="secondary" onPress={() => onChoose("create")} />
+          {status !== "signedIn" && (
+            <Pressable accessibilityRole="button" accessibilityLabel={t("signIn")} onPress={() => onChoose("signIn")} style={w.link} hitSlop={8}>
+              <Text style={w.linkText}>{t("signIn")}</Text>
+            </Pressable>
+          )}
+        </View>
       </ScrollView>
-      <View style={[w.actions, { paddingBottom: insets.bottom + s[3], paddingLeft: s[4] + insets.left, paddingRight: s[4] + insets.right }]}>
-        <Button label={t("welcomeExplore")} onPress={() => onChoose("explore")} />
-        <Button label={t("welcomeCreate")} variant="secondary" onPress={() => onChoose("create")} />
-        {status !== "signedIn" && (
-          <Pressable accessibilityRole="button" accessibilityLabel={t("signIn")} onPress={() => onChoose("signIn")} style={w.link} hitSlop={8}>
-            <Text style={w.linkText}>{t("signIn")}</Text>
-          </Pressable>
-        )}
-      </View>
     </View>
   );
 }
 
 const w = StyleSheet.create({
   root: { backgroundColor: c.background, zIndex: 5, elevation: 5 },
-  hero: { width: "100%", aspectRatio: 1.15, overflow: "hidden" },
+  scroll: { flexGrow: 1 },
+  // Wider than tall, so title, points and actions fit under it on a phone without scrolling.
+  hero: { width: "100%", aspectRatio: 1.5, overflow: "hidden" },
   heroImage: { width: "100%", height: "100%" },
   fade: { position: "absolute", left: 0, right: 0, bottom: 0, height: "28%" },
-  copy: { marginTop: -s[5], gap: s[3] },
+  copy: { paddingTop: s[3], gap: s[3] },
   title: { color: c.text, fontFamily: fonts.display, fontVariant: LINING, fontSize: type[6], lineHeight: type[6] * 1.1 },
   body: { color: c.textMuted, fontSize: type[2], lineHeight: type[2] * 1.5 },
   points: { marginTop: s[2], borderTopWidth: StyleSheet.hairlineWidth, borderColor: "rgba(197,160,89,0.22)" },
@@ -81,7 +85,8 @@ const w = StyleSheet.create({
   },
   pointIcon: { width: 22, height: 22, tintColor: c.accent },
   pointText: { color: c.text, fontSize: type[2], flex: 1 },
-  actions: { gap: s[2], paddingTop: s[3], backgroundColor: c.background },
+  // marginTop auto pushes the actions to the bottom when the page is shorter than the screen.
+  actions: { gap: s[2], paddingTop: s[5], marginTop: "auto" },
   link: { minHeight: tokens.touchTargetDp, alignItems: "center", justifyContent: "center" },
   linkText: { color: c.accent, fontSize: type[2] },
 });
