@@ -37,7 +37,9 @@ export function Button({ label, onPress, disabled, variant = "primary", hint, se
       onPress={onPress}
       style={({ pressed }) => [styles.button, variant === "secondary" && styles.secondary, (disabled || pressed) && { opacity: 0.6 }]}
     >
-      <Text style={[styles.buttonText, variant === "secondary" && { color: c.accent }]}>{label}</Text>
+      {/* A label never breaks mid-word: it shrinks a little, then ellipsizes, inside narrow buttons. */}
+      <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}
+        style={[styles.buttonText, variant === "secondary" && { color: c.accent }]}>{label}</Text>
     </Pressable>
   );
 }

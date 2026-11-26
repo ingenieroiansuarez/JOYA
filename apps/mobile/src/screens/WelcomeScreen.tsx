@@ -65,9 +65,10 @@ const w = StyleSheet.create({
   root: { backgroundColor: c.background, zIndex: 5, elevation: 5 },
   scroll: { flexGrow: 1 },
   // Wider than tall, so title, points and actions fit under it on a phone without scrolling.
-  // Below the status bar, framed in the render's own dark ground with a gold hairline under it: a
+  // 2:1 so the whole page (render, copy, three points, actions) fits a 360×840 dp phone at rest with
+  // three-button navigation; taller screens just get more air above the actions. Below the status bar, framed in the render's own dark ground with a gold hairline under it: a
   // stepped fade drew visible bands across the ring.
-  hero: { width: "100%", aspectRatio: 1.6, overflow: "hidden", backgroundColor: "#1C1C1F", borderBottomWidth: StyleSheet.hairlineWidth, borderColor: "rgba(197,160,89,0.35)" },
+  hero: { width: "100%", aspectRatio: 2, overflow: "hidden", backgroundColor: "#1C1C1F", borderBottomWidth: StyleSheet.hairlineWidth, borderColor: "rgba(197,160,89,0.35)" },
   heroImage: { width: "100%", height: "100%" },
   copy: { paddingTop: s[4], gap: s[2] },
   title: { color: c.text, fontFamily: fonts.display, fontVariant: LINING, fontSize: type[6], lineHeight: type[6] * 1.1 },
