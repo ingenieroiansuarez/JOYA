@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   try {
     const t = await exchangeCode(cfg, code, login.verifier);
     if (!nonceMatches(t.idToken, login.nonce)) return fail("nonce");
-    await startSession(cfg, { accessToken: t.accessToken, refreshToken: t.refreshToken, expiresAt: t.expiresAt });
+    await startSession(cfg, { accessToken: t.accessToken, refreshToken: t.refreshToken, expiresAt: t.expiresAt }, t.idToken);
   } catch {
     return fail("idp");
   }

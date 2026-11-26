@@ -7,7 +7,8 @@ import type { WebConfig } from "./config";
 // signs everybody out. A shared store (Valkey) comes with a multi-instance deployment.
 
 export interface Tokens { accessToken: string; refreshToken: string | null; expiresAt: number }
-export interface Session extends Tokens { id: string; createdAt: number }
+/** `idToken` is kept only to end the IdP session on sign-out (id_token_hint), never sent to the API. */
+export interface Session extends Tokens { id: string; createdAt: number; idToken?: string }
 export interface PendingLogin { verifier: string; nonce: string; next: string; createdAt: number }
 
 const SESSION_COOKIE = (cfg: WebConfig) => `${cfg.cookiePrefix}_sid`;
@@ -64,10 +65,10 @@ export async function takeLogin(cfg: WebConfig, state: string | null): Promise<P
   return login;
 }
 
-export async function startSession(cfg: WebConfig, tokens: Tokens): Promise<void> {
+export async function startSession(cfg: WebConfig, tokens: Tokens, idToken?: string): Promise<void> {
   sweep();
   const id = random();
-  store.sessions.set(id, { id, createdAt: Date.now(), ...tokens });
+  store.sessions.set(id, { id, createdAt: Date.now(), ...tokens, idToken });
   (await cookies()).set(SESSION_COOKIE(cfg), seal(cfg.sessionSecret, id), cookieOpts(cfg, SESSION_TTL_MS * 16 / 1000));
 }
 
