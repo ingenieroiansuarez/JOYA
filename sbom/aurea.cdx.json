@@ -9591,6 +9591,31 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/expo-splash-screen@58.0.14",
+      "name": "expo-splash-screen",
+      "version": "58.0.14",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:npm/expo-splash-screen@58.0.14",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "674e62864f0ba015f719e51dd44895f321bd85dd4fc3dc1ae406a2005431e1cf3595a315a342d7eb1fb4a397d714a9c103d56394c7b9098590a94b597f704223"
+        }
+      ],
+      "properties": [
+        {
+          "name": "aurea:ecosystem",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/expo-sqlite@58.0.16",
       "name": "expo-sqlite",
       "version": "58.0.16",

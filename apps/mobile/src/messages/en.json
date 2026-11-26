@@ -9,6 +9,7 @@
   "retry": "Retry",
   "signedInAs": "Signed in",
   "roles": "Roles: {roles}",
+  "coverTagline": "Fine jewellery, designed with you",
   "tabBoutique": "Boutique",
   "tabFavorites": "Favorites",
   "tabProfile": "Profile",
@@ -234,5 +235,13 @@
   "step_delivery": "Delivery",
   "profileAccount": "Your account",
   "profileAbout": "This app",
-  "profileWelcome": "Welcome to AUREA"
+  "profileWelcome": "Welcome to AUREA",
+  "welcomeTitle": "Jewellery made with you",
+  "welcomeBody": "Pick a piece from the boutique or design your own in 3D. An advisor confirms price and timing before you pay.",
+  "welcomeBoutique": "Ready pieces in gold, silver and platinum",
+  "welcomeDesign": "Your jewel in 3D: shape, metal and stone",
+  "welcomeQuote": "Clear quotes, with a simulated deposit",
+  "welcomeExplore": "Explore the boutique",
+  "welcomeCreate": "Design my jewel",
+  "welcomeArtLabel": "Ring from the AUREA collection, 3D illustration"
 }

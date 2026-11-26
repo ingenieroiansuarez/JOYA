@@ -9,6 +9,7 @@
   "retry": "Reintentar",
   "signedInAs": "Sesión iniciada",
   "roles": "Roles: {roles}",
+  "coverTagline": "Alta joyería, diseñada contigo",
   "tabBoutique": "Boutique",
   "tabFavorites": "Favoritos",
   "tabProfile": "Perfil",
@@ -234,5 +235,13 @@
   "step_delivery": "Entrega",
   "profileAccount": "Tu cuenta",
   "profileAbout": "Esta app",
-  "profileWelcome": "Te damos la bienvenida a AUREA"
+  "profileWelcome": "Te damos la bienvenida a AUREA",
+  "welcomeTitle": "Joyas que nacen contigo",
+  "welcomeBody": "Elige una pieza de la boutique o diseña la tuya en 3D. Un asesor confirma el precio y el plazo antes de que pagues.",
+  "welcomeBoutique": "Piezas listas, en oro, plata y platino",
+  "welcomeDesign": "Tu joya en 3D: forma, metal y piedra",
+  "welcomeQuote": "Cotización clara, con anticipo simulado",
+  "welcomeExplore": "Explorar la boutique",
+  "welcomeCreate": "Diseñar mi joya",
+  "welcomeArtLabel": "Anillo de la colección AUREA, ilustración 3D"
 }
